@@ -44,7 +44,7 @@ It leverages a basic job-matching algorithm (skills compatibility) and provides 
 
 ## 📁 Project Structure
 
-````text
+```text
 .
 ├── app.py                   # Main Flask application
 ├── database.py              # SQLite DB setup and models
@@ -68,6 +68,7 @@ It leverages a basic job-matching algorithm (skills compatibility) and provides 
 ├── .gitignore
 ├── requirements.txt
 └── README.md
+```
 
 ## 🛠️ Installation
 
@@ -142,4 +143,7 @@ Contributions are welcome! To get started:
 ## 📝 License
 
 This project is licensed under the MIT License — see the `LICENSE` file (if one exists in the repository) for details. If no `LICENSE` file is present, you may want to add one based on the MIT License text.
-````
+
+```
+
+```
