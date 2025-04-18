@@ -44,34 +44,30 @@ It leverages a basic job-matching algorithm (skills compatibility) and provides 
 
 ## 📁 Project Structure
 
+````text
 .
-├── app.py # Main Flask application
-├── database.py # SQLite DB setup and models
-├── reset_db.py # DB reset/init script
+├── app.py                   # Main Flask application
+├── database.py              # SQLite DB setup and models
+├── reset_db.py              # DB reset/init script
 ├── instance/
-│ └── careerquest.db # SQLite database file
+│   └── careerquest.db       # SQLite database file(created automatically, the database isn't hosted.)
 ├── static/
-│ ├── script.js # Front-end JavaScript
-│ └── styles.css # Custom styling
-├── templates/ # HTML templates (Jinja2)
-│ ├── index.html
-│ ├── login.html
-│ ├── register.html
-│ ├── dashboard.html
-│ ├── all_jobs.html
-│ ├── job_compatibility.html
-│ ├── job_recommendations.html
-│ ├── navbar.html
-│ └── profile.html
-├── login.html # (Optional) Separate login page
-├── profile_page.html # (Optional) Separate profile view
-├── registration.html # (Optional) Standalone registration page
-├── structure.txt # Basic project notes/structure
+│   ├── script.js            # Front-end JavaScript
+│   └── styles.css           # Custom styling
+├── templates/               # HTML templates (Jinja2)
+│   ├── index.html
+│   ├── login.html
+│   ├── register.html
+│   ├── dashboard.html
+│   ├── all_jobs.html
+│   ├── job_compatibility.html
+│   ├── job_recommendations.html
+│   ├── navbar.html
+│   └── profile.html
+├── structure.txt            # Basic project notes/structure
 ├── .gitignore
 ├── requirements.txt
 └── README.md
-
----
 
 ## 🛠️ Installation
 
@@ -106,7 +102,7 @@ It leverages a basic job-matching algorithm (skills compatibility) and provides 
 1.  **Initialize/Reset the database:**
 
     ```bash
-    python reset_db.py
+    python3 reset_db.py
     ```
 
     _Note: This will delete any existing data._
@@ -114,7 +110,7 @@ It leverages a basic job-matching algorithm (skills compatibility) and provides 
 2.  **Run the application:**
 
     ```bash
-    python app.py
+    python3 app.py
     ```
 
 3.  **Visit the app in your browser:**
@@ -146,3 +142,4 @@ Contributions are welcome! To get started:
 ## 📝 License
 
 This project is licensed under the MIT License — see the `LICENSE` file (if one exists in the repository) for details. If no `LICENSE` file is present, you may want to add one based on the MIT License text.
+````
