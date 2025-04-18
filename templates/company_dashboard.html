@@ -1,0 +1,78 @@
+<!-- templates/company_dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CareerQuest - Company Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    {% include 'navbar.html' %}
+
+    <div class="container">
+      <div class="card">
+        <div class="card-header">
+          <h2>Company Dashboard</h2>
+          <p>Manage your company profile and job listings</p>
+        </div>
+        <div class="card-body">
+          {% with messages = get_flashed_messages() %} {% if messages %} {% for
+          message in messages %}
+          <div class="alert">{{ message }}</div>
+          {% endfor %} {% endif %} {% endwith %}
+
+          <div class="dashboard-grid">
+            <div class="card">
+              <div class="card-header">
+                <h2>Company Profile</h2>
+              </div>
+              <div class="card-body">
+                {% if company_profile %}
+                <p>
+                  <strong>Company Name:</strong> {{ company_profile.company_name
+                  }}
+                </p>
+                <p><strong>Location:</strong> {{ company_profile.location }}</p>
+                <p>
+                  <strong>Industry:</strong> {{
+                  company_profile.get_industry_list()|join(', ') }}
+                </p>
+                {% else %}
+                <p>
+                  Please complete your company profile to start posting jobs.
+                </p>
+                {% endif %}
+                <a
+                  href="{{ url_for('company_profile') }}"
+                  class="btn btn-primary"
+                >
+                  {% if company_profile %}Update{% else %}Create{% endif %}
+                  Profile
+                </a>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h2>Job Listings</h2>
+              </div>
+              <div class="card-body">
+                <p>You have {{ jobs|length }} active job listings.</p>
+                <a href="{{ url_for('manage_jobs') }}" class="btn btn-primary"
+                  >Manage Jobs</a
+                >
+                <a href="{{ url_for('add_job') }}" class="btn btn-secondary"
+                  >Add New Job</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

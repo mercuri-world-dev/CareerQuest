@@ -1,0 +1,16 @@
+careerquest/
+├── app.py
+├── database.py
+├── static/
+│   ├── styles.css
+│   └── script.js
+└── templates/
+    ├── all_jobs.html
+    ├── dashboard.html
+    ├── index.html
+    ├── job_compatibility.html
+    ├── job_recommendations.html
+    ├── login.html
+    ├── navbar.html
+    ├── profile.html
+    └── register.html

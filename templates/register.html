@@ -1,0 +1,102 @@
+<!-- templates/register.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CareerQuest - Register</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-header">
+          <h1>CareerQuest</h1>
+          <p>Job Matcher</p>
+        </div>
+        <div class="auth-body">
+          <h2>Create an Account</h2>
+
+          {% with messages = get_flashed_messages() %} {% if messages %} {% for
+          message in messages %}
+          <div class="alert">{{ message }}</div>
+          {% endfor %} {% endif %} {% endwith %}
+
+          <form method="POST">
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Account Type</label>
+              <div class="checkbox-group">
+                <div class="checkbox-item">
+                  <input
+                    type="radio"
+                    id="user"
+                    name="account_type"
+                    value="user"
+                    checked
+                  />
+                  <label for="user">Job Seeker</label>
+                </div>
+                <div class="checkbox-item">
+                  <input
+                    type="radio"
+                    id="company"
+                    name="account_type"
+                    value="company"
+                  />
+                  <label for="company">Company</label>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+              Register
+            </button>
+          </form>
+
+          <div class="auth-footer">
+            <p>
+              Already have an account?
+              <a href="{{ url_for('login') }}">Log in here</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

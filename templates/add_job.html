@@ -1,0 +1,196 @@
+<!-- templates/add_job.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CareerQuest - Add Job</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    {% include 'navbar.html' %}
+
+    <div class="container">
+      <div class="card">
+        <div class="card-header">
+          <h2>Add New Job</h2>
+          <p>Create a new job listing</p>
+        </div>
+        <div class="card-body">
+          {% with messages = get_flashed_messages() %} {% if messages %} {% for
+          message in messages %}
+          <div class="alert">{{ message }}</div>
+          {% endfor %} {% endif %} {% endwith %}
+
+          <form method="POST">
+            <div class="form-group">
+              <label for="role_name">Job Title</label>
+              <input
+                type="text"
+                id="role_name"
+                name="role_name"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <div class="form-row">
+              <div class="form-col">
+                <label for="job_type">Job Type</label>
+                <select id="job_type" name="job_type" class="form-control">
+                  <option value="Full-time">Full-time</option>
+                  <option value="Part-time">Part-time</option>
+                  <option value="Contract">Contract</option>
+                  <option value="Internship">Internship</option>
+                  <option value="Temporary">Temporary</option>
+                </select>
+              </div>
+
+              <div class="form-col">
+                <label for="work_mode">Work Mode</label>
+                <select id="work_mode" name="work_mode" class="form-control">
+                  <option value="remote">Remote</option>
+                  <option value="hybrid">Hybrid</option>
+                  <option value="in-person">In-person</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-col">
+                <label for="weekly_hours">Weekly Hours</label>
+                <input
+                  type="number"
+                  id="weekly_hours"
+                  name="weekly_hours"
+                  class="form-control"
+                  min="1"
+                  max="80"
+                />
+              </div>
+
+              <div class="form-col">
+                <label for="location">Location (City, State, Country)</label>
+                <input
+                  type="text"
+                  id="location"
+                  name="location"
+                  class="form-control"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="industry">Industry (comma separated)</label>
+              <input
+                type="text"
+                id="industry"
+                name="industry"
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="qualifications"
+                >Qualifications (comma separated)</label
+              >
+              <input
+                type="text"
+                id="qualifications"
+                name="qualifications"
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="accommodations"
+                >Accommodations Offered (comma separated)</label
+              >
+              <input
+                type="text"
+                id="accommodations"
+                name="accommodations"
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-row">
+              <div class="form-col">
+                <label for="application_period_start"
+                  >Application Start Date</label
+                >
+                <input
+                  type="date"
+                  id="application_period_start"
+                  name="application_period_start"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-col">
+                <label for="application_period_end">Application End Date</label>
+                <input
+                  type="date"
+                  id="application_period_end"
+                  name="application_period_end"
+                  class="form-control"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="application_materials"
+                >Required Application Materials (comma separated)</label
+              >
+              <input
+                type="text"
+                id="application_materials"
+                name="application_materials"
+                class="form-control"
+                placeholder="e.g., Resume, Cover Letter, Portfolio"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="application_status">Application Status</label>
+              <select
+                id="application_status"
+                name="application_status"
+                class="form-control"
+              >
+                <option value="Open">Open</option>
+                <option value="Closed">Closed</option>
+                <option value="Draft">Draft</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="job_description">Job Description</label>
+              <textarea
+                id="job_description"
+                name="job_description"
+                class="form-control"
+                rows="5"
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="application_link">Application Link (optional)</label>
+              <input
+                type="url"
+                id="application_link"
+                name="application_link"
+                class="form-control"
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add Job</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

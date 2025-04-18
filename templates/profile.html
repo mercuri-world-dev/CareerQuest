@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - CareerQuest</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2>My Profile</h2>
+                <p>Update your profile details to get better job recommendations</p>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="{{ url_for('profile') }}">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" class="form-control" id="username" value="{{ current_user.username }}" disabled>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" value="{{ current_user.email }}" disabled>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="age_range">Age Range</label>
+                            <select class="form-control" id="age_range" name="age_range">
+                                <option value="" {% if not current_user.age_range %}selected{% endif %}>Select age range</option>
+                                <option value="18-22" {% if current_user.age_range == "18-22" %}selected{% endif %}>18-22</option>
+                                <option value="23-30" {% if current_user.age_range == "23-30" %}selected{% endif %}>23-30</option>
+                                <option value="31-40" {% if current_user.age_range == "31-40" %}selected{% endif %}>31-40</option>
+                                <option value="41-50" {% if current_user.age_range == "41-50" %}selected{% endif %}>41-50</option>
+                                <option value="51+" {% if current_user.age_range == "51+" %}selected{% endif %}>51+</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-col">
+                            <label for="hours_per_week">Preferred Hours Per Week</label>
+                            <input type="number" class="form-control" id="hours_per_week" name="hours_per_week" min="1" max="80" value="{{ current_user.hours_per_week or '' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="location">Location (City, State, Country)</label>
+                        <input type="text" class="form-control" id="location" name="location" value="{{ current_user.location or '' }}" placeholder="e.g., Atlanta, Georgia, United States">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="accommodations">Needed Accommodations (comma separated)</label>
+                        <input type="text" class="form-control" id="accommodations" name="accommodations" value="{{ current_user.get_accommodations_list()|join(', ') }}" placeholder="e.g., flexible hours, standing desk, quiet workspace">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="educational_background">Educational Background & Skills</label>
+                        <textarea class="form-control" id="educational_background" name="educational_background" rows="4" placeholder="Describe your education, skills, and experience">{{ current_user.educational_background or '' }}</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Work Mode Preferences</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="remote_preference" name="remote_preference" {% if current_user.remote_preference %}checked{% endif %}>
+                                <label for="remote_preference">Remote</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="hybrid_preference" name="hybrid_preference" {% if current_user.hybrid_preference %}checked{% endif %}>
+                                <label for="hybrid_preference">Hybrid</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="in_person_preference" name="in_person_preference" {% if current_user.in_person_preference %}checked{% endif %}>
+                                <label for="in_person_preference">In-Person</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Save Profile</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!-- templates/navbar.html -->
+<div class="navbar">
+  <div class="container">
+    <div class="navbar-brand">
+      <a href="{{ url_for('dashboard') }}">CareerQuest</a>
+    </div>
+    <ul class="navbar-nav">
+      {% if current_user.is_authenticated %} {% if
+      current_user.has_role('admin') %}
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('admin.index') }}">Admin</a>
+      </li>
+      {% elif current_user.has_role('company') %}
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('company_dashboard') }}"
+          >Dashboard</a
+        >
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('company_profile') }}"
+          >Company Profile</a
+        >
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('manage_jobs') }}">Manage Jobs</a>
+      </li>
+      {% else %}
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('job_recommendations') }}"
+          >Recommendations</a
+        >
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('all_jobs') }}">Browse Jobs</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('profile') }}">My Profile</a>
+      </li>
+      {% endif %}
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+      </li>
+      {% else %}
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+</div>
