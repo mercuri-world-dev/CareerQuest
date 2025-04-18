@@ -1,10 +1,17 @@
-careerquest/
+├── __pycache__
+│   └── database.cpython-313.pyc
 ├── app.py
 ├── database.py
-├── static/
-│   ├── styles.css
-│   └── script.js
-└── templates/
+├── instance
+│   └── careerquest.db
+├── login.html
+├── profile_page.html
+├── registration.html
+├── static
+│   ├── script.js
+│   └── styles.css
+├── structure.txt
+└── templates
     ├── all_jobs.html
     ├── dashboard.html
     ├── index.html
