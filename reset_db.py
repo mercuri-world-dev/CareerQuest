@@ -1,6 +1,10 @@
 # reset_db.py
 import os
-from app import app, db, Role, User, CompanyProfile
+from main import db, User
+from database import Role
+from __init__ import create_app
+
+app = create_app()
 
 # Delete the database file if it exists
 db_path = 'instance/careerquest.db'

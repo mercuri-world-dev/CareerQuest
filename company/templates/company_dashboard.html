@@ -9,6 +9,10 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='styles.css') }}"
     />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('company.static', filename='company.css') }}"
+    />
   </head>
   <body>
     {% include 'navbar.html' %}
@@ -47,7 +51,7 @@
                 </p>
                 {% endif %}
                 <a
-                  href="{{ url_for('company_profile') }}"
+                  href="{{ url_for('company.company_profile') }}"
                   class="btn btn-primary"
                 >
                   {% if company_profile %}Update{% else %}Create{% endif %}
@@ -62,10 +66,10 @@
               </div>
               <div class="card-body">
                 <p>You have {{ jobs|length }} active job listings.</p>
-                <a href="{{ url_for('manage_jobs') }}" class="btn btn-primary"
+                <a href="{{ url_for('company.manage_jobs') }}" class="btn btn-primary"
                   >Manage Jobs</a
                 >
-                <a href="{{ url_for('add_job') }}" class="btn btn-secondary"
+                <a href="{{ url_for('company.add_job') }}" class="btn btn-secondary"
                   >Add New Job</a
                 >
               </div>
