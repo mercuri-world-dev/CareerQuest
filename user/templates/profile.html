@@ -24,7 +24,7 @@
                     {% endif %}
                 {% endwith %}
 
-                <form method="POST" action="{{ url_for('profile') }}">
+                <form method="POST" action="{{ url_for('users.profile') }}">
                     <div class="form-group">
                         <label for="username">Username</label>
                         <input type="text" class="form-control" id="username" value="{{ current_user.username }}" disabled>

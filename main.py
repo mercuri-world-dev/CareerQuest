@@ -74,12 +74,6 @@ def index():
     # If not authenticated or not properly loaded, show the index page
     return render_template('index.html')
 
-@main_bp.route('/job_recommendations')
-@login_required
-@role_required('user')
-def job_recommendations():
-    return render_template('job_recommendations.html')
-
 @main_bp.route('/all_jobs')
 @login_required
 def all_jobs():

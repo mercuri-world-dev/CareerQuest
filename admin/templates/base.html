@@ -129,7 +129,7 @@
                 {{ current_user.username }} <b class="caret"></b>
               </a>
               <ul class="dropdown-menu">
-                <li><a href="{{ url_for('logout') }}">Log out</a></li>
+                <li><a href="{{ url_for('auth.logout') }}">Log out</a></li>
               </ul>
             </li>
             {% endif %}

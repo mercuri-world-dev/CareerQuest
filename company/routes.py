@@ -29,31 +29,6 @@ def company_dashboard():
         
     return render_template('company_dashboard.html', company_profile=company_profile, jobs=jobs)
 
-@company_bp.route('/profile', methods=['GET', 'POST'])
-@login_required
-@role_required('user')
-def profile():
-    if request.method == 'POST':
-        current_user.age_range = request.form.get('age_range')
-        hours = request.form.get('hours_per_week')
-        current_user.hours_per_week = int(hours) if hours else None
-        current_user.location = request.form.get('location')
-        current_user.educational_background = request.form.get('educational_background')
-        current_user.remote_preference = request.form.get('remote_preference') == 'on'
-        current_user.hybrid_preference = request.form.get('hybrid_preference') == 'on'
-        current_user.in_person_preference = request.form.get('in_person_preference') == 'on'
-        
-        # Handle accommodations as a list
-        accommodations = request.form.get('accommodations', '')
-        accommodations_list = [item.strip() for item in accommodations.split(',') if item.strip()]
-        current_user.set_accommodations_list(accommodations_list)
-        
-        db.session.commit()
-        flash('Profile updated successfully!')
-        return redirect(url_for('profile'))
-        
-    return render_template('profile.html')
-
 @company_bp.route('/company_profile', methods=['GET', 'POST'])
 @login_required
 @role_required('company')
