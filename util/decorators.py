@@ -13,7 +13,7 @@ def role_required(*roles):
                 return redirect(url_for('auth.login'))
             
             if not any(current_user.has_role(role) for role in roles):
-                flash('You do not have permission to access this page.', 'danger')
+                flash('You do not have permission to access this page.', 'warning')
                 return redirect(url_for('main.index'))
                 
             return fn(*args, **kwargs)
