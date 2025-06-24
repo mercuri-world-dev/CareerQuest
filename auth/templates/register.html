@@ -1,106 +1,83 @@
-<!-- templates/register.html -->
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CareerQuest - Register</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('auth.static', filename='auth.css') }}"
-    />
-  </head>
-  <body>
-    <div class="auth-container">
-      <div class="auth-card">
-        <div class="auth-header">
-          <h1>CareerQuest</h1>
-          <p>Job Matcher</p>
-        </div>
-        <div class="auth-body">
-          <h2>Create an Account</h2>
+{% extends "auth_base.html" %}
 
-          {% with messages = get_flashed_messages() %} {% if messages %} {% for
-          message in messages %}
-          <div class="alert">{{ message }}</div>
-          {% endfor %} {% endif %} {% endwith %}
+{% block title %}Register - CareerQuest{% endblock %}
 
-          <form method="POST">
-            <div class="form-group">
-              <label for="username">Username</label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                class="form-control"
-                required
-              />
-            </div>
+{% block content %}
+<div class="auth-card">
+  <div class="auth-header">
+    <h1>CareerQuest</h1>
+  </div>
+  <div class="auth-body">
+    <h2>Create an Account</h2>
 
-            <div class="form-group">
-              <label for="email">Email</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                class="form-control"
-                required
-              />
-            </div>
+    {% with messages = get_flashed_messages() %} {% if messages %} {% for
+    message in messages %}
+    <div class="alert">{{ message }}</div>
+    {% endfor %} {% endif %} {% endwith %}
 
-            <div class="form-group">
-              <label for="password">Password</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                class="form-control"
-                required
-              />
-            </div>
+    <form method="POST" action="{{ url_for('auth.register') }}" class="auth-form">
+      <div class="form-group">
+        <input
+          type="text"
+          id="username"
+          name="username"
+          required
+          placeholder=" "
+          autocomplete="username"
+        />
+        <label for="username">Username</label>
+      </div>
 
-            <div class="form-group">
-              <label>Account Type</label>
-              <div class="checkbox-group">
-                <div class="checkbox-item">
-                  <input
-                    type="radio"
-                    id="user"
-                    name="account_type"
-                    value="user"
-                    checked
-                  />
-                  <label for="user">Job Seeker</label>
-                </div>
-                <div class="checkbox-item">
-                  <input
-                    type="radio"
-                    id="company"
-                    name="account_type"
-                    value="company"
-                  />
-                  <label for="company">Company</label>
-                </div>
-              </div>
-            </div>
+      <div class="form-group">
+        <input
+          type="email"
+          id="email"
+          name="email"
+          required
+          placeholder=" "
+          autocomplete="email"
+        />
+        <label for="email">Email</label>
+      </div>
 
-            <button type="submit" class="btn btn-primary btn-block">
-              Register
-            </button>
-          </form>
+      <div class="form-group">
+        <input
+          type="password"
+          id="password"
+          name="password"
+          required
+          placeholder=" "
+          autocomplete="new-password"
+        />
+        <label for="password">Password</label>
+      </div>
 
-          <div class="auth-footer">
-            <p>
-              Already have an account?
-              <a href="{{ url_for('auth.login') }}">Log in here</a>
-            </p>
-          </div>
+      <div class="form-group">
+        <div class="account-type-toggle">
+          <input type="radio" id="user" name="account_type" value="user" checked />
+          <label for="user" class="account-type-btn">
+            <span class="icon" aria-hidden="true">👤</span>
+            <span>Job Seeker</span>
+          </label>
+          <input type="radio" id="company" name="account_type" value="company" />
+          <label for="company" class="account-type-btn">
+            <span class="icon" aria-hidden="true">🏢</span>
+            <span>Company</span>
+          </label>
         </div>
       </div>
+
+      <button type="submit" class="btn btn-primary btn-block">
+        Register
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>
+        Already have an account?
+        <a href="{{ url_for('auth.login') }}">Log in here</a>
+      </p>
     </div>
-  </body>
-</html>
+  </div>
+</div>
+{% endblock %}

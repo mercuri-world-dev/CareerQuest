@@ -1,5 +1,3 @@
-// static/script.js - modifications
-
 // Global variables
 let currentUser = null;
 let allJobs = [];

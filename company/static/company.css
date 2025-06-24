@@ -3,6 +3,13 @@
     display: flex;
     align-items: center;
     margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.35);
+    border-radius: 16px;
+    border: 2px solid rgba(255,255,255,0.85);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    overflow: hidden;
 }
 
 .company-logo {
@@ -15,6 +22,12 @@
     justify-content: center;
     margin-right: 20px;
     overflow: hidden;
+    background: rgba(255, 255, 255, 0.35);
+    border-radius: 16px;
+    border: 2px solid rgba(255,255,255,0.85);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .company-logo img {
@@ -39,6 +52,12 @@
     border-radius: 4px;
     font-size: 0.8rem;
     font-weight: 500;
+    background: rgba(255, 255, 255, 0.35);
+    border-radius: 16px;
+    border: 2px solid rgba(255,255,255,0.85);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .status-open {
@@ -54,4 +73,24 @@
 .status-draft {
     background-color: #fff3cd;
     color: #856404;
+}
+
+.company-profile-form {
+  color: var(--white-translucent);
+  width: 100%;
+}
+
+.company-profile-card {
+  width: 65vw;
+  align-self: center;
+}
+
+.edit-job-form {
+  color: var(--white-translucent);
+  width: 100%;
+}
+
+.edit-job-card {
+  width: 65vw;
+  align-self: center;
 }

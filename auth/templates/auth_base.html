@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <title>{% block title %}Authentication - CareerQuest{% endblock %}</title>
+      <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+      <link rel="stylesheet" href="{{ url_for('auth.static', filename='auth.css') }}">
+      <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+      {% block head %}{% endblock %}
+  </head>
+  <body>
+      {% include 'starbg.html' %}
+      
+      {% with messages = get_flashed_messages() %}
+          {% if messages %}
+              {% for message in messages %}
+                  <div class="alert">{{ message }}</div>
+              {% endfor %}
+          {% endif %}
+      {% endwith %}
+      <div class="auth-container">
+          {% block content %}{% endblock %}
+      </div>
+      <script src="{{ url_for('static', filename='script.js') }}"></script>
+      <script src="{{ url_for('static', filename='starbg.js') }}"></script>
+      {% block scripts %}{% endblock %}
+  </body>
+  <footer>
+    <div class="container">
+      <p>&copy; 2025 CareerQuest. All rights reserved.</p>
+    </div>
+  </footer>
+</html>

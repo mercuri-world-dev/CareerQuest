@@ -1,6 +1,6 @@
-from flask import Flask, session
+from flask import Flask, redirect, session, url_for
 from flask_cors import CORS
-from flask_login import LoginManager, current_user, logout_user
+from flask_login import LoginManager, current_user, login_user, logout_user
 import os
 
 from database import db, User, Role, CompanyProfile, Job
@@ -33,7 +33,9 @@ def create_app(config_object=None):
         PERMANENT_SESSION_LIFETIME=3600,  # 1 hour
         SESSION_TYPE='filesystem',
         SESSION_FILE_DIR=os.path.join(os.getcwd(), 'flask_session'),
-        SESSION_USE_SIGNER=True
+        SESSION_USE_SIGNER=True,
+        TESTING_AUTO_LOGIN_USER=False, # TODO: Remove this in production, only for testing purposes
+        TESTING_AUTO_LOGIN_COMPANY=True  # TODO: Remove this in production, only for testing purposes
     )
 
     CORS(app)
@@ -42,6 +44,26 @@ def create_app(config_object=None):
     login_manager = LoginManager()
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
+
+    @app.before_request
+    def auto_login_test_user():
+        if app.config.get("TESTING_AUTO_LOGIN_USER", False):
+            from flask_login import current_user
+            if not current_user.is_authenticated:
+                user = User.query.filter_by(username="ARealPerson").first()
+                if user:
+                    login_user(user)
+                    redirect(url_for('users.dashboard'))
+
+    @app.before_request
+    def auto_login_test_company():
+        if app.config.get("TESTING_AUTO_LOGIN_COMPANY", False):
+            from flask_login import current_user
+            if not current_user.is_authenticated:
+                user = User.query.filter_by(username="arealcompany").first()
+                if user:
+                    login_user(user)
+                    redirect(url_for('company.company_dashboard'))
 
     @app.before_request
     def clear_session_on_restart():

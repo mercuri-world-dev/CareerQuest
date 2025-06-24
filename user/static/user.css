@@ -1,0 +1,9 @@
+.profile-form {
+  color: var(--white-translucent);
+  width: 100%;
+}
+
+.profile-card {
+  width: 65vw;
+  align-self: center;
+}

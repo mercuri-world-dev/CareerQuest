@@ -1,18 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Job Compatibility - CareerQuest</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}"
-    />
-  </head>
-  <body>
-    {% include 'navbar.html' %}
+{% extends 'base.html' %}
+{% block title %}Job Compatibility - CareerQuest{% endblock %}
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('users.static', filename='user.css') }}">
+{% endblock %}
 
-    <div class="container">
+{% block content %}
       <div class="card">
         <div class="card-header">
           <h2>Job Compatibility</h2>
@@ -33,212 +25,212 @@
           <div id="compatibilityResults" class="results-container"></div>
         </div>
       </div>
-    </div>
+{% endblock %}
 
-    <script>
-      document.addEventListener("DOMContentLoaded", async () => {
-        // Get the job ID from the job object passed by the Flask route
-        const jobId = "{{ job.id }}";
-        const resultsDiv = document.getElementById("compatibilityResults");
-        const loadingDiv = document.getElementById("compatibilityLoading");
-        const errorDiv = document.getElementById("compatibilityError");
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    // Get the job ID from the job object passed by the Flask route
+    const jobId = "{{ job.id }}";
+    const resultsDiv = document.getElementById("compatibilityResults");
+    const loadingDiv = document.getElementById("compatibilityLoading");
+    const errorDiv = document.getElementById("compatibilityError");
 
-        resultsDiv.innerHTML = "";
-        errorDiv.style.display = "none";
-        loadingDiv.style.display = "flex";
+    resultsDiv.innerHTML = "";
+    errorDiv.style.display = "none";
+    loadingDiv.style.display = "flex";
 
-        try {
-          const response = await fetch(`/api/compatibility/current/${jobId}`);
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
+    try {
+      const response = await fetch(`/api/compatibility/current/${jobId}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
 
-          const data = await response.json();
+      const data = await response.json();
 
-          // Create job card with compatibility details
-          const jobCard = createDetailedJobCard(data);
-          resultsDiv.appendChild(jobCard);
-        } catch (error) {
-          console.error("Error fetching compatibility:", error);
-          errorDiv.textContent = `Error: ${
-            error.message || "Could not fetch compatibility data"
-          }`;
-          errorDiv.style.display = "block";
-        } finally {
-          loadingDiv.style.display = "none";
+      // Create job card with compatibility details
+      const jobCard = createDetailedJobCard(data);
+      resultsDiv.appendChild(jobCard);
+    } catch (error) {
+      console.error("Error fetching compatibility:", error);
+      errorDiv.textContent = `Error: ${
+        error.message || "Could not fetch compatibility data"
+      }`;
+      errorDiv.style.display = "block";
+    } finally {
+      loadingDiv.style.display = "none";
+    }
+  });
+
+  // Helper function to format compatibility score as percentage
+  function formatScore(score) {
+    return `${Math.round(score * 100)}%`;
+  }
+
+  // Helper function to create detailed job card with compatibility info
+  function createDetailedJobCard(job) {
+    const card = document.createElement("div");
+    card.className = "job-card detailed";
+
+    // Job title and company
+    const title = document.createElement("h3");
+    title.textContent = `${job.role_name} at ${job.company_name}`;
+    card.appendChild(title);
+
+    // Overall compatibility score
+    const overallScore = document.createElement("div");
+    overallScore.className = "overall-score";
+    overallScore.innerHTML = `<h4>Overall Compatibility</h4><p class="score">${formatScore(
+      job.overall_compatibility
+    )}</p>`;
+    card.appendChild(overallScore);
+
+    // Job details section
+    const detailsSection = document.createElement("div");
+    detailsSection.className = "job-details-section";
+
+    const detailsTitle = document.createElement("h4");
+    detailsTitle.textContent = "Job Details";
+    detailsSection.appendChild(detailsTitle);
+
+    // Add job details
+    if (job.industry) {
+      const industry = document.createElement("p");
+      industry.textContent = `Industry: ${job.industry.join(", ")}`;
+      detailsSection.appendChild(industry);
+    }
+
+    if (job.work_mode) {
+      const workMode = document.createElement("p");
+      workMode.textContent = `Work Mode: ${job.work_mode}`;
+      detailsSection.appendChild(workMode);
+    }
+
+    if (job.location) {
+      const location = document.createElement("p");
+      location.textContent = `Location: ${job.location}`;
+      detailsSection.appendChild(location);
+    }
+
+    if (job.weekly_hours) {
+      const hours = document.createElement("p");
+      hours.textContent = `Weekly Hours: ${job.weekly_hours}`;
+      detailsSection.appendChild(hours);
+    }
+
+    if (job.qualifications) {
+      const qualifications = document.createElement("p");
+      qualifications.textContent = `Qualifications: ${job.qualifications.join(
+        ", "
+      )}`;
+      detailsSection.appendChild(qualifications);
+    }
+
+    if (job.accommodations) {
+      const accommodations = document.createElement("p");
+      accommodations.textContent = `Accommodations: ${job.accommodations.join(
+        ", "
+      )}`;
+      detailsSection.appendChild(accommodations);
+    }
+
+    card.appendChild(detailsSection);
+
+    // Compatibility factors section
+    if (job.factors) {
+      const factorsSection = document.createElement("div");
+      factorsSection.className = "compatibility-factors";
+
+      const factorsTitle = document.createElement("h4");
+      factorsTitle.textContent = "Compatibility Factors";
+      factorsSection.appendChild(factorsTitle);
+
+      // Create a table for factors
+      const table = document.createElement("table");
+      table.className = "factors-table";
+
+      // Table header
+      const thead = document.createElement("thead");
+      const headerRow = document.createElement("tr");
+      const factorHeader = document.createElement("th");
+      factorHeader.textContent = "Factor";
+      const scoreHeader = document.createElement("th");
+      scoreHeader.textContent = "Score";
+      headerRow.appendChild(factorHeader);
+      headerRow.appendChild(scoreHeader);
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      // Table body
+      const tbody = document.createElement("tbody");
+      const factors = [
+        { key: "location", label: "Location" },
+        { key: "work_mode", label: "Work Mode" },
+        { key: "hours", label: "Hours" },
+        { key: "accommodations", label: "Accommodations" },
+        { key: "qualifications", label: "Qualifications Match" },
+      ];
+
+      factors.forEach((factor) => {
+        if (job.factors[factor.key] !== undefined) {
+          const row = document.createElement("tr");
+          const factorCell = document.createElement("td");
+          factorCell.textContent = factor.label;
+          const scoreCell = document.createElement("td");
+          scoreCell.textContent = formatScore(job.factors[factor.key]);
+          row.appendChild(factorCell);
+          row.appendChild(scoreCell);
+          tbody.appendChild(row);
         }
       });
 
-      // Helper function to format compatibility score as percentage
-      function formatScore(score) {
-        return `${Math.round(score * 100)}%`;
-      }
+      table.appendChild(tbody);
+      factorsSection.appendChild(table);
+      card.appendChild(factorsSection);
+    }
 
-      // Helper function to create detailed job card with compatibility info
-      function createDetailedJobCard(job) {
-        const card = document.createElement("div");
-        card.className = "job-card detailed";
+    // Job description section if available
+    if (job.job_description) {
+      const descriptionSection = document.createElement("div");
+      descriptionSection.className = "job-description-section";
 
-        // Job title and company
-        const title = document.createElement("h3");
-        title.textContent = `${job.role_name} at ${job.company_name}`;
-        card.appendChild(title);
+      const descriptionTitle = document.createElement("h4");
+      descriptionTitle.textContent = "Job Description";
+      descriptionSection.appendChild(descriptionTitle);
 
-        // Overall compatibility score
-        const overallScore = document.createElement("div");
-        overallScore.className = "overall-score";
-        overallScore.innerHTML = `<h4>Overall Compatibility</h4><p class="score">${formatScore(
-          job.overall_compatibility
-        )}</p>`;
-        card.appendChild(overallScore);
+      const description = document.createElement("p");
+      description.textContent = job.job_description;
+      descriptionSection.appendChild(description);
 
-        // Job details section
-        const detailsSection = document.createElement("div");
-        detailsSection.className = "job-details-section";
+      card.appendChild(descriptionSection);
+    }
 
-        const detailsTitle = document.createElement("h4");
-        detailsTitle.textContent = "Job Details";
-        detailsSection.appendChild(detailsTitle);
+    // Application information
+    const applicationSection = document.createElement("div");
+    applicationSection.className = "application-section";
 
-        // Add job details
-        if (job.industry) {
-          const industry = document.createElement("p");
-          industry.textContent = `Industry: ${job.industry.join(", ")}`;
-          detailsSection.appendChild(industry);
-        }
+    if (job.application_link) {
+      // Add external application link button
+      const applyButton = document.createElement("a");
+      applyButton.className = "btn btn-primary";
+      applyButton.textContent = "Apply for this Job";
+      applyButton.href = job.application_link;
+      applyButton.target = "_blank"; // Open in new tab
+      applicationSection.appendChild(applyButton);
+    } else {
+      // Add placeholder button if no link
+      const applyButton = document.createElement("button");
+      applyButton.className = "btn btn-primary";
+      applyButton.textContent = "Apply for this Job";
+      applyButton.addEventListener("click", () => {
+        alert("Application feature will be implemented in the future.");
+      });
+      applicationSection.appendChild(applyButton);
+    }
 
-        if (job.work_mode) {
-          const workMode = document.createElement("p");
-          workMode.textContent = `Work Mode: ${job.work_mode}`;
-          detailsSection.appendChild(workMode);
-        }
+    card.appendChild(applicationSection);
 
-        if (job.location) {
-          const location = document.createElement("p");
-          location.textContent = `Location: ${job.location}`;
-          detailsSection.appendChild(location);
-        }
-
-        if (job.weekly_hours) {
-          const hours = document.createElement("p");
-          hours.textContent = `Weekly Hours: ${job.weekly_hours}`;
-          detailsSection.appendChild(hours);
-        }
-
-        if (job.qualifications) {
-          const qualifications = document.createElement("p");
-          qualifications.textContent = `Qualifications: ${job.qualifications.join(
-            ", "
-          )}`;
-          detailsSection.appendChild(qualifications);
-        }
-
-        if (job.accommodations) {
-          const accommodations = document.createElement("p");
-          accommodations.textContent = `Accommodations: ${job.accommodations.join(
-            ", "
-          )}`;
-          detailsSection.appendChild(accommodations);
-        }
-
-        card.appendChild(detailsSection);
-
-        // Compatibility factors section
-        if (job.factors) {
-          const factorsSection = document.createElement("div");
-          factorsSection.className = "compatibility-factors";
-
-          const factorsTitle = document.createElement("h4");
-          factorsTitle.textContent = "Compatibility Factors";
-          factorsSection.appendChild(factorsTitle);
-
-          // Create a table for factors
-          const table = document.createElement("table");
-          table.className = "factors-table";
-
-          // Table header
-          const thead = document.createElement("thead");
-          const headerRow = document.createElement("tr");
-          const factorHeader = document.createElement("th");
-          factorHeader.textContent = "Factor";
-          const scoreHeader = document.createElement("th");
-          scoreHeader.textContent = "Score";
-          headerRow.appendChild(factorHeader);
-          headerRow.appendChild(scoreHeader);
-          thead.appendChild(headerRow);
-          table.appendChild(thead);
-
-          // Table body
-          const tbody = document.createElement("tbody");
-          const factors = [
-            { key: "location", label: "Location" },
-            { key: "work_mode", label: "Work Mode" },
-            { key: "hours", label: "Hours" },
-            { key: "accommodations", label: "Accommodations" },
-            { key: "qualifications", label: "Qualifications Match" },
-          ];
-
-          factors.forEach((factor) => {
-            if (job.factors[factor.key] !== undefined) {
-              const row = document.createElement("tr");
-              const factorCell = document.createElement("td");
-              factorCell.textContent = factor.label;
-              const scoreCell = document.createElement("td");
-              scoreCell.textContent = formatScore(job.factors[factor.key]);
-              row.appendChild(factorCell);
-              row.appendChild(scoreCell);
-              tbody.appendChild(row);
-            }
-          });
-
-          table.appendChild(tbody);
-          factorsSection.appendChild(table);
-          card.appendChild(factorsSection);
-        }
-
-        // Job description section if available
-        if (job.job_description) {
-          const descriptionSection = document.createElement("div");
-          descriptionSection.className = "job-description-section";
-
-          const descriptionTitle = document.createElement("h4");
-          descriptionTitle.textContent = "Job Description";
-          descriptionSection.appendChild(descriptionTitle);
-
-          const description = document.createElement("p");
-          description.textContent = job.job_description;
-          descriptionSection.appendChild(description);
-
-          card.appendChild(descriptionSection);
-        }
-
-        // Application information
-        const applicationSection = document.createElement("div");
-        applicationSection.className = "application-section";
-
-        if (job.application_link) {
-          // Add external application link button
-          const applyButton = document.createElement("a");
-          applyButton.className = "btn btn-primary";
-          applyButton.textContent = "Apply for this Job";
-          applyButton.href = job.application_link;
-          applyButton.target = "_blank"; // Open in new tab
-          applicationSection.appendChild(applyButton);
-        } else {
-          // Add placeholder button if no link
-          const applyButton = document.createElement("button");
-          applyButton.className = "btn btn-primary";
-          applyButton.textContent = "Apply for this Job";
-          applyButton.addEventListener("click", () => {
-            alert("Application feature will be implemented in the future.");
-          });
-          applicationSection.appendChild(applyButton);
-        }
-
-        card.appendChild(applicationSection);
-
-        return card;
-      }
-    </script>
-  </body>
-</html>
+    return card;
+  }
+</script>
+{% endblock %}

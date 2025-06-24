@@ -1,76 +1,62 @@
-<!-- templates/manage_jobs.html -->
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CareerQuest - Manage Jobs</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('company.static', filename='company.css') }}"
-    />
-  </head>
-  <body>
-    {% include 'navbar.html' %}
+{% extends "base.html" %}
 
-    <div class="container">
-      <div class="card">
-        <div class="card-header">
-          <h2>Manage Job Listings</h2>
-          <p>View, edit, and delete your job listings</p>
-        </div>
-        <div class="card-body">
-          {% with messages = get_flashed_messages() %} {% if messages %} {% for
-          message in messages %}
-          <div class="alert">{{ message }}</div>
-          {% endfor %} {% endif %} {% endwith %}
+{% block title %}Manage Jobs - CareerQuest{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('company.static', filename='company.css') }}">
+{% endblock %}
 
-          <a href="{{ url_for('company.add_job') }}" class="btn btn-primary"
-            >Add New Job</a
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h2>Manage Job Listings</h2>
+    <p>View, edit, and delete your job listings</p>
+  </div>
+  <div class="card-body">
+    {% with messages = get_flashed_messages() %} {% if messages %} {% for
+    message in messages %}
+    <div class="alert">{{ message }}</div>
+    {% endfor %} {% endif %} {% endwith %}
+
+    <a href="{{ url_for('company.add_job') }}" class="btn btn-primary"
+      >Add New Job</a
+    >
+
+    <div class="results-container">
+      <h3>Your Job Listings</h3>
+
+      {% if jobs %} {% for job in jobs %}
+      <div class="job-card">
+        <h3>{{ job.role_name }}</h3>
+        <p><strong>Status:</strong> {{ job.application_status }}</p>
+        <p><strong>Location:</strong> {{ job.location }}</p>
+        <p><strong>Work Mode:</strong> {{ job.work_mode }}</p>
+        <p><strong>Weekly Hours:</strong> {{ job.weekly_hours }}</p>
+
+        <div class="job-actions">
+          <a
+            href="{{ url_for('company.edit_job', job_id=job.id) }}"
+            class="btn btn-secondary"
+            >Edit</a
           >
-
-          <div class="results-container">
-            <h3>Your Job Listings</h3>
-
-            {% if jobs %} {% for job in jobs %}
-            <div class="job-card">
-              <h3>{{ job.role_name }}</h3>
-              <p><strong>Status:</strong> {{ job.application_status }}</p>
-              <p><strong>Location:</strong> {{ job.location }}</p>
-              <p><strong>Work Mode:</strong> {{ job.work_mode }}</p>
-              <p><strong>Weekly Hours:</strong> {{ job.weekly_hours }}</p>
-
-              <div class="job-actions">
-                <a
-                  href="{{ url_for('company.edit_job', job_id=job.id) }}"
-                  class="btn btn-secondary"
-                  >Edit</a
-                >
-                <form
-                  method="POST"
-                  action="{{ url_for('company.delete_job', job_id=job.id) }}"
-                  style="display: inline"
-                >
-                  <button
-                    type="submit"
-                    class="btn btn-secondary"
-                    onclick="return confirm('Are you sure you want to delete this job?')"
-                  >
-                    Delete
-                  </button>
-                </form>
-              </div>
-            </div>
-            {% endfor %} {% else %}
-            <p>You haven't posted any jobs yet.</p>
-            {% endif %}
-          </div>
+          <form
+            method="POST"
+            action="{{ url_for('company.delete_job', job_id=job.id) }}"
+            style="display: inline"
+          >
+            <button
+              type="submit"
+              class="btn btn-secondary"
+              onclick="return confirm('Are you sure you want to delete this job?')"
+            >
+              Delete
+            </button>
+          </form>
         </div>
       </div>
+      {% endfor %} {% else %}
+      <p>You haven't posted any jobs yet.</p>
+      {% endif %}
     </div>
-  </body>
-</html>
+  </div>
+</div>
+{% endblock %}}

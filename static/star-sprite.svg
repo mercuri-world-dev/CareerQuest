@@ -1,0 +1,18 @@
+  <svg class="star star1" width="490" height="402" viewBox="0 0 490 402" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="star1" viewBox="0 0 490 402">
+    <g filter="url(#filter0_g_27_4)">
+      <path d="M123.5 14.5L171.5 159L10 206.5L156 243L123.5 378.5L231.5 280.5L327 391.5L301 235.5L479.5 210L318.5 148.5L347 10L245.5 112L123.5 14.5Z" fill="#FFFFFF"/>
+    </g>
+    <defs>
+      <filter id="filter0_g_27_4" x="0" y="0" width="489.5" height="401.5" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+        <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+        <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.3333333432674408 0.3333333432674408" numOctaves="3" seed="4772" />
+        <feDisplacementMap in="shape" scale="20" xChannelSelector="R" yChannelSelector="G" result="displacedImage" width="100%" height="100%" />
+        <feMerge result="effect1_texture_27_4">
+          <feMergeNode in="displacedImage"/>
+        </feMerge>
+      </filter>
+    </defs>
+    </symbol>
+  </svg>

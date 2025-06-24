@@ -1,51 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CareerQuest - Job Matcher</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}"
-    />
-  </head>
-  <body>
-    <div class="container">
-      <header class="landing-header">
-        <h1>Welcome to <span>CareerQuest</span></h1>
-        <p class="tagline">
-          Find the perfect job match for your skills and preferences
-        </p>
-        <div class="landing-buttons">
-          <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Log In</a>
-          <a href="{{ url_for('auth.register') }}" class="btn btn-secondary"
-            >Register</a
-          >
-        </div>
-      </header>
+{% extends "base.html" %}
 
-      <div class="features-section">
-        <div class="feature-card">
-          <h2>Find Job Recommendations</h2>
-          <p>Get personalized job matches based on your profile</p>
-        </div>
+{% block title %}CareerQuest - Home{% endblock %}
+{% block navbar %}{% endblock %}
 
-        <div class="feature-card">
-          <h2>View All Available Jobs</h2>
-          <p>Browse through our complete job listings</p>
-        </div>
+{% block content %}
+<header class="landing-header">
+  <h1>Welcome to <span>CareerQuest</span></h1>
+  <p class="tagline">
+    Find the perfect job match for your skills and preferences
+  </p>
+  <div class="landing-buttons">
+    <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Log In</a>
+    <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Register</a
+    >
+  </div>
+</header>
 
-        <div class="feature-card">
-          <h2>Check Job Compatibility</h2>
-          <p>See how well you match with specific job opportunities</p>
-        </div>
-      </div>
-    </div>
+<div class="features-section">
+  <div class="feature-card">
+    <h2 class="feature-card-header">Find Job Recommendations</h2>
+    <p class="feature-card-body">Get personalized job matches based on your profile</p>
+  </div>
 
-    <footer>
-      <div class="container">
-        <p>&copy; 2025 CareerQuest. All rights reserved.</p>
-      </div>
-    </footer>
-  </body>
-</html>
+  <div class="feature-card">
+    <h2 class="feature-card-header">View All Available Jobs</h2>
+    <p class="feature-card-body">Browse through our complete job listings</p>
+  </div>
+
+  <div class="feature-card">
+    <h2 class="feature-card-header">Check Job Compatibility</h2>
+    <p class="feature-card-body">See how well you match with specific job opportunities</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='cardFlyin.js') }}"></script>
+{% endblock %}
+
+

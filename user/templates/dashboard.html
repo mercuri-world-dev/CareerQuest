@@ -1,84 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard - CareerQuest</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}"
-    />
-  </head>
-  <body>
-    {% include 'navbar.html' %}
+{% extends 'base.html' %}
+{% block title %}Dashboard - CareerQuest{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('users.static', filename='user.css') }}">
+{% endblock %}
 
-    <div class="container">
-      <header>
-        <h1>Welcome to <span>CareerQuest</span></h1>
-        <p class="tagline">
-          Find the perfect job match for your skills and preferences
-        </p>
-      </header>
+{% block content %}
+<header>
+  <h1>Welcome to <span>CareerQuest</span></h1>
+  <p class="tagline">
+    Find the perfect job match for your skills and preferences
+  </p>
+</header>
 
-      <div class="dashboard-grid">
-        <div class="card">
-          <div class="card-header">
-            <h2>Job Recommendations</h2>
-            <p>Personalized job matches based on your profile</p>
-          </div>
-          <div class="card-body">
-            <p>
-              Get job recommendations tailored to your skills, preferences, and
-              accommodations.
-            </p>
-            <a
-              href="{{ url_for('users.job_recommendations') }}"
-              class="btn btn-primary"
-              >View Recommendations</a
-            >
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <h2>Browse All Jobs</h2>
-            <p>Explore all available job opportunities</p>
-          </div>
-          <div class="card-body">
-            <p>
-              Browse through our complete job listings to find your next career
-              opportunity.
-            </p>
-            <a href="{{ url_for('main.all_jobs') }}" class="btn btn-primary"
-              >Browse Jobs</a
-            >
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <h2>My Profile</h2>
-            <p>Update your information for better matches</p>
-          </div>
-          <div class="card-body">
-            <p>
-              Keep your profile updated to receive the most relevant job
-              recommendations.
-            </p>
-            <a href="{{ url_for('users.profile') }}" class="btn btn-primary"
-              >Edit Profile</a
-            >
-          </div>
-        </div>
-      </div>
+<div class="dashboard-grid">
+  <div class="card">
+    <div class="card-header">
+      <h2>Job Recommendations</h2>
+      <p>Personalized job matches based on your profile</p>
     </div>
+    <div class="card-body">
+      <p>
+        Get job recommendations tailored to your skills, preferences, and
+        accommodations.
+      </p>
+      <a
+        href="{{ url_for('users.job_recommendations') }}"
+        class="btn btn-secondary"
+        >View Recommendations</a
+      >
+    </div>
+  </div>
 
-    <footer>
-      <div class="container">
-        <p>&copy; 2025 CareerQuest. All rights reserved.</p>
-      </div>
-    </footer>
+  <div class="card">
+    <div class="card-header">
+      <h2>Browse All Jobs</h2>
+      <p>Explore all available job opportunities</p>
+    </div>
+    <div class="card-body">
+      <p>
+        Browse through our complete job listings to find your next career
+        opportunity.
+      </p>
+      <a href="{{ url_for('main.all_jobs') }}" class="btn btn-secondary"
+        >Browse Jobs</a
+      >
+    </div>
+  </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-  </body>
-</html>
+  <div class="card">
+    <div class="card-header">
+      <h2>My Profile</h2>
+      <p>Update your information for better matches</p>
+    </div>
+    <div class="card-body">
+      <p>
+        Keep your profile updated to receive the most relevant job
+        recommendations.
+      </p>
+      <a href="{{ url_for('users.profile') }}" class="btn btn-secondary"
+        >Edit Profile</a
+      >
+    </div>
+  </div>
+</div>
+{% endblock %}

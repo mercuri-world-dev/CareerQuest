@@ -6,19 +6,26 @@
 }
 
 .auth-card {
-    background-color: var(--white);
-    border-radius: 10px;
-    box-shadow: var(--shadow);
+    color: var(--white);
+    background: rgba(255, 255, 255, 0.35);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.85);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     width: 100%;
     max-width: 400px;
     overflow: hidden;
 }
 
 .auth-header {
-    background-color: var(--secondary-color);
+    background: rgba(36, 53, 114, 0.8); /* var(--secondary-color) with opacity */
     color: var(--white);
     padding: 30px 25px;
     text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 .auth-header h1 {
@@ -32,24 +39,29 @@
 
 .auth-body h2 {
     font-size: 1.5rem;
-    color: var(--secondary-color);
     margin-bottom: 20px;
     text-align: center;
+}
+
+.auth-body label {
+    color: var(--medium-gray);
 }
 
 .auth-footer {
     margin-top: 20px;
     text-align: center;
     font-size: 0.9rem;
+    color: var(--white);
 }
 
 .auth-footer a {
-    color: var(--primary-color);
+    color: var(--primary-dark);
     text-decoration: none;
+    font-weight: bold;
 }
 
 .auth-footer a:hover {
-    text-decoration: underline;
+    color: var(--primary-color);
 }
 
 .auth-google {
@@ -75,4 +87,107 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+/* Floating label styles */
+.form-group {
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 16px 12px 8px 12px;
+    font-size: 1rem;
+    border: 1px solid var(--medium-gray);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.7);
+    color: var(--text-color);
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.form-group label {
+    position: absolute;
+    top: 14px;
+    left: 8px;
+    color: var(--secondary-color);
+    font-size: 1rem;
+    pointer-events: none;
+    background: transparent;
+    transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+    padding: 0 4px;
+    line-height: 1.2;
+}
+
+.form-group input:focus + label,
+.form-group input:not(:placeholder-shown) + label {
+    top: 4px;
+    left: 8px;
+    font-size: 0.75rem;
+    padding: 0 4px;
+}
+
+.account-type-toggle {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.account-type-toggle input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    clip: rect(0 0 0 0);
+    overflow: hidden;
+}
+
+.account-type-toggle label {
+    position: static !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 22px 10px 22px;
+    border-radius: 12px;
+    border: 2px solid var(--medium-gray);
+    color: var(--medium-gray) !important;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(36,53,114,0.07);
+    min-width: 100px;
+    user-select: none;
+    pointer-events: auto !important;
+    top: auto !important;
+    left: auto !important;
+}
+
+.account-type-toggle label .icon {
+    font-size: 2rem;
+    margin-bottom: 4px;
+}
+
+input[type="radio"][name="account_type"]:checked + label {
+    border-color: var(--white) !important;
+    background: rgba(217, 194, 237, 0.18) !important;
+    color: var(--white) !important;
+    box-shadow: 0 4px 16px rgba(36,53,114,0.13) !important;
+}
+
+
+.account-type-toggle label:hover {
+    background: rgba(217, 194, 237, 0.12) !important;
+    color: var(--white) !important;
 }

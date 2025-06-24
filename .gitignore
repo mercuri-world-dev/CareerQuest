@@ -21,3 +21,5 @@ venv/
 
 # Configuration files
 config.py
+
+.ref/
