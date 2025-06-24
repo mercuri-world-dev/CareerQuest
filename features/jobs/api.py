@@ -1,10 +1,11 @@
 from flask import Blueprint, jsonify, request
-from flask_login import current_user, login_required
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-from database import Job, User, db
+from database import User
 from features.jobs.util.job_scoring import calculate_accommodations_match, calculate_hours_compatibility, calculate_location_similarity, calculate_work_mode_compatibility
+from main.supabase_client import get_supabase
+from util.auth import get_supabase_user
 from util.decorators import role_required, sb_login_required
 
 jobs_api_bp = Blueprint('jobs_api', __name__)
@@ -12,38 +13,46 @@ jobs_api_bp = Blueprint('jobs_api', __name__)
 # API routes
 @jobs_api_bp.route('/users/<user_id>', methods=['GET'])
 def get_user(user_id):
-    # Strip leading zeros from user_id to match database ID
+    supabase = get_supabase()
     try:
-        user_id = int(user_id)
+      user_id = int(user_id)
     except ValueError:
-        return jsonify({"error": "Invalid user ID"}), 400
-        
-    user = User.query.get(user_id)
+      return jsonify({"error": "Invalid user ID"}), 400
+    
+    user = supabase.table('users').select('*').eq('id', user_id).single().execute()
     
     if not user:
-        return jsonify({"error": "User not found"}), 404
-        
+      return jsonify({"error": "User not found"}), 404
+    
     return jsonify(user.to_dict())
 
 @jobs_api_bp.route('/current_user', methods=['GET'])
 @sb_login_required
 def get_current_user():
-    return jsonify(current_user.to_dict())
+    supabase_user = get_supabase_user()
+    if not supabase_user:
+        return jsonify({"error": "User not authenticated"}), 401
+    supabase = get_supabase()
+    user = supabase.table('users').select('*').eq('id', supabase_user.id).single().execute()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    return jsonify(user.to_dict())
 
 @jobs_api_bp.route('/jobs', methods=['GET'])
 def get_jobs():
-    # Filter by status if provided
+    supabase = get_supabase()
     status = request.args.get('status')
     if status:
-        jobs = Job.query.filter_by(application_status=status).all()
+        jobs = supabase.table('jobs').select('*').eq('application_status', status).execute()
     else:
-        jobs = Job.query.all()
+        jobs = supabase.table('jobs').select('*').execute()
         
     return jsonify([job.to_dict() for job in jobs])
 
 @jobs_api_bp.route('/jobs/<job_id>', methods=['GET'])
 def get_job(job_id):
-    job = db.session.get(Job, job_id)
+    supabase = get_supabase()
+    job = supabase.table('jobs').select('*').eq('id', job_id).single().execute()
     
     if not job:
         return jsonify({"error": "Job not found"}), 404
@@ -54,28 +63,34 @@ def get_job(job_id):
 @sb_login_required
 @role_required('user')
 def get_matches_for_current_user():
-    user = current_user
+    supabase_user = get_supabase_user()
+    if not supabase_user:
+        return jsonify({"error": "User not authenticated"}), 401
+    supabase = get_supabase()
+    user = supabase.table('users').select('*').eq('id', supabase_user.id).single().execute()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
     return generate_matches_response(user)
 
 @jobs_api_bp.route('/matches/<user_id>', methods=['GET'])
 def get_matches(user_id):
-    # Strip leading zeros from user_id to match database ID
+    supabase = get_supabase()
     try:
         user_id = int(user_id)
     except ValueError:
         return jsonify({"error": "Invalid user ID"}), 400
         
-    user = User.query.get(user_id)
+    user = supabase.table('users').select('*').eq('id', user_id).single().execute()
     
     if not user:
         return jsonify({"error": "User not found"}), 404
         
     return generate_matches_response(user)
 
-def generate_matches_response(user):
+def generate_matches_response(user: User):
     # Calculate compatibility scores for each job
     try:
-        jobs = Job.query.filter_by(application_status='Open').all()
+        jobs = get_supabase().table('jobs').select('*').execute()
         scores = []
         
         for job in jobs:
@@ -150,20 +165,19 @@ def generate_matches_response(user):
 
 @jobs_api_bp.route('/compatibility/<user_id>/<job_id>', methods=['GET'])
 def get_compatibility(user_id, job_id):
-    # Find the user and job
+    supabase = get_supabase()
     try:
         user_id = int(user_id)
     except ValueError:
         return jsonify({"error": "Invalid user ID"}), 400
         
-    user = User.query.get(user_id)
-    job = db.session.get(Job, job_id)
+    user = supabase.table('users').select('*').eq('id', user_id).single().execute()
+    job = supabase.table('jobs').select('*').eq('id', job_id).single().execute()
     
     if not user or not job:
         return jsonify({"error": "User or job not found"}), 404
     
     try:    
-        # Calculate compatibility factors
         location_score = calculate_location_similarity(user.location, job.location)
         hours_score = calculate_hours_compatibility(user.hours_per_week, job.weekly_hours)
         work_mode_score = calculate_work_mode_compatibility(
@@ -176,7 +190,6 @@ def get_compatibility(user_id, job_id):
             job.get_accommodations_list()
         )
         
-        # Calculate text similarity between user background and job qualifications
         user_text = user.educational_background or ""
         job_text = ' '.join(job.get_qualifications_list())
         
@@ -187,7 +200,6 @@ def get_compatibility(user_id, job_id):
         except:
             qualification_score = 0.0
             
-        # Calculate overall compatibility
         total_score = (
             location_score * 0.3 +
             hours_score * 0.1 +
@@ -216,13 +228,18 @@ def get_compatibility(user_id, job_id):
 @jobs_api_bp.route('/compatibility/current/<job_id>', methods=['GET'])
 @sb_login_required
 def get_compatibility_current_user(job_id):
-    user = current_user
-    job = db.session.get(Job, job_id)
+    supabase_user = get_supabase_user()
+    if not supabase_user:
+        return jsonify({"error": "User not authenticated"}), 401
+    supabase = get_supabase()
+    user = supabase.table('users').select('*').eq('id', supabase_user.id).single().execute()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    job = supabase.table('jobs').select('*').eq('id', job_id).single().execute()
     
     if not job:
         return jsonify({"error": "Job not found"}), 404
         
-    # Calculate compatibility factors
     location_score = calculate_location_similarity(user.location, job.location)
     hours_score = calculate_hours_compatibility(user.hours_per_week, job.weekly_hours)
     work_mode_score = calculate_work_mode_compatibility(
@@ -235,7 +252,6 @@ def get_compatibility_current_user(job_id):
         job.get_accommodations_list()
     )
     
-    # Calculate text similarity between user background and job qualifications
     user_text = user.educational_background or ""
     job_text = ' '.join(job.get_qualifications_list())
     
@@ -246,7 +262,6 @@ def get_compatibility_current_user(job_id):
     except:
         qualification_score = 0.0
         
-    # Calculate overall compatibility
     total_score = (
         location_score * 0.3 +
         hours_score * 0.1 +

@@ -3,8 +3,6 @@ from flask_cors import CORS
 from flask_login import LoginManager, current_user, login_user, logout_user
 import os
 
-from database import db, User, Role, CompanyProfile, Job
-
 from flask_admin import Admin, AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
 
@@ -39,31 +37,31 @@ def create_app(config_object=None):
     )
 
     CORS(app)
-    db.init_app(app)
+    # db.init_app(app)
 
     login_manager = LoginManager()
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
 
-    @app.before_request
-    def auto_login_test_user():
-        if app.config.get("TESTING_AUTO_LOGIN_USER", False):
-            from flask_login import current_user
-            if not current_user.is_authenticated:
-                user = User.query.filter_by(username="ARealPerson").first()
-                if user:
-                    login_user(user)
-                    redirect(url_for('users.dashboard'))
+    # @app.before_request
+    # def auto_login_test_user():
+    #     if app.config.get("TESTING_AUTO_LOGIN_USER", False):
+    #         from flask_login import current_user
+    #         if not current_user.is_authenticated:
+    #             user = User.query.filter_by(username="ARealPerson").first()
+    #             if user:
+    #                 login_user(user)
+    #                 redirect(url_for('users.dashboard'))
 
-    @app.before_request
-    def auto_login_test_company():
-        if app.config.get("TESTING_AUTO_LOGIN_COMPANY", False):
-            from flask_login import current_user
-            if not current_user.is_authenticated:
-                user = User.query.filter_by(username="arealcompany").first()
-                if user:
-                    login_user(user)
-                    redirect(url_for('company.company_dashboard'))
+    # @app.before_request
+    # def auto_login_test_company():
+    #     if app.config.get("TESTING_AUTO_LOGIN_COMPANY", False):
+    #         from flask_login import current_user
+    #         if not current_user.is_authenticated:
+    #             user = User.query.filter_by(username="arealcompany").first()
+    #             if user:
+    #                 login_user(user)
+    #                 redirect(url_for('company.company_dashboard'))
 
     @app.before_request
     def clear_session_on_restart():
@@ -84,12 +82,12 @@ def create_app(config_object=None):
 
     @login_manager.user_loader
     def load_user(user_id):
-        try:
-            user = db.session.get(User, int(user_id))
-            if user is None:
-                return None
-            return user
-        except Exception:
+        # try:
+        #     user = db.session.get(User, int(user_id))
+        #     if user is None:
+        #         return None
+        #     return user
+        # except Exception:
             return None
 
     # Admin views with access control
@@ -116,10 +114,10 @@ def create_app(config_object=None):
         template_mode='bootstrap3',
         index_view=MyAdminIndexView()
     )
-    admin.add_view(SecureModelView(User, db.session))
-    admin.add_view(SecureModelView(Role, db.session))
-    admin.add_view(SecureModelView(CompanyProfile, db.session))
-    admin.add_view(SecureModelView(Job, db.session))
+    # admin.add_view(SecureModelView(User, db.session))
+    # admin.add_view(SecureModelView(Role, db.session))
+    # admin.add_view(SecureModelView(CompanyProfile, db.session))
+    # admin.add_view(SecureModelView(Job, db.session))
 
     # Register blueprints
     from main.routes import main_bp

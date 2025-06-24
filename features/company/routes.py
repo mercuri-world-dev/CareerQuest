@@ -1,9 +1,10 @@
 from datetime import datetime
 import uuid
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import login_required, current_user
+from flask_login import current_user
 
-from database import CompanyProfile, Job, db
+from main.supabase_client import get_supabase
+from models import Job
 from util.decorators import role_required, sb_login_required
 
 company_bp = Blueprint('company', __name__, template_folder='templates', static_folder='static', static_url_path='/static/company')
@@ -12,8 +13,23 @@ company_bp = Blueprint('company', __name__, template_folder='templates', static_
 @sb_login_required
 @role_required('company')
 def company_dashboard():
+    supabase = get_supabase()
     # Get company profile or create if it doesn't exist
-    company_profile = CompanyProfile.query.filter_by(user_id=current_user.id).first()
+    company_profile_res = supabase.table('company_profiles').select('*').eq('user_id', current_user.id).single().execute()
+    if company_profile_res.data:
+        company_profile = company_profile_res.data
+    else:
+        company_profile = {
+            'user_id': current_user.id,
+            'company_name': '',
+            'location': '',
+            'description': '',
+            'website': '',
+            'industry_list': [],
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow()
+        }
+        supabase.table('company_profiles').insert(company_profile).execute()
     
     # Initialize jobs as an empty list
     jobs = []
@@ -21,7 +37,9 @@ def company_dashboard():
     # Get jobs posted by this company if the profile exists
     if company_profile:
         try:
-            jobs = Job.query.filter_by(company_profile_id=company_profile.id).all()
+            jobs_res = supabase.table('jobs').select('*').eq('company_profile_id', company_profile['id']).execute()
+            if jobs_res.data:
+                jobs = jobs_res.data
         except Exception as e:
             # In case of database errors, log it but don't crash
             print(f"Error retrieving jobs: {e}")
@@ -33,12 +51,23 @@ def company_dashboard():
 @sb_login_required
 @role_required('company')
 def company_profile():
-    # Get or create company profile
-    company_profile = CompanyProfile.query.filter_by(user_id=current_user.id).first()
-    
-    if not company_profile:
-        company_profile = CompanyProfile(user_id=current_user.id, company_name='')
-        db.session.add(company_profile)
+    supabase = get_supabase()
+    # Get company profile or create if it doesn't exist
+    company_profile_res = supabase.table('company_profiles').select('*').eq('user_id', current_user.id).single().execute()
+    if company_profile_res.data:
+        company_profile = company_profile_res.data
+    else:
+        company_profile = {
+            'user_id': current_user.id,
+            'company_name': '',
+            'location': '',
+            'description': '',
+            'website': '',
+            'industry_list': [],
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow()
+        }
+        supabase.table('company_profiles').insert(company_profile).execute()
         
     if request.method == 'POST':
         company_profile.company_name = request.form.get('company_name')
@@ -52,11 +81,10 @@ def company_profile():
         company_profile.set_industry_list(industry_list)
         
         try:
-            db.session.commit()
+            supabase.table('company_profiles').update(company_profile).eq('user_id', current_user.id).execute()
             flash('Company profile updated successfully!', 'message')
             return redirect(url_for('company.company_dashboard'))
         except Exception as e:
-            db.session.rollback()
             print(f"Error updating company profile: {e}")
             flash('There was an error updating your profile. Please try again.', 'error')
             
@@ -66,7 +94,12 @@ def company_profile():
 @sb_login_required
 @role_required('company')
 def manage_jobs():
-    company_profile = CompanyProfile.query.filter_by(user_id=current_user.id).first()
+    supabase = get_supabase()
+    company_profile_res = supabase.table('company_profiles').select('*').eq('user_id', current_user.id).single().execute()
+    if company_profile_res.data:
+        company_profile = company_profile_res.data
+    else:
+        company_profile = None
     
     if not company_profile:
         flash('Please complete your company profile first', 'warning')
@@ -74,7 +107,9 @@ def manage_jobs():
     
     jobs = []    
     try:
-        jobs = Job.query.filter_by(company_profile_id=company_profile.id).all()
+        jobs_res = supabase.table('jobs').select('*').eq('company_profile_id', company_profile['id']).execute()
+        if jobs_res.data:
+            jobs = jobs_res.data
     except Exception as e:
         print(f"Error retrieving jobs: {e}")
         flash('There was an issue retrieving your jobs. Please try again later.', 'error')
@@ -85,8 +120,14 @@ def manage_jobs():
 @sb_login_required
 @role_required('company')
 def add_job():
-    company_profile = CompanyProfile.query.filter_by(user_id=current_user.id).first()
+    supabase = get_supabase()
     
+    company_profile = supabase.table('company_profiles').select('*').eq('user_id', current_user.id).single().execute()
+    if company_profile.data:
+        company_profile = company_profile.data
+    else:
+        company_profile = None
+
     if not company_profile:
         flash('Please complete your company profile first', 'warning')
         return redirect(url_for('company.company_profile'))
@@ -110,7 +151,7 @@ def add_job():
                 application_link=request.form.get('application_link'),
                 application_status=request.form.get('application_status', 'Open')
             )
-            
+
             # Handle lists
             industry = request.form.get('industry', '')
             industry_list = [item.strip() for item in industry.split(',') if item.strip()]
@@ -137,9 +178,8 @@ def add_job():
                 job.application_period_end = datetime.strptime(
                     request.form.get('application_period_end'), '%Y-%m-%d'
                 )
-                
-            db.session.add(job)
-            db.session.commit()
+
+            supabase.table('jobs').insert(job.to_dict()).execute()
             
             flash('Job added successfully!', 'message')
             return redirect(url_for('company.manage_jobs'))
@@ -147,7 +187,6 @@ def add_job():
             flash('Invalid date format. Please use YYYY-MM-DD.', 'warning')
             return render_template('add_job.html')
         except Exception as e:
-            db.session.rollback()
             print(f"Error adding job: {e}")
             flash('There was an error adding the job. Please try again.', 'error')
             
@@ -157,13 +196,23 @@ def add_job():
 @sb_login_required
 @role_required('company')
 def edit_job(job_id):
-    company_profile = CompanyProfile.query.filter_by(user_id=current_user.id).first()
+    supabase = get_supabase()
+
+    company_profile_res = supabase.table('company_profiles').select('*').eq('user_id', current_user.id).single().execute()
+    if company_profile_res.data:
+        company_profile = company_profile_res.data
+    else:
+        company_profile = None
     
     if not company_profile:
         flash('Please complete your company profile first', 'warning')
         return redirect(url_for('company.company_profile'))
         
-    job = db.session.get(Job, job_id)
+    job_res = supabase.table('jobs').select('*').eq('id', job_id).single().execute()
+    if job_res.data:
+        job = Job(**job_res.data)
+    else:
+        job = None
     
     if not job or job.company_profile_id != company_profile.id:
         flash('Job not found or you do not have permission to edit it', 'warning')
@@ -206,16 +255,14 @@ def edit_job(job_id):
                 job.application_period_end = datetime.strptime(
                     request.form.get('application_period_end'), '%Y-%m-%d'
                 )
-                
-            db.session.commit()
-            
+
+            supabase.table('jobs').update(job.to_dict()).eq('id', job_id).execute()            
             flash('Job updated successfully!', 'message')
             return redirect(url_for('company.manage_jobs'))
         except ValueError:
             flash('Invalid date format. Please use YYYY-MM-DD.', 'warning')
             return render_template('edit_job.html', job=job)
         except Exception as e:
-            db.session.rollback()
             print(f"Error updating job: {e}")
             flash('There was an error updating the job. Please try again.', 'error')
             
@@ -225,25 +272,32 @@ def edit_job(job_id):
 @sb_login_required
 @role_required('company')
 def delete_job(job_id):
-    company_profile = CompanyProfile.query.filter_by(user_id=current_user.id).first()
+    supabase = get_supabase()
+
+    company_profile_res = supabase.table('company_profiles').select('*').eq('user_id', current_user.id).single().execute()
+    if company_profile_res.data:
+        company_profile = company_profile_res.data
+    else:
+        company_profile = None
     
     if not company_profile:
         flash('Please complete your company profile first', 'warning')
         return redirect(url_for('company.company_profile'))
         
-    job = db.session.get(Job, job_id)
+    job_res = supabase.table('jobs').select('*').eq('id', job_id).single().execute()
+    if job_res.data:
+        job = Job(**job_res.data)
+    else:
+        job = None
     
     if not job or job.company_profile_id != company_profile.id:
         flash('Job not found or you do not have permission to delete it', 'warning')
         return redirect(url_for('company.manage_jobs'))
     
     try:    
-        db.session.delete(job)
-        db.session.commit()
-        
+        supabase.table('jobs').delete().eq('id', job_id).execute()
         flash('Job deleted successfully!', 'message')
     except Exception as e:
-        db.session.rollback()
         print(f"Error deleting job: {e}")
         flash('There was an error deleting the job. Please try again.', 'error')
         
