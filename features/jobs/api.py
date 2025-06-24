@@ -5,7 +5,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from database import Job, User, db
 from features.jobs.util.job_scoring import calculate_accommodations_match, calculate_hours_compatibility, calculate_location_similarity, calculate_work_mode_compatibility
-from util.decorators import role_required
+from util.decorators import role_required, sb_login_required
 
 jobs_api_bp = Blueprint('jobs_api', __name__)
 
@@ -26,7 +26,7 @@ def get_user(user_id):
     return jsonify(user.to_dict())
 
 @jobs_api_bp.route('/current_user', methods=['GET'])
-@login_required
+@sb_login_required
 def get_current_user():
     return jsonify(current_user.to_dict())
 
@@ -51,7 +51,7 @@ def get_job(job_id):
     return jsonify(job.to_dict())
 
 @jobs_api_bp.route('/matches', methods=['GET'])
-@login_required
+@sb_login_required
 @role_required('user')
 def get_matches_for_current_user():
     user = current_user
@@ -214,7 +214,7 @@ def get_compatibility(user_id, job_id):
         return jsonify({"error": "There was an error calculating compatibility. Please try again later."}), 500
 
 @jobs_api_bp.route('/compatibility/current/<job_id>', methods=['GET'])
-@login_required
+@sb_login_required
 def get_compatibility_current_user(job_id):
     user = current_user
     job = db.session.get(Job, job_id)

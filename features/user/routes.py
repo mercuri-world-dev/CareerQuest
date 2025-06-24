@@ -2,24 +2,24 @@ from flask import Blueprint, render_template, redirect, request, url_for, flash
 from flask_login import current_user, login_required
 
 from database import db, Job
-from util.decorators import role_required
+from util.decorators import role_required, sb_login_required
 
 user_bp = Blueprint('users', __name__, template_folder='templates', static_folder='static', static_url_path='/static/user')
 
 @user_bp.route('/dashboard')
-@login_required
+@sb_login_required
 @role_required('user')
 def dashboard():
     return render_template('dashboard.html')
 
 @user_bp.route('/job_recommendations')
-@login_required
+@sb_login_required
 @role_required('user')
 def job_recommendations():
     return render_template('job_recommendations.html')
 
 @user_bp.route('/job_compatibility/<job_id>')
-@login_required
+@sb_login_required
 @role_required('user')
 def job_compatibility(job_id):
     job = db.session.get(Job, job_id)
@@ -30,7 +30,7 @@ def job_compatibility(job_id):
     return render_template('job_compatibility.html', job=job)
 
 @user_bp.route('/profile', methods=['GET', 'POST'])
-@login_required
+@sb_login_required
 @role_required('user')
 def profile():
     if request.method == 'POST':

@@ -1,21 +1,32 @@
 
 from functools import wraps
 
-from flask import flash, redirect, url_for
+from flask import flash, redirect, session, url_for
 from flask_login import current_user
 
 
 def role_required(*roles):
-    def wrapper(fn):
+    def decorator(fn):
         @wraps(fn)
-        def decorated_view(*args, **kwargs):
-            if not current_user.is_authenticated or not hasattr(current_user, 'id'):
+        def wrapper(*args, **kwargs):
+            user = session.get('supabase_user')
+            if not user:
+                flash('Please log in to access this page.', 'warning')
                 return redirect(url_for('auth.login'))
-            
-            if not any(current_user.has_role(role) for role in roles):
+            user_role = user.get('user_metadata', {}).get('account_type')
+            if user_role not in roles:
                 flash('You do not have permission to access this page.', 'warning')
                 return redirect(url_for('main.index'))
-                
             return fn(*args, **kwargs)
-        return decorated_view
+        return wrapper
+    return decorator
+
+def sb_login_required(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        user = session.get('supabase_user')
+        if not user:
+            flash('Please log in to access this page.', 'warning')
+            return redirect(url_for('auth.login'))
+        return fn(*args, **kwargs)
     return wrapper

@@ -4,12 +4,12 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 
 from database import CompanyProfile, Job, db
-from util.decorators import role_required
+from util.decorators import role_required, sb_login_required
 
 company_bp = Blueprint('company', __name__, template_folder='templates', static_folder='static', static_url_path='/static/company')
 
 @company_bp.route('/company_dashboard')
-@login_required
+@sb_login_required
 @role_required('company')
 def company_dashboard():
     # Get company profile or create if it doesn't exist
@@ -30,7 +30,7 @@ def company_dashboard():
     return render_template('company_dashboard.html', company_profile=company_profile, jobs=jobs)
 
 @company_bp.route('/company_profile', methods=['GET', 'POST'])
-@login_required
+@sb_login_required
 @role_required('company')
 def company_profile():
     # Get or create company profile
@@ -63,7 +63,7 @@ def company_profile():
     return render_template('company_profile.html', company_profile=company_profile)
 
 @company_bp.route('/manage_jobs')
-@login_required
+@sb_login_required
 @role_required('company')
 def manage_jobs():
     company_profile = CompanyProfile.query.filter_by(user_id=current_user.id).first()
@@ -82,7 +82,7 @@ def manage_jobs():
     return render_template('manage_jobs.html', jobs=jobs)
 
 @company_bp.route('/add_job', methods=['GET', 'POST'])
-@login_required
+@sb_login_required
 @role_required('company')
 def add_job():
     company_profile = CompanyProfile.query.filter_by(user_id=current_user.id).first()
@@ -154,7 +154,7 @@ def add_job():
     return render_template('add_job.html')
 
 @company_bp.route('/edit_job/<job_id>', methods=['GET', 'POST'])
-@login_required
+@sb_login_required
 @role_required('company')
 def edit_job(job_id):
     company_profile = CompanyProfile.query.filter_by(user_id=current_user.id).first()
@@ -222,7 +222,7 @@ def edit_job(job_id):
     return render_template('edit_job.html', job=job)
 
 @company_bp.route('/delete_job/<job_id>', methods=['POST'])
-@login_required
+@sb_login_required
 @role_required('company')
 def delete_job(job_id):
     company_profile = CompanyProfile.query.filter_by(user_id=current_user.id).first()
