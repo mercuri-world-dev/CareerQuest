@@ -1,6 +1,6 @@
 # reset_db.py
 import os
-from main import db, User
+from features.jobs.routes import db, User
 from database import Role
 from __init__ import create_app
 

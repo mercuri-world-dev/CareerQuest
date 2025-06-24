@@ -13,12 +13,12 @@ print("AUTH STATIC FOLDER:", auth_bp.static_folder)
 #         email = request.form.get('email')
 #         password = request.form.get('password')
 #         if not email or not password:
-#             flash('Email and password are required', 'danger')
+#             flash('Email and password are required', 'warning')
 #             return redirect(url_for('auth.login'))
         
 #         res = supabase.auth.sign_in_with_password(email=email, password=password)
 #         if res.error:
-#             flash('Login failed: ' + res.error.message, 'danger')
+#             flash('Login failed: ' + res.error.message, 'error')
 #             return redirect(url_for('auth.login'))
         
 #         return redirect(url_for('main.index'))
@@ -41,7 +41,7 @@ print("AUTH STATIC FOLDER:", auth_bp.static_folder)
 #     next = request.args.get('next', url_for('main.index'))
 #     res = supabase.auth.exchange_code_for_session(code, redirect_to=next)
 #     if res.error:
-#         flash('Login failed: ' + res.error.message, 'danger')
+#         flash('Login failed: ' + res.error.message, 'error')
 #         return redirect(url_for('auth.login'))
 #     return redirect(next)
 
@@ -122,7 +122,7 @@ def register():
         db.session.add(user)
         db.session.commit()
         
-        flash('Registration successful! Please log in.')
+        flash('Registration successful! Please log in.', 'message')
         return redirect(url_for('auth.login'))
         
     return render_template('register.html')

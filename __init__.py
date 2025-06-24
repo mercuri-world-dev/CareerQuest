@@ -35,7 +35,7 @@ def create_app(config_object=None):
         SESSION_FILE_DIR=os.path.join(os.getcwd(), 'flask_session'),
         SESSION_USE_SIGNER=True,
         TESTING_AUTO_LOGIN_USER=False, # TODO: Remove this in production, only for testing purposes
-        TESTING_AUTO_LOGIN_COMPANY=True  # TODO: Remove this in production, only for testing purposes
+        TESTING_AUTO_LOGIN_COMPANY=False  # TODO: Remove this in production, only for testing purposes
     )
 
     CORS(app)
@@ -122,12 +122,17 @@ def create_app(config_object=None):
     admin.add_view(SecureModelView(Job, db.session))
 
     # Register blueprints
-    from main import main_bp
-    from user.routes import user_bp
-    from company.routes import company_bp
-    from auth.routes import auth_bp
+    from main.routes import main_bp
+    from features.jobs.routes import jobs_bp
+    from features.jobs.api import jobs_api_bp
+    from features.user.routes import user_bp
+    from features.company.routes import company_bp
+    from features.auth.routes import auth_bp
+    from features.auth.routes import auth_bp
     # from admin.routes import admin_bp
     app.register_blueprint(main_bp)
+    app.register_blueprint(jobs_bp)
+    app.register_blueprint(jobs_api_bp, url_prefix='/api/jobs')
     app.register_blueprint(user_bp)
     app.register_blueprint(company_bp)
     app.register_blueprint(auth_bp)
