@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import current_user
 
 from main.supabase_client import get_supabase
-from models import Job
+from db.models import Job
 from util.decorators import role_required, sb_login_required
 
 company_bp = Blueprint('company', __name__, template_folder='templates', static_folder='static', static_url_path='/static/company')

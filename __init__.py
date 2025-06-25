@@ -25,43 +25,17 @@ def create_app(config_object=None):
 
     app.config.from_mapping(
         SECRET_KEY=os.environ.get('SECRET_KEY', 'your-secret-key-change-in-production'),  # TODO: Change this in production
-        SQLALCHEMY_DATABASE_URI=os.environ.get('DATABASE_URL', 'sqlite:///careerquest.db'),
-        SQLALCHEMY_TRACK_MODIFICATIONS=False,
-        SESSION_REFRESH_EACH_REQUEST=True,
-        PERMANENT_SESSION_LIFETIME=3600,  # 1 hour
-        SESSION_TYPE='filesystem',
-        SESSION_FILE_DIR=os.path.join(os.getcwd(), 'flask_session'),
-        SESSION_USE_SIGNER=True,
-        TESTING_AUTO_LOGIN_USER=False, # TODO: Remove this in production, only for testing purposes
-        TESTING_AUTO_LOGIN_COMPANY=False  # TODO: Remove this in production, only for testing purposes
+        SERVER_NAME=os.environ.get('SERVER_NAME', 'localhost:5001'),
+        APPLICATION_ROOT=os.environ.get('APPLICATION_ROOT', '/'),
+        PREFERRED_URL_SCHEME=os.environ.get('PREFERRED_URL_SCHEME', 'http'),
     )
-
+    
     CORS(app)
     # db.init_app(app)
 
     login_manager = LoginManager()
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
-
-    # @app.before_request
-    # def auto_login_test_user():
-    #     if app.config.get("TESTING_AUTO_LOGIN_USER", False):
-    #         from flask_login import current_user
-    #         if not current_user.is_authenticated:
-    #             user = User.query.filter_by(username="ARealPerson").first()
-    #             if user:
-    #                 login_user(user)
-    #                 redirect(url_for('users.dashboard'))
-
-    # @app.before_request
-    # def auto_login_test_company():
-    #     if app.config.get("TESTING_AUTO_LOGIN_COMPANY", False):
-    #         from flask_login import current_user
-    #         if not current_user.is_authenticated:
-    #             user = User.query.filter_by(username="arealcompany").first()
-    #             if user:
-    #                 login_user(user)
-    #                 redirect(url_for('company.company_dashboard'))
 
     @app.before_request
     def clear_session_on_restart():
@@ -121,21 +95,18 @@ def create_app(config_object=None):
 
     # Register blueprints
     from main.routes import main_bp
-    from features.jobs.routes import jobs_bp
-    from features.jobs.api import jobs_api_bp
-    from features.user.routes import user_bp
-    from features.company.routes import company_bp
-    from features.auth.routes import auth_bp
+    # from features.jobs.routes import jobs_bp
+    # from features.jobs.api import jobs_api_bp
+    # from features.user.routes import user_bp
+    # from features.company.routes import company_bp
     from features.auth.routes import auth_bp
     # from admin.routes import admin_bp
     app.register_blueprint(main_bp)
-    app.register_blueprint(jobs_bp)
-    app.register_blueprint(jobs_api_bp, url_prefix='/api/jobs')
-    app.register_blueprint(user_bp)
-    app.register_blueprint(company_bp)
-    app.register_blueprint(auth_bp)
+    # app.register_blueprint(jobs_bp)
+    # app.register_blueprint(jobs_api_bp, url_prefix='/api/jobs')
+    # app.register_blueprint(user_bp)
+    # app.register_blueprint(company_bp)
+    app.register_blueprint(auth_bp, url_prefix='/auth')    
     # app.register_blueprint(admin_bp)
 
     return app
-
-

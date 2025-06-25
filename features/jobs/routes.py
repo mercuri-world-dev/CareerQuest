@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template
 
-from database import Job
 from main.supabase_client import get_supabase
+from db.models import Job
 from util.decorators import sb_login_required
 
 jobs_bp = Blueprint('jobs', __name__, template_folder='templates', static_folder='static')

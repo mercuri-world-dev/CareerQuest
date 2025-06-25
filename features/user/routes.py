@@ -2,7 +2,6 @@ from flask import Blueprint, render_template, redirect, request, url_for, flash
 from flask_login import current_user, login_required
 
 from main.supabase_client import get_supabase
-from models import UserProfile
 from util.decorators import role_required, sb_login_required
 
 user_bp = Blueprint('users', __name__, template_folder='templates', static_folder='static', static_url_path='/static/user')
@@ -50,7 +49,7 @@ def profile():
         # Handle accommodations as a list
         accommodations = request.form.get('accommodations', '')
         accommodations_list = [item.strip() for item in accommodations.split(',') if item.strip()]
-        user_profile = supabase.table('user_profiles').select('*').eq('user_public_id', current_user.public_id).single().execute()
+        user_profile = supabase.table('user_profiles').select('*').eq('user_id', current_user.id).single().execute()
         if not user_profile:
             flash('User profile not found', 'error')
             return redirect(url_for('users.profile'))

@@ -2,9 +2,9 @@ from flask import Blueprint, jsonify, request
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-from database import User
 from features.jobs.util.job_scoring import calculate_accommodations_match, calculate_hours_compatibility, calculate_location_similarity, calculate_work_mode_compatibility
 from main.supabase_client import get_supabase
+from db.models import CQUser
 from util.auth import get_supabase_user
 from util.decorators import role_required, sb_login_required
 
@@ -87,7 +87,7 @@ def get_matches(user_id):
         
     return generate_matches_response(user)
 
-def generate_matches_response(user: User):
+def generate_matches_response(user: CQUser):
     # Calculate compatibility scores for each job
     try:
         jobs = get_supabase().table('jobs').select('*').execute()
