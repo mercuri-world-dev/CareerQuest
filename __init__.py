@@ -132,7 +132,7 @@ def create_app(config_object=None):
     # from admin.routes import admin_bp
     app.register_blueprint(main_bp)
     app.register_blueprint(jobs_bp)
-    app.register_blueprint(jobs_api_bp, url_prefix='/api/jobs')
+    app.register_blueprint(jobs_api_bp, url_prefix='/api/')
     app.register_blueprint(user_bp)
     app.register_blueprint(company_bp)
     app.register_blueprint(auth_bp)

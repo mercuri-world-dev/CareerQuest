@@ -448,17 +448,19 @@ label {
     text-align: center;
     margin: 15px 0 25px;
     padding: 15px;
-    background-color: var(--light-gray);
+    background-color: var(--white-more-transparent);
     border-radius: 8px;
+    border: 1px solid var(--light-gray);
 }
 
 .overall-score h4 {
     margin-bottom: 10px;
-    color: var(--secondary-color);
+    color: var(--white);
 }
 
 .overall-score .score {
     font-size: 2rem;
+    color: var(--accent-color);
 }
 
 .job-details-section, .compatibility-factors {
@@ -485,7 +487,7 @@ label {
 }
 
 .factors-table th {
-    background-color: var(--light-gray);
+    background-color: var(--white-more-transparent);
     font-weight: 600;
 }
 
