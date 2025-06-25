@@ -33,8 +33,8 @@ def fetch_user_permissions(user_id):
     # Get permissions for roles
     if not role_ids:
         return []
-    perms_resp = supabase.table('role_permissions').select('permission_name').in_('role_id', role_ids).execute()
-    permissions = [p['permission_name'] for p in perms_resp.data] if perms_resp.data else []
+    perms_resp = supabase.table('role_permissions').select('permission_id').in_('role_id', role_ids).execute()
+    permissions = [p['permission_id'] for p in perms_resp.data] if perms_resp.data else []
     return permissions
 
 def create_jwt_token(user_id, permissions):
@@ -45,6 +45,8 @@ def create_jwt_token(user_id, permissions):
         "exp": datetime.now(tz=timezone.utc) + timedelta(hours=JWT_EXPIRY_HOURS)
     }
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    if isinstance(token, bytes):
+        token = token.decode('utf-8')
     return token
 
 def verify_jwt_token(token):

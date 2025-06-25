@@ -22,72 +22,72 @@ def create_app(config_object=None):
     # app.config.setdefault('SESSION_TYPE', 'filesystem')
     # app.config.setdefault('SESSION_FILE_DIR', os.path.join(os.getcwd(), 'flask_session'))
     # app.config.setdefault('SESSION_USE_SIGNER', True)
-
+    
     app.config.from_mapping(
         SECRET_KEY=os.environ.get('SECRET_KEY', 'your-secret-key-change-in-production'),  # TODO: Change this in production
         SERVER_NAME=os.environ.get('SERVER_NAME', 'localhost:5001'),
         APPLICATION_ROOT=os.environ.get('APPLICATION_ROOT', '/'),
         PREFERRED_URL_SCHEME=os.environ.get('PREFERRED_URL_SCHEME', 'http'),
     )
-    
-    CORS(app)
-    # db.init_app(app)
 
-    login_manager = LoginManager()
-    login_manager.init_app(app)
-    login_manager.login_view = 'auth.login'
+    # CORS(app)
+    # # db.init_app(app)
 
-    @app.before_request
-    def clear_session_on_restart():
-        """Force logout on server restart"""
-        # Check if user is authenticated but session has a different server instance
-        server_id = os.environ.get('SERVER_INSTANCE_ID', os.getpid())
-        if 'server_id' not in session:
-            # New session or server restarted
-            session['server_id'] = server_id
-            # If user was authenticated, log them out
-            if current_user.is_authenticated:
-                logout_user()
-        elif session.get('server_id') != server_id:
-            # Server restarted with existing session
-            session['server_id'] = server_id
-            if current_user.is_authenticated:
-                logout_user()
+    # login_manager = LoginManager()
+    # login_manager.init_app(app)
+    # login_manager.login_view = 'auth.login'
 
-    @login_manager.user_loader
-    def load_user(user_id):
+    # @app.before_request
+    # def clear_session_on_restart():
+    #     """Force logout on server restart"""
+    #     # Check if user is authenticated but session has a different server instance
+    #     server_id = os.environ.get('SERVER_INSTANCE_ID', os.getpid())
+    #     if 'server_id' not in session:
+    #         # New session or server restarted
+    #         session['server_id'] = server_id
+    #         # If user was authenticated, log them out
+    #         if current_user.is_authenticated:
+    #             logout_user()
+    #     elif session.get('server_id') != server_id:
+    #         # Server restarted with existing session
+    #         session['server_id'] = server_id
+    #         if current_user.is_authenticated:
+    #             logout_user()
+
+    # @login_manager.user_loader
+    # def load_user(user_id):
         # try:
         #     user = db.session.get(User, int(user_id))
         #     if user is None:
         #         return None
         #     return user
         # except Exception:
-            return None
+            # return None
 
     # Admin views with access control
-    class MyAdminIndexView(AdminIndexView):
-        @expose('/')
-        def index(self):
-            from flask_login import current_user
-            if not current_user.is_authenticated or not current_user.has_role('admin'):
-                from flask import redirect, url_for
-                return redirect(url_for('auth.login'))
-            return super(MyAdminIndexView, self).index()
+    # class MyAdminIndexView(AdminIndexView):
+    #     @expose('/')
+    #     def index(self):
+    #         from flask_login import current_user
+    #         if not current_user.is_authenticated or not current_user.has_role('admin'):
+    #             from flask import redirect, url_for
+    #             return redirect(url_for('auth.login'))
+    #         return super(MyAdminIndexView, self).index()
 
-    class SecureModelView(ModelView):
-        def is_accessible(self):
-            from flask_login import current_user
-            return current_user.is_authenticated and current_user.has_role('admin')
-        def inaccessible_callback(self, name, **kwargs):
-            from flask import redirect, url_for
-            return redirect(url_for('auth.login'))
+    # class SecureModelView(ModelView):
+    #     def is_accessible(self):
+    #         from flask_login import current_user
+    #         return current_user.is_authenticated and current_user.has_role('admin')
+    #     def inaccessible_callback(self, name, **kwargs):
+    #         from flask import redirect, url_for
+    #         return redirect(url_for('auth.login'))
 
-    admin = Admin(
-        app,
-        name='CareerQuest Admin',
-        template_mode='bootstrap3',
-        index_view=MyAdminIndexView()
-    )
+    # admin = Admin(
+    #     app,
+    #     name='CareerQuest Admin',
+    #     template_mode='bootstrap3',
+    #     index_view=MyAdminIndexView()
+    # )
     # admin.add_view(SecureModelView(User, db.session))
     # admin.add_view(SecureModelView(Role, db.session))
     # admin.add_view(SecureModelView(CompanyProfile, db.session))

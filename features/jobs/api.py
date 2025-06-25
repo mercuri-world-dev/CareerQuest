@@ -61,7 +61,6 @@ def get_job(job_id):
 
 @jobs_api_bp.route('/matches', methods=['GET'])
 @sb_login_required
-@role_required('user')
 def get_matches_for_current_user():
     supabase_user = get_supabase_user()
     if not supabase_user:

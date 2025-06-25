@@ -1,26 +1,23 @@
 from flask import Blueprint, render_template, redirect, request, url_for, flash
-from flask_login import current_user, login_required
+from flask_login import current_user
 
 from main.supabase_client import get_supabase
-from util.decorators import role_required, sb_login_required
+from util.decorators import sb_login_required
 
 user_bp = Blueprint('users', __name__, template_folder='templates', static_folder='static', static_url_path='/static/user')
 
 @user_bp.route('/dashboard')
 @sb_login_required
-@role_required('user')
 def dashboard():
     return render_template('dashboard.html')
 
 @user_bp.route('/job_recommendations')
 @sb_login_required
-@role_required('user')
 def job_recommendations():
     return render_template('job_recommendations.html')
 
 @user_bp.route('/job_compatibility/<job_id>')
 @sb_login_required
-@role_required('user')
 def job_compatibility(job_id):
     supabase = get_supabase()
     job = supabase.table('jobs').select('*').eq('id', job_id).single().execute()
@@ -32,7 +29,6 @@ def job_compatibility(job_id):
 
 @user_bp.route('/profile', methods=['GET', 'POST'])
 @sb_login_required
-@role_required('user')
 #TODO: fix this with final user profile model  
 def profile():
     supabase = get_supabase()
