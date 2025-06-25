@@ -6,7 +6,7 @@ from features.jobs.util.job_scoring import calculate_accommodations_match, calcu
 from main.supabase_client import get_supabase
 from db.models import CQUser
 from util.auth import get_supabase_user
-from util.decorators import role_required, sb_login_required
+from util.decorators import permission_required, sb_login_required
 
 jobs_api_bp = Blueprint('jobs_api', __name__)
 

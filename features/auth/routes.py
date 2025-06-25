@@ -1,16 +1,17 @@
-from flask import Blueprint, flash, redirect, render_template, request, session, url_for
-from flask_login import current_user, logout_user
-from util.auth import fetch_user_permissions, create_jwt_token, get_supabase_user
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask_login import logout_user
+from util.anonymize_email import anonymize_email
+from util.auth import fetch_permissions, create_jwt_token, fetch_user_roles, get_supabase_user
 from flask import make_response
 
 from main.supabase_client import get_supabase
-from util.db_result import DbResult
 
 auth_bp = Blueprint('auth', __name__, template_folder='templates', static_folder='static', static_url_path='/static/auth')
 
 def set_jwt_cookie_and_redirect(user_id):
-    permissions = fetch_user_permissions(user_id)
-    jwt_token = create_jwt_token(user_id, permissions)
+    roles = fetch_user_roles(user_id)
+    permissions = fetch_permissions(roles)
+    jwt_token = create_jwt_token(user_id, permissions, roles)
     resp = make_response(redirect(url_for('main.index')))
     resp.set_cookie('access_token', jwt_token, httponly=True, secure=True)
     return resp
@@ -77,6 +78,13 @@ def callback():
             flash('OAuth callback failed: could not get user session', 'error')
             return redirect(url_for('auth.login'))
         user = session_resp.user
+        if not user or not user.id:
+            flash('OAuth callback failed: User not found', 'error')
+            return redirect(url_for('auth.login'))
+        supabase.table('users').upsert({
+            'user_id': user.id,
+            'anonymized_email': anonymize_email(user.email) if user.email else None,
+        }).execute()
     except Exception as e:
         flash('OAuth callback failed: ' + str(e), 'error')
         return redirect(url_for('auth.login'))
@@ -107,6 +115,10 @@ def register():
         if not user:
             flash('Registration failed: User not found', 'error')
             return redirect(url_for('auth.register'))
+        supabase.table('users').upsert({
+            'user_id': user.id,
+            'anonymized_email': anonymize_email(user.email) if user.email else None,
+        }).execute()
         return set_jwt_cookie_and_redirect(user.id)
     return render_template('register.html')
 

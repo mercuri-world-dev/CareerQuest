@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-import json
 from typing import List, Optional
 from datetime import datetime, timezone
 import uuid

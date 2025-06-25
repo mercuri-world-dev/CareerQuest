@@ -25,23 +25,27 @@ def get_supabase_user():
         print(f"JWT decode error: {e}")
         return None
 
-def fetch_user_permissions(user_id):
+def fetch_user_roles(user_id):
     supabase = get_supabase()
     # Get roles for user
     roles_resp = supabase.table('user_roles').select('role_id').eq('user_id', user_id).execute()
-    role_ids = [r['role_id'] for r in roles_resp.data] if roles_resp.data else []
-    # Get permissions for roles
-    if not role_ids:
+    if not roles_resp.data:
         return []
-    perms_resp = supabase.table('role_permissions').select('permission_id').in_('role_id', role_ids).execute()
+    return [r['role_id'] for r in roles_resp.data]
+
+def fetch_permissions(user_roles):
+    supabase = get_supabase()
+    if not user_roles:
+        return []
+    perms_resp = supabase.table('role_permissions').select('permission_id').in_('role_id', user_roles).execute()
     permissions = [p['permission_id'] for p in perms_resp.data] if perms_resp.data else []
     return permissions
 
-def create_jwt_token(user_id, permissions):
-    print(f"Creating JWT token for user {user_id} with permissions: {permissions}")
+def create_jwt_token(user_id, permissions, roles):
     payload = {
         "sub": user_id,
         "permissions": permissions,
+        "roles": roles,
         "exp": datetime.now(tz=timezone.utc) + timedelta(hours=JWT_EXPIRY_HOURS)
     }
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)

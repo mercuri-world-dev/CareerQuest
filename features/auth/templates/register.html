@@ -38,22 +38,22 @@
         />
         <label for="password">Password</label>
       </div>
-      </div>
-
       <button type="submit" class="btn btn-primary btn-block" name="register_method" value="email">
         Register
       </button> 
       <button type="submit" class="btn btn-google btn-block" name="register_method" value="google">
         Register with Google
       </button>
+      <div class="auth-footer">
+        <p>
+          Already have an account?
+          <a href="{{ url_for('auth.login') }}">Log in here</a>
+        </p>
+      </div>
+      </div>
+
     </form>
 
-    <div class="auth-footer">
-      <p>
-        Already have an account?
-        <a href="{{ url_for('auth.login') }}">Log in here</a>
-      </p>
-    </div>
   </div>
 </div>
 {% endblock %}
