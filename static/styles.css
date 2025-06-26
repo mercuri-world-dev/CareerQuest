@@ -490,13 +490,31 @@ label {
 }
 
 /* Alert Styles */
-.alert {
+.alert-error {
     padding: 12px 15px;
     margin-bottom: 20px;
     border-radius: 6px;
     background-color: #fadbd8;
     color: var(--error-color);
     border-left: 4px solid var(--error-color);
+}
+
+.alert-warning {
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    background-color: #ffecbe;
+    color: #e3a20a;
+    border-left: 4px solid #e3a20a;
+}
+
+.alert-message {
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    background-color: var(--accent-color);
+    color: #4c7e41;
+    border-left: 4px solid #4c7e41;
 }
 
 /* Loading Styles */

@@ -10,8 +10,9 @@
     <p>Create a new job listing</p>
   </div>
   <div class="card-body">
-    {% with messages = get_flashed_messages() %} {% if messages %} {% for
-    message in messages %}
+    {% block messages %}
+      {% include 'components/messages.html' %}
+    {% endblock %}
     <div class="alert">{{ message }}</div>
     {% endfor %} {% endif %} {% endwith %}
 
