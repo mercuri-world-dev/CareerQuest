@@ -61,9 +61,9 @@ class UserProfile:
 
 @dataclass
 class CompanyProfile:
-  id: int
-  user_id: int
   company_name: str
+  id: Optional[int] = None
+  user_id: Optional[str] = None
   industry: List[str] = field(default_factory=list)
   description: Optional[str] = None
   website: Optional[str] = None
@@ -111,10 +111,11 @@ class CompanyProfile:
 
 @dataclass
 class Job:
-  id: str
   company_profile_id: int
-  company_name: str
   role_name: str
+  id: Optional[int] = None
+  user_id: Optional[str] = None
+  company_name: Optional[str] = None
   industry: List[str] = field(default_factory=list)
   weekly_hours: Optional[int] = None
   work_mode: Optional[str] = None
@@ -123,22 +124,20 @@ class Job:
   accommodations: List[str] = field(default_factory=list)
   application_period_start: Optional[datetime] = None
   application_period_end: Optional[datetime] = None
-  application_status: str = "Open"
+  application_status: bool = False
   job_type: Optional[str] = None
   application_materials: List[str] = field(default_factory=list)
   job_description: Optional[str] = None
   application_link: Optional[str] = None
   created_at: datetime = field(default_factory=lambda: datetime.now(tz=timezone.utc))
-
-  def __post_init__(self):
-    if not self.id:
-      self.id = str(uuid.uuid4())
+  updated_at: datetime = field(default_factory=lambda: datetime.now(tz=timezone.utc))
 
   @classmethod
   def from_sb_response(cls, sb_response):
     instance = cls(
       id=sb_response['id'],
       company_profile_id=sb_response['company_profile_id'],
+      user_id=sb_response['user_id'],
       company_name=sb_response['company_name'],
       role_name=sb_response['role_name'],
       weekly_hours=sb_response.get('weekly_hours'),
@@ -203,5 +202,8 @@ class Job:
       'job_type': self.job_type,
       'application_materials': self.get_application_materials_list(),
       'job_description': self.job_description,
-      'application_link': self.application_link
+      'application_link': self.application_link,
+      'created_at': self.created_at.isoformat(),
+      'updated_at': self.updated_at.isoformat(),
+      'user_id': self.user_id,
     }

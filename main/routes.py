@@ -1,16 +1,14 @@
 from flask import Blueprint, flash, jsonify, redirect, render_template, session, url_for
 from flask_login import current_user, logout_user
 
-from util.auth import get_supabase_user
+from util.auth import is_authenticated
 
 main_bp = Blueprint('main', __name__, template_folder='templates', static_folder='static')
 
 @main_bp.route('/')
 def index():
-    # user = get_supabase_user()
-    # if user and user.id:
-    #     return redirect(url_for('users.dashboard'))
-    
+    if is_authenticated():
+        return redirect(url_for('users.dashboard'))
     return render_template('index.html')
 
 # Debug

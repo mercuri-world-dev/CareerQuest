@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Add Company - CareerQuest{% endblock %}
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('cms.static', filename='cms.css') }}">
+{% endblock %}
+{% block content %}
+<div class="card company-profile-card">
+  <div class="card-header">
+    <h2>Add Company</h2>
+    <p>Create a new company profile</p>
+  </div>
+  <div class="card-body">
+    {% with messages = get_flashed_messages() %} {% if messages %} {% for message in messages %}
+    <div class="alert">{{ message }}</div>
+    {% endfor %} {% endif %} {% endwith %}
+    <form class="company-profile-form" method="POST">
+      <div class="form-group">
+        <label for="company_name">Company Name</label>
+        <input type="text" id="company_name" name="company_name" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label for="location">Location (City, State, Country)</label>
+        <input type="text" id="location" name="location" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label for="industry">Industry (comma separated)</label>
+        <input type="text" id="industry" name="industry" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label for="website">Website</label>
+        <input type="url" id="website" name="website" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label for="description">Company Description</label>
+        <textarea id="description" name="description" class="form-control" rows="5"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Add Company</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

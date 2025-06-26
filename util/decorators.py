@@ -2,21 +2,18 @@ from functools import wraps
 
 from flask import flash, json, jsonify, redirect, session, url_for
 
-from util.auth import fetch_user_role, get_supabase_user
+from util.auth import fetch_user_role, get_access_token, is_authenticated
 
-def role_required(required_role):
+def role_required(required_roles: list):
     def wrapper(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            supabase_token = json.loads(session.get('supabase.auth.token'))
-            if not supabase_token:
+            access_token = get_access_token()
+            if not access_token:
+                flash('You must be logged in to access this page.', 'warning')
                 return redirect(url_for('auth.login'))
-            token = supabase_token.get('access_token')
-            if not token:
-                flash('You must be logged in to access this page.', 'error')
-                return redirect(url_for('auth.login'))
-            user_role = fetch_user_role(token)
-            if user_role is None or required_role not in user_role:
+            user_role = fetch_user_role(access_token)
+            if user_role is None or user_role not in required_roles:
                 flash('You do not have permission to access this page (inadequate role).', 'error')
                 return redirect(url_for('main.index'))
             return f(*args, **kwargs)
@@ -26,8 +23,7 @@ def role_required(required_role):
 def sb_login_required(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        user = get_supabase_user()
-        if not user:
+        if not is_authenticated():
             flash('Please log in to access this page.', 'warning')
             return redirect(url_for('auth.login'))
         return fn(*args, **kwargs)

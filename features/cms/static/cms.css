@@ -1,0 +1,96 @@
+/* Company profile styles */
+.company-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.35);
+    border-radius: 16px;
+    border: 2px solid rgba(255,255,255,0.85);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    overflow: hidden;
+}
+
+.company-logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: var(--light-gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.35);
+    border-radius: 16px;
+    border: 2px solid rgba(255,255,255,0.85);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.company-logo img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.company-info h3 {
+    margin-bottom: 5px;
+}
+
+/* Job management styles */
+.job-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.35);
+    border-radius: 16px;
+    border: 2px solid rgba(255,255,255,0.85);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.status-open {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-closed {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.status-draft {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.company-profile-form {
+  color: var(--white-translucent);
+  width: 100%;
+}
+
+.company-profile-card {
+  width: 65vw;
+  align-self: center;
+}
+
+.edit-job-form {
+  color: var(--white-translucent);
+  width: 100%;
+}
+
+.edit-job-card {
+  width: 65vw;
+  align-self: center;
+}

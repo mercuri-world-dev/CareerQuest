@@ -1,10 +1,9 @@
+import json
 import os
-from flask import request
-import requests
+from flask import session
+from supabase.client import Client
 from dotenv import load_dotenv, find_dotenv
 import jwt
-from datetime import datetime, timedelta, timezone
-from main.supabase_client import get_supabase
 
 load_dotenv(find_dotenv())
 
@@ -14,27 +13,12 @@ JWT_ALGORITHM = "HS256"
 JWT_EXPIRY_HOURS = 1
 
 def decode_jwt(token):
-    try:
-        payload = jwt.decode(token, JWT_SECRET, audience="authenticated", algorithms=[JWT_ALGORITHM])
-        print(f"Decoded JWT payload: {payload}")  # Debugging line
-        return payload
-    except jwt.ExpiredSignatureError:
-        print(e) # TODO: Handle expired token 
-        return None
-    except jwt.InvalidTokenError as e:
-        print('Invalid token: ', e) # TODO: Handle invalid token
-        return None
-
-def get_supabase_user():
-  auth_header = request.headers.get('Authorization', '')
-  if not auth_header.startswith('Bearer '):
-    return None
-  token = auth_header.split(' ')[1]
   try:
-    resp = requests.get(url, headers={"Authorization": f"Bearer {token}"})
-    return resp.json() if resp.status_code == 200 else None
-  except Exception as e:
-    print(f"JWT decode error: {e}")
+    payload = jwt.decode(token, JWT_SECRET, audience="authenticated", algorithms=[JWT_ALGORITHM])
+    return payload
+  except jwt.ExpiredSignatureError:
+    return None
+  except jwt.InvalidTokenError as e:
     return None
   
 def fetch_user_role(token):
@@ -42,6 +26,29 @@ def fetch_user_role(token):
   if not res:
     return None
   return res.get('user_role')
+
+def get_access_token():
+  supabase_token = session.get('supabase.auth.token')
+  if not supabase_token:
+      return None
+  if isinstance(supabase_token, str):
+      try:
+          supabase_token_json = json.loads(supabase_token)
+      except json.JSONDecodeError:
+          return None
+  return supabase_token_json.get('access_token')
+
+def get_current_user_id(supabase: Client):
+  user = supabase.auth.get_user()
+  if user and user.user and user.user.id:
+    return user.user.id
+  return None
+
+def is_authenticated():
+  access_token = get_access_token()
+  if not access_token:
+    return False
+  return True
 
 # def create_jwt_token(user_id, permissions, roles):
 #     payload = { 

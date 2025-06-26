@@ -1,8 +1,6 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask_login import logout_user
 from util.anonymize_email import anonymize_email
-from util.auth import get_supabase_user
-from flask import make_response
+from util.auth import is_authenticated
 
 from main.supabase_client import get_supabase
 
@@ -12,13 +10,12 @@ auth_bp = Blueprint('auth', __name__, template_folder='templates', static_folder
 def login():
     supabase = get_supabase()
     if request.method == 'POST':
-        user = get_supabase_user()
-        if user and user.id:
+        if is_authenticated():
             try:
-                resp = logout_user()
+                resp = supabase.auth.sign_out()
             except Exception as e:
                 flash('Logout failed: ' + str(e), 'error')
-                return redirect(url_for('auth.login'))
+                return redirect(url_for('users.dashboard'))
         email = request.form.get('email')
         password = request.form.get('password')
         if not email or not password:
@@ -122,6 +119,4 @@ def logout():
     except Exception as e:
         flash('Logout failed: ' + str(e), 'error')
     resp = redirect(url_for('auth.login'))
-    resp = make_response(resp)
-    resp.set_cookie('access_token', '', expires=0)
     return resp

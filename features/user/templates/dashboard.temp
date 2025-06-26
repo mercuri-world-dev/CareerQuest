@@ -23,7 +23,11 @@
         Get job recommendations tailored to your skills, preferences, and
         accommodations.
       </p>
-      <p style="font-style: italic;">Coming soon</p>
+      <a
+        href="{{ url_for('users.job_recommendations') }}"
+        class="btn btn-secondary"
+        >View Recommendations</a
+      >
     </div>
   </div>
 
@@ -53,7 +57,9 @@
         Keep your profile updated to receive the most relevant job
         recommendations.
       </p>
-      <p style="font-style: italic;">Coming soon</p>
+      <a href="{{ url_for('users.profile') }}" class="btn btn-secondary"
+        >Edit Profile</a
+      >
     </div>
   </div>
 </div>
