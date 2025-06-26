@@ -11,11 +11,6 @@
     <p>Manage your company profile and job listings</p>
   </header>
   <div>
-    {% with messages = get_flashed_messages() %} {% if messages %} {% for
-    message in messages %}
-    <div class="alert">{{ message }}</div>
-    {% endfor %} {% endif %} {% endwith %}
-
     <div class="dashboard-grid">
       <div class="card">
         <div class="card-header">

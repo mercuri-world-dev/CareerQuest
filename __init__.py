@@ -1,6 +1,9 @@
 from flask import Flask
 import os
 
+from main.supabase_client import get_supabase
+from util.auth import get_access_token
+
 def create_app(config_object=None):
     app = Flask(__name__, instance_relative_config=True)
     
@@ -10,6 +13,13 @@ def create_app(config_object=None):
         APPLICATION_ROOT=os.environ.get('APPLICATION_ROOT', '/'),
         PREFERRED_URL_SCHEME=os.environ.get('PREFERRED_URL_SCHEME', 'http'),
     )
+
+    @app.before_request
+    def set_supabase_auth():
+        access_token = get_access_token()
+        supabase = get_supabase()
+        if access_token:
+            supabase.postgrest.auth(access_token)
     
     # Register blueprints
     from main.routes import main_bp

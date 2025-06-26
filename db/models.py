@@ -188,6 +188,7 @@ class Job:
   def to_dict(self):
     return {
       'id': self.id,
+      'company_profile_id': self.company_profile_id,
       'company_name': self.company_name,
       'role_name': self.role_name,
       'industry': self.get_industry_list(),

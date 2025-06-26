@@ -1,8 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from datetime import datetime
-from db.models import Job
+from datetime import datetime, timezone
 from main.supabase_client import get_supabase
-from util.auth import fetch_user_role, get_access_token, get_current_user_id
+from util.auth import fetch_user_role, get_access_token
 from util.decorators import role_required, sb_login_required
 
 CONTENT_MANAGER_GROUPS = ['admin', 'elevated_content_manager', 'content_manager']
@@ -14,7 +13,7 @@ cms_bp = Blueprint('cms', __name__, template_folder='templates', static_folder='
 @sb_login_required
 @role_required(CONTENT_MANAGER_GROUPS)
 def dashboard():
-    return render_template('cms_dashboard.html')
+  return render_template('cms_dashboard.html')
 
 @cms_bp.route('/manage-jobs')
 @sb_login_required
@@ -28,10 +27,6 @@ def manage_jobs():
 @role_required(CONTENT_MANAGER_GROUPS)
 def add_job():
     supabase = get_supabase()
-    current_user_id = get_current_user_id(supabase)
-    if not current_user_id:
-        flash('Failed to retrieve user id.', 'warning')
-        return redirect(url_for('cms.dashboard'))
 
     companies_resp = supabase.table('company_profiles').select('*').execute()
     companies = companies_resp.data or []
@@ -51,48 +46,68 @@ def add_job():
             else:
                 application_status = True
 
-            job = Job(
-                company_profile_id=selected_company['id'],
-                company_name=selected_company.get('company_name'),
-                role_name=request.form.get('role_name'),
-                weekly_hours=int(request.form.get('weekly_hours')) if request.form.get('weekly_hours') else None,
-                work_mode=request.form.get('work_mode'),
-                location=request.form.get('location'),
-                job_type=request.form.get('job_type'),
-                job_description=request.form.get('job_description'),
-                application_link=request.form.get('application_link'),
-                application_status=application_status
-            )
+            company_profile_id=selected_company['id']
+            company_name=selected_company.get('company_name')
+            role_name=request.form.get('role_name')
+            weekly_hours=int(request.form.get('weekly_hours')) if request.form.get('weekly_hours') else None
+            work_mode=request.form.get('work_mode')
+            location=request.form.get('location')
+            job_type=request.form.get('job_type')
+            job_description=request.form.get('job_description')
+            application_link=request.form.get('application_link')
+            application_status=application_status
+
             # Handle lists
             industry = request.form.get('industry', '')
             industry_list = [item.strip() for item in industry.split(',') if item.strip()]
-            job.set_industry_list(industry_list)
             
             qualifications = request.form.get('qualifications', '')
             qualifications_list = [item.strip() for item in qualifications.split(',') if item.strip()]
-            job.set_qualifications_list(qualifications_list)
             
             accommodations = request.form.get('accommodations', '')
             accommodations_list = [item.strip() for item in accommodations.split(',') if item.strip()]
-            job.set_accommodations_list(accommodations_list)
             
             application_materials = request.form.get('application_materials', '')
             materials_list = [item.strip() for item in application_materials.split(',') if item.strip()]
-            job.set_application_materials_list(materials_list)
             
             # Handle dates
             if request.form.get('application_period_start'):
-                job.application_period_start = datetime.strptime(
-                    request.form.get('application_period_start'), '%Y-%m-%d'
-                )
+              application_period_start = datetime.strptime(
+                request.form.get('application_period_start'), '%Y-%m-%d'
+              )
+            else:
+              application_period_start = None
             if request.form.get('application_period_end'):
-                job.application_period_end = datetime.strptime(
-                    request.form.get('application_period_end'), '%Y-%m-%d'
-                )
+              application_period_end = datetime.strptime(
+                request.form.get('application_period_end'), '%Y-%m-%d'
+              )
+            else:
+              application_period_end = None
 
-            supabase.table('jobs').insert(job.to_dict()).execute()
-            
-            flash('Job added successfully!', 'message')
+            job_data = {
+              'company_profile_id': company_profile_id,
+              'company_name': company_name,
+              'role_name': role_name,
+              'weekly_hours': weekly_hours,
+              'work_mode': work_mode,
+              'location': location,
+              'job_type': job_type,
+              'job_description': job_description,
+              'application_link': application_link,
+              'application_status': application_status,
+              'industry': industry_list,
+              'qualifications': qualifications_list,
+              'accommodations': accommodations_list,
+              'application_materials': materials_list,
+              'application_period_start': application_period_start.isoformat() if application_period_start else None,
+              'application_period_end': application_period_end.isoformat() if application_period_end else None,
+              'created_at': datetime.now(tz=timezone.utc).isoformat(),
+              'updated_at': datetime.now(tz=timezone.utc).isoformat()
+            }
+
+            supabase.table('jobs').insert(job_data).execute()
+
+            flash('Job added successfully!', 'message') 
             return redirect(url_for('cms.manage_jobs'))
         except ValueError:
             flash('Invalid date format. Please use YYYY-MM-DD.', 'warning')
@@ -108,10 +123,6 @@ def add_job():
 @role_required(CONTENT_MANAGER_GROUPS)
 def add_company():
     supabase = get_supabase()
-    current_user_id = get_current_user_id(supabase)
-    if not current_user_id:
-        flash('Failed to retrieve user id.', 'warning')
-        return redirect(url_for('cms.dashboard'))
     
     if request.method == 'POST':
         company_name = request.form.get('company_name')
@@ -134,11 +145,9 @@ def add_company():
                 'updated_at': datetime.utcnow().isoformat()
             }
             resp = supabase.table('company_profiles').insert(company_data).execute()
-            print(f"Company insert response: {resp}")
             flash('Company profile added successfully!', 'message')
             return redirect(url_for('cms.dashboard'))
         except Exception as e:
-            print(f"Error adding company: {e}")
             flash('There was an error adding the company. Please try again.', 'error')
             return render_template('add_company.html')
     return render_template('add_company.html')

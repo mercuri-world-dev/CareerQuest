@@ -20,7 +20,7 @@ def decode_jwt(token):
     return None
   except jwt.InvalidTokenError as e:
     return None
-  
+
 def fetch_user_role(token):
   res = decode_jwt(token)
   if not res:

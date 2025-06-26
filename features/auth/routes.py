@@ -30,6 +30,15 @@ def login():
         if not user or not user.id:
             flash('Login failed: User not found', 'error')
             return redirect(url_for('auth.login'))
+        auth_token = res.session.access_token
+        refresh_token = res.session.refresh_token
+        if not auth_token:
+            flash('Login failed: No authentication token received', 'error')
+            return redirect(url_for('auth.login'))
+        if not refresh_token:
+            flash('Login failed: No refresh token received', 'error')
+            return redirect(url_for('auth.login'))
+        supabase.auth.set_session(auth_token, refresh_token)
         return redirect(url_for('main.index'))
     return render_template('login.html')
 
@@ -70,10 +79,6 @@ def callback():
         if not user or not user.id:
             flash('OAuth callback failed: User not found', 'error')
             return redirect(url_for('auth.login'))
-        supabase.table('users').upsert({
-            'user_id': user.id,
-            'anonymized_email': anonymize_email(user.email) if user.email else None,
-        }).execute()
     except Exception as e:
         flash('OAuth callback failed: ' + str(e), 'error')
         return redirect(url_for('auth.login'))
