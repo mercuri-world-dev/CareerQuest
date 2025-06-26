@@ -1,20 +1,12 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import logout_user
 from util.anonymize_email import anonymize_email
-from util.auth import fetch_permissions, create_jwt_token, fetch_user_roles, get_supabase_user
+from util.auth import get_supabase_user
 from flask import make_response
 
 from main.supabase_client import get_supabase
 
 auth_bp = Blueprint('auth', __name__, template_folder='templates', static_folder='static', static_url_path='/static/auth')
-
-def set_jwt_cookie_and_redirect(user_id):
-    roles = fetch_user_roles(user_id)
-    permissions = fetch_permissions(roles)
-    jwt_token = create_jwt_token(user_id, permissions, roles)
-    resp = make_response(redirect(url_for('main.index')))
-    resp.set_cookie('access_token', jwt_token, httponly=True, secure=True)
-    return resp
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -41,7 +33,7 @@ def login():
         if not user or not user.id:
             flash('Login failed: User not found', 'error')
             return redirect(url_for('auth.login'))
-        return set_jwt_cookie_and_redirect(user.id)
+        return redirect(url_for('main.index'))
     return render_template('login.html')
 
 @auth_bp.route('/login/google')
@@ -88,7 +80,7 @@ def callback():
     except Exception as e:
         flash('OAuth callback failed: ' + str(e), 'error')
         return redirect(url_for('auth.login'))
-    return set_jwt_cookie_and_redirect(user.id)
+    return redirect(url_for('main.index'))
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
@@ -119,7 +111,7 @@ def register():
             'user_id': user.id,
             'anonymized_email': anonymize_email(user.email) if user.email else None,
         }).execute()
-        return set_jwt_cookie_and_redirect(user.id)
+        return redirect(url_for('auth.login'))
     return render_template('register.html')
 
 @auth_bp.route('/logout')

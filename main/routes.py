@@ -7,7 +7,7 @@ main_bp = Blueprint('main', __name__, template_folder='templates', static_folder
 
 @main_bp.route('/')
 def index():
-    user = get_supabase_user()
+    # user = get_supabase_user()
     # if user and user.id:
     #     return redirect(url_for('users.dashboard'))
     
