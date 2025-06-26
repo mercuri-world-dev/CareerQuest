@@ -9,13 +9,22 @@
   </head>
   <body>
       {% block navbar %}{% include 'components/navbar.html' %}{% endblock %}
-      {% include 'starbg.html' %}
+      {% block messages %}
+      {% with messages = get_flashed_messages() %}
+          {% if messages %}
+              {% for message in messages %}
+                  <div class="alert">{{ message }}</div>
+              {% endfor %}
+          {% endif %}
+      {% endwith %}
+      {% endblock %}
+      {% include 'components/starbg.html' %}
 
       <div class="container">
           {% block content %}{% endblock %}
       </div>
       <script src="{{ url_for('static', filename='script.js') }}"></script>
-      <script src="{{ url_for('static', filename='effects/components/starbg.js') }}"></script>
+      <script src="{{ url_for('static', filename='effects/starbg.js') }}"></script>
       {% block scripts %}{% endblock %}
   </body>
   <footer>
