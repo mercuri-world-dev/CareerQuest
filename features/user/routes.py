@@ -34,7 +34,7 @@ def dashboard():
 def profile():
     supabase = get_supabase()
     profile_resp = supabase.table('user_profiles').select('*').eq('user_id', get_current_user_id(supabase)).limit(1).execute()
-    profile = profile_resp.data
+    profile = profile_resp.data[0] if profile_resp.data else None
     if request.method == 'POST':
         try:
             accommodations = request.form.get('accommodations', '')
@@ -52,12 +52,14 @@ def profile():
                 "updated_at": datetime.now(tz=timezone.utc).isoformat()
             }
 
-            resp = supabase.table('user_profiles').insert(profile_data).execute()
+            if profile and profile.get('id'):
+                profile_data['id'] = profile['id']
+
+            resp = supabase.table('user_profiles').upsert(profile_data).execute()
             flash('User profile updated successfully!', 'message')
             return render_template('profile.html', profile=resp.data[0] if resp.data else None)
         except Exception as e:
             print(f"Error updating user profile: {e}")
             flash('There was an error updating the user profile. Please try again.', 'error')
             return render_template('profile.html', profile=profile if profile else None)
-        
     return render_template('profile.html', profile=profile if profile else None)
