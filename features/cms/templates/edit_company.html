@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Edit Company - CareerQuest{% endblock %}
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('cms.static', filename='cms.css') }}">
+{% endblock %}
+{% block content %}
+<div class="card company-profile-card">
+  <div class="card-header">
+    <h2>Edit Company</h2>
+    <p>Update your company profile</p>
+  </div>
+  <div class="card-body">
+    {% block messages %}
+      {% include 'components/messages.html' %}
+    {% endblock %}
+    <form class="company-profile-form" method="POST">
+      <div class="form-group">
+        <label for="company_name">Company Name</label>
+        <input type="text" id="company_name" name="company_name" class="form-control" value="{{ company.company_name }}" required />
+      </div>
+      <div class="form-group">
+        <label for="location">Location (City, State, Country)</label>
+        <input type="text" id="location" name="location" class="form-control" value="{{ company.location }}" />
+      </div>
+      <div class="form-group">
+        <label for="industry">Industry (comma separated)</label>
+        <input type="text" id="industry" name="industry" class="form-control" value="{{ company.industry|join(', ') }}" />
+      </div>
+      <div class="form-group">
+        <label for="website">Website</label>
+        <input type="url" id="website" name="website" class="form-control" value="{{ company.website }}" />
+      </div>
+      <div class="form-group">
+        <label for="description">Company Description</label>
+        <textarea id="description" name="description" class="form-control" rows="5">{{ company.description }}</textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

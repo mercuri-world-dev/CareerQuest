@@ -9,15 +9,8 @@
       {% block head %}{% endblock %}
   </head>
   <body>
-      {% include 'starbg.html' %}
-      
-      {% with messages = get_flashed_messages() %}
-          {% if messages %}
-              {% for message in messages %}
-                  <div class="alert">{{ message }}</div>
-              {% endfor %}
-          {% endif %}
-      {% endwith %}
+      {% include 'components/starbg.html' %}
+
       <div class="auth-container">
           {% block content %}{% endblock %}
       </div>

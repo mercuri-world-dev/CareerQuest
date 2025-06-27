@@ -1,130 +1,133 @@
-# from gotrue import SyncSupportedStorage
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask_login import current_user, login_user, logout_user
+from util.auth import is_authenticated
 
-from database import Role, User, db
+from main.supabase_client import get_supabase
 
 auth_bp = Blueprint('auth', __name__, template_folder='templates', static_folder='static', static_url_path='/static/auth')
 
-print("AUTH STATIC FOLDER:", auth_bp.static_folder)                
-# @auth_bp.route('/login', methods=['GET', 'POST'])
-# def login():
-#     if request.method == 'POST':
-#         email = request.form.get('email')
-#         password = request.form.get('password')
-#         if not email or not password:
-#             flash('Email and password are required', 'warning')
-#             return redirect(url_for('auth.login'))
-        
-#         res = supabase.auth.sign_in_with_password(email=email, password=password)
-#         if res.error:
-#             flash('Login failed: ' + res.error.message, 'error')
-#             return redirect(url_for('auth.login'))
-        
-#         return redirect(url_for('main.index'))
-#     return render_template('auth/login.html')
-
-# @auth_bp.route('/register')
-# def register():
-#     return render_template('auth/register.html')
-
-# @auth_bp.route('/logout')
-# def logout():
-#     logout_user()
-#     return redirect(url_for('main.index')) # TODO: import index route')
-
-# @auth_bp.route('/login/callback')
-# def callback():
-#     code = request.args.get('code')
-#     if not code:
-#         return redirect(url_for('auth.login'))
-#     next = request.args.get('next', url_for('main.index'))
-#     res = supabase.auth.exchange_code_for_session(code, redirect_to=next)
-#     if res.error:
-#         flash('Login failed: ' + res.error.message, 'error')
-#         return redirect(url_for('auth.login'))
-#     return redirect(next)
-
-# @auth_bp.route('/login/google')
-# def google_login():
-#     res = supabase.auth.sign_in_with_oauth(
-#         {
-#             'provider': 'google',
-#             'options': {
-#                 'redirect_to': url_for('auth.callback')
-#             }
-#         }
-#     )
-#     return redirect(res.url)
-
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    # Clear any potentially stale session data
-    if current_user.is_authenticated and hasattr(current_user, 'id'):
-        logout_user()
-        
+    supabase = get_supabase()
     if request.method == 'POST':
-        username = request.form.get('username')
+        if is_authenticated():
+            try:
+                resp = supabase.auth.sign_out()
+            except Exception as e:
+                flash('Logout failed: ' + str(e), 'error')
+                return redirect(url_for('main.index'))
+        if request.form.get('login_method') == 'google':
+            return redirect(url_for('auth.login_google'))
+        email = request.form.get('email')
         password = request.form.get('password')
-        
-        user = User.query.filter_by(username=username).first()
-        
-        if user and user.check_password(password):
-            login_user(user)
-            
-            # Redirect to appropriate dashboard based on role
-            next_page = request.args.get('next')
-            if next_page:
-                return redirect(next_page)
-            return redirect(url_for('main.index'))
-                
-        flash('Invalid username or password')
-    
+        if not email or not password:
+            flash('Email and password are required', 'warning')
+            return redirect(url_for('auth.login'))
+        try:
+            res = supabase.auth.sign_in_with_password({"email": email, "password": password})
+        except Exception as e:
+            flash('Login failed: ' + str(e), 'error')
+            return redirect(url_for('auth.login'))
+        user = res.user
+        if not user or not user.id:
+            flash('Login failed: User not found', 'error')
+            return redirect(url_for('auth.login'))
+        auth_token = res.session.access_token
+        refresh_token = res.session.refresh_token
+        if not auth_token:
+            flash('Login failed: No authentication token received', 'error')
+            return redirect(url_for('auth.login'))
+        if not refresh_token:
+            flash('Login failed: No refresh token received', 'error')
+            return redirect(url_for('auth.login'))
+        supabase.auth.set_session(auth_token, refresh_token)
+        return redirect(url_for('main.index'))
     return render_template('login.html')
 
-@auth_bp.route('/logout')
-def logout():
-    logout_user()
-    # After logout, explicitly redirect to the landing page
+@auth_bp.route('/login/google')
+def login_google():
+    supabase = get_supabase()
+    try:
+        res = supabase.auth.sign_in_with_oauth(
+            {
+                'provider': 'google',
+                'options': {
+                    'redirect_to': url_for('auth.callback', _external=True)
+                }
+            }
+        )
+    except Exception as e:
+        flash('Google login failed: ' + str(e), 'error')
+        return redirect(url_for('auth.login'))
+    return redirect(res.url)
+
+@auth_bp.route('/callback')
+def callback():
+    code = request.args.get('code')
+    if not code:
+        flash('No code provided in callback', 'error')
+        return redirect(url_for('auth.login'))
+    supabase = get_supabase()
+    try:
+        exchange = supabase.auth.exchange_code_for_session({ "auth_code": code })
+        if not exchange or not exchange.session:
+            flash('OAuth callback failed: could not exchange code for session', 'error')
+            return redirect(url_for('auth.login'))
+        session_resp = exchange.session
+        if not session_resp or not session_resp.user:
+            flash('OAuth callback failed: could not get user session', 'error')
+            return redirect(url_for('auth.login'))
+        user = session_resp.user
+        if not user or not user.id:
+            flash('OAuth callback failed: User not found', 'error')
+            return redirect(url_for('auth.login'))
+    except Exception as e:
+        flash('OAuth callback failed: ' + str(e), 'error')
+        return redirect(url_for('auth.login'))
     return redirect(url_for('main.index'))
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
-    # Clear any potentially stale session data
-    if current_user.is_authenticated and hasattr(current_user, 'id'):
-        logout_user()
-    
+    supabase = get_supabase()
     if request.method == 'POST':
-        username = request.form.get('username')
+        if is_authenticated():
+            try:
+                resp = supabase.auth.sign_out()
+            except Exception as e:
+                flash('Logout failed: ' + str(e), 'error')
+                return redirect(url_for('main.index'))
+        if request.form.get('register_method') == 'google':
+            return redirect(url_for('auth.login_google'))
         email = request.form.get('email')
         password = request.form.get('password')
-        account_type = request.form.get('account_type', 'user')
-        
-        if User.query.filter_by(username=username).first():
-            flash('Username already exists')
+        if not email or not password:
+            flash('Email and password are required', 'warning')
             return redirect(url_for('auth.register'))
-            
-        if User.query.filter_by(email=email).first():
-            flash('Email already registered')
+        try:
+            res = supabase.auth.sign_up(
+                {
+                    "email": email,
+                    "password": password
+                }
+            )
+        except Exception as e:
+            flash('Registration failed: ' + str(e), 'error')
             return redirect(url_for('auth.register'))
-            
-        user = User(username=username, email=email)
-        user.set_password(password)
-        
-        # Assign role based on account type
-        role = Role.query.filter_by(name=account_type).first()
-        if role:
-            user.roles.append(role)
-            print(f"Assigned role {role.name} to user {username}")
-        else:
-            print(f"Role {account_type} not found")
-            
-        db.session.add(user)
-        db.session.commit()
-        
-        flash('Registration successful! Please log in.', 'message')
+        user = res.user
+        if not user:
+            flash('Registration failed: User not found', 'error')
+            return redirect(url_for('auth.register'))
+        supabase.table('users').upsert({
+            'user_id': user.id
+        }).execute()
         return redirect(url_for('auth.login'))
-        
     return render_template('register.html')
 
-
+@auth_bp.route('/logout')
+def logout():
+    supabase = get_supabase()
+    try:
+        res = supabase.auth.sign_out()
+    except Exception as e:
+        flash('Logout failed: ' + str(e), 'error')
+    resp = redirect(url_for('auth.login'))
+    return resp

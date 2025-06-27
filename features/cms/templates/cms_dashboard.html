@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Company Dashboard - CareerQuest{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('cms.static', filename='cms.css') }}">
+{% endblock %}
+
+{% block content %}
+  <header>
+    <h1>Content Management Dashboard</h1>
+  </header>
+  <div>
+    <div class="dashboard-grid">
+      <div class="card">
+        <div class="card-header">
+          <h2>Add Company</h2>
+        </div>
+        <div class="card-body">
+          <a href="{{ url_for('cms.manage_companies') }}" class="btn btn-primary">
+            Manage Companies
+          </a>
+          <a href="{{ url_for('cms.add_company') }}" class="btn btn-primary">
+            Add New Company
+          </a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Job Listings</h2>
+        </div>
+        <div class="card-body">
+          <a href="{{ url_for('cms.manage_jobs') }}" class="btn btn-primary"
+            >Manage Jobs</a
+          >
+          <a href="{{ url_for('cms.add_job') }}" class="btn btn-secondary"
+            >Add New Job</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -8,9 +8,11 @@
       {% block head %}{% endblock %}
   </head>
   <body>
-      {% block navbar %}{% include 'navbar.html' %}{% endblock %}
-      {% include 'starbg.html' %}
-
+      {% block navbar %}{% include 'components/navbar.html' %}{% endblock %}
+      {% block messages %}
+        {% include 'components/messages.html' %}
+      {% endblock %}
+      {% include 'components/starbg.html' %}
       <div class="container">
           {% block content %}{% endblock %}
       </div>

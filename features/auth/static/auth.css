@@ -132,7 +132,9 @@
     padding: 0 4px;
 }
 
-.account-type-toggle {
+/* one day....... */
+
+/* .account-type-toggle {
     display: flex !important;
     flex-direction: row !important;
     gap: 16px;
@@ -190,4 +192,4 @@ input[type="radio"][name="account_type"]:checked + label {
 .account-type-toggle label:hover {
     background: rgba(217, 194, 237, 0.12) !important;
     color: var(--white) !important;
-}
+} */

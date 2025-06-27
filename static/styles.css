@@ -42,6 +42,7 @@
 
     --dark-gray: #7f8c8d;
     --dark-gray-translucent: rgba(127, 140, 141, 0.8);
+    --dark-gray-transparent: rgba(127, 140, 141, 0.15);
 
     --error-color: #e74c3c;
     --error-color-translucent: rgba(231, 76, 60, 0.8);
@@ -225,6 +226,10 @@ header h1 span {
     color: var(--white-translucent);
 }
 
+.form-group input::placeholder {
+    color: var(--white-transparent);
+}
+
 .form-row {
     display: flex;
     gap: 20px;
@@ -244,9 +249,9 @@ label {
 .form-control {
     width: 100%;
     padding: 12px 15px;
-    color: var(--medium-gray);
+    color: var(--light-gray);
     border: 1px solid var(--medium-gray);
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: var(--dark-gray-transparent);
     border-radius: 6px;
     font-size: 16px;
     transition: var(--transition);
@@ -257,6 +262,10 @@ label {
     border-color: var(--light-gray);
     background-color: rgba(255, 255, 255, 0.4);
     outline: none;
+}
+
+.form-select option {
+    color: var(--dark-gray);
 }
 
 .checkbox-group {
@@ -473,7 +482,7 @@ label {
     padding-bottom: 8px;
     border-bottom: 1px solid var(--medium-gray);
 }
-
+ 
 .factors-table {
     width: 100%;
     border-collapse: collapse;
@@ -492,13 +501,31 @@ label {
 }
 
 /* Alert Styles */
-.alert {
+.alert-error {
     padding: 12px 15px;
     margin-bottom: 20px;
     border-radius: 6px;
     background-color: #fadbd8;
     color: var(--error-color);
     border-left: 4px solid var(--error-color);
+}
+
+.alert-warning {
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    background-color: #ffecbe;
+    color: #e3a20a;
+    border-left: 4px solid #e3a20a;
+}
+
+.alert-message {
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    background-color: var(--accent-color);
+    color: #4c7e41;
+    border-left: 4px solid #4c7e41;
 }
 
 /* Loading Styles */

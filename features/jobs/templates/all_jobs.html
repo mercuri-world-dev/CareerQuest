@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block title %} All Jobs - CareerQuest {% endblock %}
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h2>All Available Jobs</h2>
+      <p>Browse through our complete job listings</p>
+    </div>
+    <div class="card-body">
+      <form id="jobFilterForm" class="form-group" style="margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap;">
+        <input type="text" name="company_name" class="form-control" placeholder="Company Name" />
+        <input type="text" name="role_name" class="form-control" placeholder="Job Title" />
+        <select name="job_type" class="form-control form-select">
+          <option value="">Any Type</option>
+          <option value="Full-time">Full-time</option>
+          <option value="Part-time">Part-time</option>
+          <option value="Contract">Contract</option>
+          <option value="Internship">Internship</option>
+          <option value="Temporary">Temporary</option>
+        </select>
+        <select name="work_mode" class="form-control form-select">
+          <option value="">Any Mode</option>
+          <option value="remote">Remote</option>
+          <option value="hybrid">Hybrid</option>
+          <option value="in-person">In-person</option>
+        </select>
+        <input type="text" name="location" class="form-control" placeholder="Location" />
+        <input type="text" name="industry" class="form-control" placeholder="Industry (comma separated)" />
+        <select name="application_status" class="form-control form-select">
+          <option value="">Any Status</option>
+          <option value="Open">Open</option>
+          <option value="Closed">Closed</option>
+          <option value="Draft">Draft</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Filter</button>
+        <button type="reset" class="btn btn-secondary" onclick="clearFilterForm()">Reset</button>
+      </form>
+      <div id="jobsLoading" class="loading" style="display: none">
+        <div class="loading-spinner"></div>
+        <p>Loading jobs...</p>
+      </div>
+
+      <div id="jobsError" class="error" style="display: none"></div>
+
+      <div id="jobsResults" class="results-container"></div>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+  <script>
+    function clearFilterForm() {
+      const form = document.getElementById("jobFilterForm");
+      form.reset();
+    }
+
+    function getQueryStringFromForm(form) {
+      const params = new URLSearchParams();
+      for (const el of form.elements) {
+        if (el.name && el.value) {
+          if (el.name == 'application_status') {
+            params.append(el.name, el.value === 'Open');
+            continue;
+          }
+          params.append(el.name, el.value);
+        }
+      }
+      return params.toString();
+    }
+
+    function updateJobsList(queryString = "") {
+      const resultsDiv = document.getElementById("jobsResults");
+      const loadingDiv = document.getElementById("jobsLoading");
+      const errorDiv = document.getElementById("jobsError");
+      resultsDiv.innerHTML = "";
+      errorDiv.style.display = "none";
+      loadingDiv.style.display = "flex";
+      let url = "/api/jobs";
+      if (queryString) url += "?" + queryString;
+      fetch(url)
+        .then((response) => {
+          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+          return response.json();
+        })
+        .then((data) => {
+          if (data && data.length > 0) {
+            const heading = document.createElement("h3");
+            heading.textContent = "Results";
+            resultsDiv.appendChild(heading);
+            data.forEach((job) => {
+              const jobCard = createJobCard(job);
+              resultsDiv.appendChild(jobCard);
+            });
+          } else {
+            const noResults = document.createElement("p");
+            noResults.textContent = "No jobs found.";
+            resultsDiv.appendChild(noResults);
+          }
+        })
+        .catch((error) => {
+          errorDiv.textContent = `Error: ${error.message || "Could not fetch jobs"}`;
+          errorDiv.style.display = "block";
+        })
+        .finally(() => {
+          loadingDiv.style.display = "none";
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("jobFilterForm");
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const queryString = getQueryStringFromForm(form);
+        window.history.replaceState(null, "", `?${queryString}`);
+        updateJobsList(queryString);
+      });
+      updateJobsList(window.location.search.slice(1));
+    });
+
+    function createJobCard(job) {
+      const card = document.createElement("div");
+      card.className = "job-card";
+
+      // Title
+      const title = document.createElement("h3");
+      title.textContent = `${job.role_name || "Untitled Role"} at ${job.company_name || "Unknown Company"}`;
+      card.appendChild(title);
+
+      const skipFields = [
+        "id", "created_at", "updated_at", "company_id", "role_name", "company_name", "user_id", "company_profile_id",
+      ];
+
+      const dateFields = ["application_period_start", "application_period_end"];
+
+      Object.entries(job).forEach(([key, value]) => {
+        if (skipFields.includes(key) || value === null || value === undefined || value.toString().trim() === "") return;
+        let label = key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+        let displayValue = value;
+        if (Array.isArray(value)) {
+          displayValue = value.join(", ");
+        } else if (typeof value === "boolean") {
+          displayValue = value ? "Open" : "Closed";
+        }
+        if (key === "role_name" || key === "company_name") return;
+        if (dateFields.includes(key) && value) {
+          displayValue = new Date(value).toLocaleDateString();
+        }
+        const p = document.createElement("p");
+        p.textContent = `${label}: ${displayValue}`;
+        card.appendChild(p);
+      });
+
+      return card;
+    }
+  </script>
+{% endblock %}

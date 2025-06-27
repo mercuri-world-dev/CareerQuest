@@ -10,30 +10,17 @@
   <div class="auth-body">
     <h2>Create an Account</h2>
 
-    {% with messages = get_flashed_messages() %} {% if messages %} {% for
-    message in messages %}
-    <div class="alert">{{ message }}</div>
-    {% endfor %} {% endif %} {% endwith %}
+    {% block messages %}
+      {% include 'components/messages.html' %}
+    {% endblock %}
 
     <form method="POST" action="{{ url_for('auth.register') }}" class="auth-form">
-      <div class="form-group">
-        <input
-          type="text"
-          id="username"
-          name="username"
-          required
-          placeholder=" "
-          autocomplete="username"
-        />
-        <label for="username">Username</label>
-      </div>
 
       <div class="form-group">
         <input
           type="email"
           id="email"
           name="email"
-          required
           placeholder=" "
           autocomplete="email"
         />
@@ -45,39 +32,27 @@
           type="password"
           id="password"
           name="password"
-          required
           placeholder=" "
           autocomplete="new-password"
         />
         <label for="password">Password</label>
       </div>
-
-      <div class="form-group">
-        <div class="account-type-toggle">
-          <input type="radio" id="user" name="account_type" value="user" checked />
-          <label for="user" class="account-type-btn">
-            <span class="icon" aria-hidden="true">👤</span>
-            <span>Job Seeker</span>
-          </label>
-          <input type="radio" id="company" name="account_type" value="company" />
-          <label for="company" class="account-type-btn">
-            <span class="icon" aria-hidden="true">🏢</span>
-            <span>Company</span>
-          </label>
-        </div>
+      <button type="submit" class="btn btn-primary btn-block" name="register_method" value="email">
+        Register
+      </button> 
+      <button type="submit" class="btn btn-google btn-block" name="register_method" value="google">
+        Register with Google
+      </button>
+      <div class="auth-footer">
+        <p>
+          Already have an account?
+          <a href="{{ url_for('auth.login') }}">Log in here</a>
+        </p>
+      </div>
       </div>
 
-      <button type="submit" class="btn btn-primary btn-block">
-        Register
-      </button>
     </form>
 
-    <div class="auth-footer">
-      <p>
-        Already have an account?
-        <a href="{{ url_for('auth.login') }}">Log in here</a>
-      </p>
-    </div>
   </div>
 </div>
 {% endblock %}
