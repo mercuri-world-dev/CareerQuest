@@ -1,6 +1,6 @@
 from functools import wraps
 
-from flask import flash, json, jsonify, redirect, session, url_for
+from flask import flash, redirect, url_for
 
 from util.auth import fetch_user_role, get_access_token, is_authenticated
 

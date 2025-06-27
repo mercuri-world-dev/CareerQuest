@@ -1,5 +1,4 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from util.anonymize_email import anonymize_email
 from util.auth import is_authenticated
 
 from main.supabase_client import get_supabase
@@ -110,8 +109,7 @@ def register():
             flash('Registration failed: User not found', 'error')
             return redirect(url_for('auth.register'))
         supabase.table('users').upsert({
-            'user_id': user.id,
-            'anonymized_email': anonymize_email(user.email) if user.email else None,
+            'user_id': user.id
         }).execute()
         return redirect(url_for('auth.login'))
     return render_template('register.html')

@@ -1,6 +1,6 @@
 // Global variables
-let currentUser = null;
-let allJobs = [];
+// let currentUser = null;
+// let allJobs = [];
 
 // DOM Ready event
 // document.addEventListener('DOMContentLoaded', function() {

@@ -1,6 +1,5 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template
 from util.decorators import role_required
-from main.supabase_client import get_supabase
 
 admin_bp = Blueprint('admin', __name__, template_folder='templates', static_folder='static')
  

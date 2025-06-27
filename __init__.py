@@ -8,7 +8,7 @@ def create_app(config_object=None):
     app = Flask(__name__, instance_relative_config=True)
     
     app.config.from_mapping(
-        SECRET_KEY=os.environ.get('SECRET_KEY', 'your-secret-key-change-in-production'),  # TODO: Change this in production
+        SECRET_KEY=os.environ.get('SECRET_KEY'),
         SERVER_NAME=os.environ.get('SERVER_NAME', 'localhost:5001'),
         APPLICATION_ROOT=os.environ.get('APPLICATION_ROOT', '/'),
         PREFERRED_URL_SCHEME=os.environ.get('PREFERRED_URL_SCHEME', 'http'),
@@ -21,7 +21,6 @@ def create_app(config_object=None):
         if access_token:
             supabase.postgrest.auth(access_token)
     
-    # Register blueprints
     from main.routes import main_bp
     from features.jobs.routes import jobs_bp
     from features.jobs.api import jobs_api_bp
