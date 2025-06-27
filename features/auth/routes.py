@@ -15,6 +15,8 @@ def login():
             except Exception as e:
                 flash('Logout failed: ' + str(e), 'error')
                 return redirect(url_for('main.index'))
+        if request.form.get('login_method') == 'google':
+            return redirect(url_for('auth.login_google'))
         email = request.form.get('email')
         password = request.form.get('password')
         if not email or not password:
@@ -85,10 +87,16 @@ def callback():
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.form.get('register_method') == 'google':
-        return redirect(url_for('auth.login_google'))
     supabase = get_supabase()
     if request.method == 'POST':
+        if is_authenticated():
+            try:
+                resp = supabase.auth.sign_out()
+            except Exception as e:
+                flash('Logout failed: ' + str(e), 'error')
+                return redirect(url_for('main.index'))
+        if request.form.get('register_method') == 'google':
+            return redirect(url_for('auth.login_google'))
         email = request.form.get('email')
         password = request.form.get('password')
         if not email or not password:

@@ -20,7 +20,6 @@
             type="text"
             id="email"
             name="email"
-            required
             placeholder=" "
             autocomplete="email"
           />
@@ -32,7 +31,6 @@
             type="password"
             id="password"
             name="password"
-            required
             placeholder=" "
             autocomplete="current-password"
           />
@@ -40,8 +38,11 @@
         </div>
 
         <div class="form-group">
-          <button type="submit" class="btn btn-primary btn-block">
+          <button type="submit" class="btn btn-primary btn-block" name="login_method" value="email">
             Log In
+          </button> 
+          <button type="submit" class="btn btn-google btn-block" name="login_method" value="google">
+            Log In with Google
           </button>
         </div>
       </form>
