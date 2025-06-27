@@ -16,7 +16,7 @@ def role_required(required_roles: list):
             if user_role is None or user_role not in required_roles:
                 flash('You do not have permission to access this page (inadequate role).', 'error')
                 return redirect(url_for('main.index'))
-            return f(*args, **kwargs)
+            return f(*args, **kwargs) 
         return decorated_function
     return wrapper
 

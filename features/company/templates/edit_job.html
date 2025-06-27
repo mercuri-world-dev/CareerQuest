@@ -30,7 +30,7 @@
             <div class="form-row">
                 <div class="form-col">
                     <label for="job_type">Job Type</label>
-                    <select id="job_type" name="job_type" class="form-control">
+                    <select id="job_type" name="job_type" class="form-control form-select">
                         <option value="Full-time" {% if job.job_type == 'Full-time' %}selected{% endif %}>Full-time</option>
                         <option value="Part-time" {% if job.job_type == 'Part-time' %}selected{% endif %}>Part-time</option>
                         <option value="Contract" {% if job.job_type == 'Contract' %}selected{% endif %}>Contract</option>
@@ -41,7 +41,7 @@
                 
                 <div class="form-col">
                     <label for="work_mode">Work Mode</label>
-                    <select id="work_mode" name="work_mode" class="form-control">
+                    <select id="work_mode" name="work_mode" class="form-control form-select">
                         <option value="remote" {% if job.work_mode == 'remote' %}selected{% endif %}>Remote</option>
                         <option value="hybrid" {% if job.work_mode == 'hybrid' %}selected{% endif %}>Hybrid</option>
                         <option value="in-person" {% if job.work_mode == 'in-person' %}selected{% endif %}>In-person</option>
@@ -104,7 +104,7 @@
             
             <div class="form-group">
                 <label for="application_status">Application Status</label>
-                <select id="application_status" name="application_status" class="form-control">
+                <select id="application_status" name="application_status" class="form-control form-select">
                     <option value="Open" {% if job.application_status == 'Open' %}selected{% endif %}>Open</option>
                     <option value="Closed" {% if job.application_status == 'Closed' %}selected{% endif %}>Closed</option>
                     <option value="Draft" {% if job.application_status == 'Draft' %}selected{% endif %}>Draft</option>

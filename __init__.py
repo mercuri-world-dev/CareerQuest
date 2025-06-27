@@ -24,7 +24,7 @@ def create_app(config_object=None):
     # Register blueprints
     from main.routes import main_bp
     from features.jobs.routes import jobs_bp
-    # from features.jobs.api import jobs_api_bp
+    from features.jobs.api import jobs_api_bp
     from features.user.routes import user_bp
     # from features.company.routes import company_bp
     from features.auth.routes import auth_bp
@@ -32,7 +32,7 @@ def create_app(config_object=None):
     from features.cms.routes import cms_bp
     app.register_blueprint(main_bp)
     app.register_blueprint(jobs_bp)
-    # app.register_blueprint(jobs_api_bp, url_prefix='/api/jobs')
+    app.register_blueprint(jobs_api_bp, url_prefix='/api')
     app.register_blueprint(user_bp)
     # app.register_blueprint(company_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')    

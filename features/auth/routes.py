@@ -15,7 +15,7 @@ def login():
                 resp = supabase.auth.sign_out()
             except Exception as e:
                 flash('Logout failed: ' + str(e), 'error')
-                return redirect(url_for('users.dashboard'))
+                return redirect(url_for('main.index'))
         email = request.form.get('email')
         password = request.form.get('password')
         if not email or not password:

@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from datetime import datetime, timezone
 from main.supabase_client import get_supabase
-from util.auth import fetch_user_role, get_access_token
 from util.decorators import role_required, sb_login_required
 
 CONTENT_MANAGER_GROUPS = ['admin', 'elevated_content_manager', 'content_manager']
@@ -19,8 +18,51 @@ def dashboard():
 @sb_login_required
 @role_required(CONTENT_MANAGER_GROUPS)
 def manage_jobs():
-    return render_template('cms_dashboard.html')
-    # return render_template('manage_jobs.html')
+    supabase = get_supabase()
+    # Get all jobs for companies owned by the current user
+    companies_resp = supabase.table('company_profiles').select('id').execute()
+    company_ids = [c['id'] for c in (companies_resp.data or [])]
+    jobs_resp = supabase.table('jobs').select('*').in_('company_profile_id', company_ids).execute()
+    jobs = jobs_resp.data or []
+    return render_template('manage_jobs.html', jobs=jobs)
+
+@cms_bp.route('/edit-job/<int:job_id>', methods=['GET', 'POST'])
+@sb_login_required
+@role_required(CONTENT_MANAGER_GROUPS)
+def edit_job(job_id):
+    supabase = get_supabase()
+    job_resp = supabase.table('jobs').select('*').eq('id', job_id).single().execute()
+    job = job_resp.data
+    if not job:
+        flash('Job not found.', 'warning')
+        return redirect(url_for('cms.manage_jobs'))
+    if request.method == 'POST':
+        application_status_response = request.form.get('application_status', 'Open')
+        if application_status_response in ['Closed', 'Draft']:
+            application_status = False
+        else:
+            application_status = True
+        update_data = {
+            'role_name': request.form.get('role_name'),
+            'weekly_hours': int(request.form.get('weekly_hours')) if request.form.get('weekly_hours') else None,
+            'work_mode': request.form.get('work_mode'),
+            'location': request.form.get('location'),
+            'job_type': request.form.get('job_type'),
+            'job_description': request.form.get('job_description'),
+            'application_link': request.form.get('application_link'),
+            'application_status': application_status,
+            'industry': [item.strip() for item in request.form.get('industry', '').split(',') if item.strip()],
+            'qualifications': [item.strip() for item in request.form.get('qualifications', '').split(',') if item.strip()],
+            'accommodations': [item.strip() for item in request.form.get('accommodations', '').split(',') if item.strip()],
+            'application_materials': [item.strip() for item in request.form.get('application_materials', '').split(',') if item.strip()],
+            'application_period_start': request.form.get('application_period_start') or None,
+            'application_period_end': request.form.get('application_period_end') or None,
+            'updated_at': datetime.now(tz=timezone.utc).isoformat()
+        }
+        supabase.table('jobs').update(update_data).eq('id', job_id).execute()
+        flash('Job updated successfully!', 'message')
+        return redirect(url_for('cms.manage_jobs'))
+    return render_template('edit_job.html', job=job)
 
 @cms_bp.route('/add-job', methods=['GET', 'POST'])
 @sb_login_required
@@ -117,6 +159,39 @@ def add_job():
             flash('There was an error adding the job. Please try again.', 'error')
             return render_template('add_job.html', companies=companies)
     return render_template('add_job.html', companies=companies)
+
+@cms_bp.route('/manage-companies')
+@sb_login_required
+@role_required(CONTENT_MANAGER_GROUPS)
+def manage_companies():
+    supabase = get_supabase()
+    companies_resp = supabase.table('company_profiles').select('*').execute()
+    companies = companies_resp.data or []
+    return render_template('manage_companies.html', companies=companies)
+
+@cms_bp.route('/edit-company/<int:company_id>', methods=['GET', 'POST'])
+@sb_login_required
+@role_required(CONTENT_MANAGER_GROUPS)
+def edit_company(company_id):
+    supabase = get_supabase()
+    company_resp = supabase.table('company_profiles').select('*').eq('id', company_id).single().execute()
+    company = company_resp.data
+    if not company:
+        flash('Company not found.', 'warning')
+        return redirect(url_for('cms.manage_companies'))
+    if request.method == 'POST':
+        update_data = {
+            'company_name': request.form.get('company_name'),
+            'industry': [item.strip() for item in request.form.get('industry', '').split(',') if item.strip()],
+            'description': request.form.get('description'),
+            'website': request.form.get('website'),
+            'location': request.form.get('location'),
+            'updated_at': datetime.now(tz=timezone.utc).isoformat()
+        }
+        supabase.table('company_profiles').update(update_data).eq('id', company_id).execute()
+        flash('Company updated successfully!', 'message')
+        return redirect(url_for('cms.manage_companies'))
+    return render_template('edit_company.html', company=company)
 
 @cms_bp.route('/add-company', methods=['GET', 'POST'])
 @sb_login_required

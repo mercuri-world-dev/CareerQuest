@@ -1,14 +1,16 @@
 from flask import Blueprint, flash, jsonify, redirect, render_template, session, url_for
 from flask_login import current_user, logout_user
 
-from util.auth import is_authenticated
+from util.auth import fetch_user_role, get_access_token, is_authenticated
 
 main_bp = Blueprint('main', __name__, template_folder='templates', static_folder='static')
 
 @main_bp.route('/')
 def index():
     if is_authenticated():
-        return redirect(url_for('users.dashboard'))
+        if fetch_user_role(get_access_token()) in ['admin', 'content_manager', 'elevated_content_manager']:
+            return redirect(url_for('cms.dashboard'))
+        return redirect(url_for('users.dashboard')) 
     return render_template('index.html')
 
 # Debug

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Manage Jobs - CareerQuest{% endblock %}
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('cms.static', filename='cms.css') }}">
+{% endblock %}
+{% block content %}
+<div class="card" style="width: 80vw; margin: 0 auto;">
+  <div class="card-header">
+    <h2>Manage Jobs</h2>
+  </div>
+  <div class="card-body">
+    <table class="table cms-table">
+      <thead>
+        <tr>
+          <th>Job Title</th>
+          <th>Company</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for job in jobs %}
+        <tr>
+          <td>{{ job.role_name }}</td>
+          <td>{{ job.company_name }}</td>
+          <td>
+            <span class="status-badge status-{{ job.application_status|lower }}">{{ job.application_status }}</span>
+          </td>
+          <td>
+            <a href="{{ url_for('cms.edit_job', job_id=job.id) }}" class="btn btn-sm btn-primary">Edit</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

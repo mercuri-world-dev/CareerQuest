@@ -94,3 +94,9 @@
   width: 65vw;
   align-self: center;
 }
+
+.cms-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--white)
+}
