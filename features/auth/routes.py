@@ -116,9 +116,6 @@ def register():
         if not user:
             flash('Registration failed: User not found', 'error')
             return redirect(url_for('auth.register'))
-        supabase.table('users').upsert({
-            'user_id': user.id
-        }).execute()
         return redirect(url_for('auth.login'))
     return render_template('register.html')
 
