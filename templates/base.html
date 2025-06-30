@@ -8,7 +8,11 @@
       {% block head %}{% endblock %}
   </head>
   <body>
-      {% block navbar %}{% include 'components/navbar.html' %}{% endblock %}
+      {% block navbar %}
+        {% with is_authenticated=True %}
+          {% include 'components/navbar.html' %}
+        {% endwith %}
+      {% endblock %}
       {% block messages %}
         {% include 'components/messages.html' %}
       {% endblock %}

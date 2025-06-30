@@ -57,7 +57,7 @@ def edit_job(job_id):
             'application_materials': [item.strip() for item in request.form.get('application_materials', '').split(',') if item.strip()],
             'application_period_start': request.form.get('application_period_start') or None,
             'application_period_end': request.form.get('application_period_end') or None,
-            'updated_at': datetime.now(tz=timezone.utc).isoformat()
+            'updated_at': datetime.now(timezone.utc).isoformat()
         }
         supabase.table('jobs').update(update_data).eq('id', job_id).execute()
         flash('Job updated successfully!', 'message')
@@ -143,8 +143,6 @@ def add_job():
               'application_materials': materials_list,
               'application_period_start': application_period_start.isoformat() if application_period_start else None,
               'application_period_end': application_period_end.isoformat() if application_period_end else None,
-              'created_at': datetime.now(tz=timezone.utc).isoformat(),
-              'updated_at': datetime.now(tz=timezone.utc).isoformat()
             }
 
             supabase.table('jobs').insert(job_data).execute()
@@ -186,7 +184,7 @@ def edit_company(company_id):
             'description': request.form.get('description'),
             'website': request.form.get('website'),
             'location': request.form.get('location'),
-            'updated_at': datetime.now(tz=timezone.utc).isoformat()
+            'updated_at': datetime.now(timezone.utc).isoformat()
         }
         supabase.table('company_profiles').update(update_data).eq('id', company_id).execute()
         flash('Company updated successfully!', 'message')
@@ -216,13 +214,12 @@ def add_company():
                 'description': description,
                 'website': website,
                 'location': location,
-                'created_at': datetime.utcnow().isoformat(),
-                'updated_at': datetime.utcnow().isoformat()
             }
             resp = supabase.table('company_profiles').insert(company_data).execute()
             flash('Company profile added successfully!', 'message')
             return redirect(url_for('cms.dashboard'))
         except Exception as e:
+            print(f"Error adding company: {e}")
             flash('There was an error adding the company. Please try again.', 'error')
             return render_template('add_company.html')
     return render_template('add_company.html')
