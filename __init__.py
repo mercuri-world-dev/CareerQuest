@@ -28,6 +28,9 @@ def create_app(config_object=None):
     from features.auth.routes import auth_bp
     from features.admin.routes import admin_bp
     from features.cms.routes import cms_bp
+    if (os.environ.get('FLASK_ENV') == 'development'):
+        from debug import debug_bp
+        app.register_blueprint(debug_bp, url_prefix='/debug')
     app.register_blueprint(main_bp)
     app.register_blueprint(jobs_bp)
     app.register_blueprint(jobs_api_bp, url_prefix='/api')
