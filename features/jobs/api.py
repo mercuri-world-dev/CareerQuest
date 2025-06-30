@@ -18,29 +18,29 @@ jobs_api_bp = Blueprint('jobs_api', __name__)
 @jobs_api_bp.route('/jobs', methods=['GET'])
 @sb_login_required
 def get_jobs():
-    supabase = get_supabase()
+    # supabase = get_supabase()
     include_compatibility = request.args.get('includecompatibility', 'true').lower() == 'true'
-    query = supabase.table('jobs').select('*')
-    for field in JOB_FIELDS:
-        value = request.args.get(field)
-        if value is not None:
-            if field in ['industry', 'qualifications', 'accommodations', 'application_materials']:
-                values = [v.strip() for v in value.split(',') if v.strip()]
-                if values:
-                    query = query.contains(field, values)
-            else:
-                query = query.eq(field, value)
-    jobs_resp = query.execute()
-    jobs = jobs_resp.data if hasattr(jobs_resp, "data") else []
-    # jobs = [MOCK_JOB]
+    # query = supabase.table('jobs').select('*')
+    # for field in JOB_FIELDS:
+    #     value = request.args.get(field)
+    #     if value is not None:
+    #         if field in ['industry', 'qualifications', 'accommodations', 'application_materials']:
+    #             values = [v.strip() for v in value.split(',') if v.strip()]
+    #             if values:
+    #                 query = query.contains(field, values)
+    #         else:
+    #             query = query.eq(field, value)
+    # jobs_resp = query.execute()
+    # jobs = jobs_resp.data if hasattr(jobs_resp, "data") else []
+    jobs = [MOCK_JOB]
     if include_compatibility:
-        user_profile_resp = supabase.table('user_profiles').select('*').execute().data # Secure (RLS)
+        # user_profile_resp = supabase.table('user_profiles').select('*').execute().data # Secure (RLS)
         
-        if not user_profile_resp:
-            return jobs
+        # if not user_profile_resp:
+        #     return jobs
         
-        user_profile = user_profile_resp[0] if isinstance(user_profile_resp, list) else user_profile_resp
-        # user_profile = MOCK_USER_PROFILE
+        # user_profile = user_profile_resp[0] if isinstance(user_profile_resp, list) else user_profile_resp
+        user_profile = MOCK_USER_PROFILE
 
         jobs_with_compatibility_result = scoring.calculate_jobs_compatibility(jobs, user_profile)
 
