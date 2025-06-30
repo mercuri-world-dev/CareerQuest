@@ -29,7 +29,6 @@ jobs_bp = Blueprint('jobs', __name__, template_folder='templates', static_folder
 
 def get_rendered_job_cards():
     jobs = api.get_jobs()
-    # jobs = [MOCK_JOB]  # For testing purposes, using a mock job
     return [render_template('components/job_card.html', job=job) for job in jobs]
 
 @jobs_bp.route('/all_jobs')
