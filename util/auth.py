@@ -38,15 +38,6 @@ def get_access_token():
           return None
   return supabase_token_json.get('access_token')
 
-def get_current_user_id(supabase: Client):
-  access_token = get_access_token()
-  if not access_token:
-      return None
-  payload = decode_jwt(access_token)
-  if not payload:
-      return None
-  return payload.get('sub')
-
 def is_authenticated():
   access_token = get_access_token()
   if not access_token:
