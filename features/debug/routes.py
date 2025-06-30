@@ -41,5 +41,4 @@ MOCK_USER_PROFILE = {
 
 @debug_bp.route('/job-card')
 def job_card():
-
     return render_template('jobCard.html')

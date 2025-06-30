@@ -6,6 +6,12 @@ from features.jobs.util.job_scoring import calculate_accommodations_match, calcu
 from main.supabase_client import get_supabase
 from util.decorators import sb_login_required
 
+JOB_FIELDS = [
+  'id', 'company_profile_id', 'company_name', 'role_name', 'industry', 'weekly_hours', 'work_mode', 'location',
+  'qualifications', 'accommodations', 'application_period_start', 'application_period_end', 'application_status',
+  'job_type', 'application_materials', 'job_description', 'application_link', 'created_at', 'updated_at'
+]
+
 jobs_api_bp = Blueprint('jobs_api', __name__)
 
 # API routes
@@ -37,13 +43,8 @@ jobs_api_bp = Blueprint('jobs_api', __name__)
 @sb_login_required
 def get_jobs():
     supabase = get_supabase()
-    job_fields = [
-        'id', 'company_profile_id', 'company_name', 'role_name', 'industry', 'weekly_hours', 'work_mode', 'location',
-        'qualifications', 'accommodations', 'application_period_start', 'application_period_end', 'application_status',
-        'job_type', 'application_materials', 'job_description', 'application_link', 'created_at', 'updated_at'
-    ]
     query = supabase.table('jobs').select('*')
-    for field in job_fields:
+    for field in JOB_FIELDS:
         value = request.args.get(field)
         if value is not None:
             if field in ['industry', 'qualifications', 'accommodations', 'application_materials']:
@@ -52,8 +53,9 @@ def get_jobs():
                     query = query.contains(field, values)
             else:
                 query = query.eq(field, value)
-    jobs = query.execute()
-    return jsonify(jobs.data)
+    jobs_resp = query.execute()
+    jobs = jobs_resp.data if hasattr(jobs_resp, "data") else []
+    return jobs
 
 @jobs_api_bp.route('/jobs/<job_id>', methods=['GET'])
 @sb_login_required

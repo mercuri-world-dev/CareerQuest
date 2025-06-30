@@ -1,0 +1,7 @@
+.job-open-text {
+  color: var(--white) !important;
+}
+
+.job-closed-text {
+  color: var(--dark-gray) !important;
+}

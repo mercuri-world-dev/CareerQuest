@@ -1,0 +1,51 @@
+<div class="job-card">
+  <h3>{{ job.role_name }} at {{ job.company_name }}</h3>
+  <p class="location">{{ job.location }}</p>
+  
+  <div class="job-description">
+    <p>{{ job.description }}</p>
+  </div>
+
+  <div class="job-details">
+    <p>Industry: {{ job.industry | join(', ') }}</p>
+    <p>Work Mode: {{ job.work_mode }}</p>
+    <p>Weekly Hours: {{ job.weekly_hours }}</p>
+    <p>Qualifications: {{ job.qualifications | join(', ') }}</p>
+    <p>Accommodations: {{ job.accommodations | join(', ') }}</p>
+  </div>
+
+  {% if job.factors %}
+    <div class="compatibility-factors">
+      <h4>Compatibility Factors</h4>
+      {% for factor in job.factors %}
+        <p>{{ factor.name }}: {{ factor.score }}%</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if job.application_period_start or job.application_period_end %}
+  <div class="application-period">
+    <p>Application Period: 
+      {% if job.application_period_start %}{{ job.application_period_start[:10] }}{% endif %}
+      {% if job.application_period_end %} - {{ job.application_period_end[:10] }}{% endif %}
+      {% if job.application_status == 'Open' %}
+      <span class="job-open-text">(Open)</span>
+      {% elif job.application_status == 'Closed' %}
+      <span class="job-closed-text">(Closed)</span>
+      {% endif %}
+    </p>
+  </div>
+  {% endif %}
+  
+  {% if job.application_materials %}
+  <div class="application-materials">
+    <p>Application Materials: {{ job.application_materials | join(', ') }}</p>
+  </div>
+  {% endif %}
+
+  {% if job.application_link %}
+    <div class="apply-button">
+      <a href="{{ job.application_link }}" class="btn btn-primary">Apply Now</a>
+    </div>
+  {% endif %}
+</div>
