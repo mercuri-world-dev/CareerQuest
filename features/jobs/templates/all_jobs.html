@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('jobs.static', filename='jobs.css') }}">
+{% endblock %}
 {% block title %} All Jobs - CareerQuest {% endblock %}
 {% block content %}
   <div class="card">
@@ -32,6 +35,13 @@
           <option value="Closed">Closed</option>
           <option value="Draft">Draft</option>
         </select>
+        <div class="checkbox-item" style="display: inline-block; margin-left: 1rem;">
+          <label class="checkbox-label" for="includecompatibility">
+            <input type="checkbox" id="includecompatibility" name="includecompatibility">
+            <span class="styled-checkbox"></span>
+            Include Compatibility
+          </label>
+        </div>
         <button type="submit" class="btn btn-primary">Filter</button>
         <button type="reset" class="btn btn-secondary" onclick="clearFilterForm()">Reset</button>
       </form>
@@ -42,29 +52,36 @@
 
       <div id="jobsError" class="error" style="display: none"></div>
 
-      <div id="jobsResults" class="results-container"></div>
+      <div id="jobsResults" class="results-container">
+        {% if rendered_jobs %}
+          <h3>Results</h3>
+          {% for job in rendered_jobs %}
+            <div class="job-card">
+              {{ job | safe }}
+            </div>
+          {% endfor %}
+        {% else %}
+          <p>No jobs found.</p>
+        {% endif %}
+      </div>
     </div>
   </div>
 {% endblock %}
 {% block scripts %}
   <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("jobFilterForm");
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const queryString = getQueryStringFromForm(form);
+        window.history.replaceState(null, "", `?${queryString}`);
+        updateJobsList(queryString);
+      });
+    });
+
     function clearFilterForm() {
       const form = document.getElementById("jobFilterForm");
       form.reset();
-    }
-
-    function getQueryStringFromForm(form) {
-      const params = new URLSearchParams();
-      for (const el of form.elements) {
-        if (el.name && el.value) {
-          if (el.name == 'application_status') {
-            params.append(el.name, el.value === 'Open');
-            continue;
-          }
-          params.append(el.name, el.value);
-        }
-      }
-      return params.toString();
     }
 
     function updateJobsList(queryString = "") {
@@ -74,21 +91,24 @@
       resultsDiv.innerHTML = "";
       errorDiv.style.display = "none";
       loadingDiv.style.display = "flex";
-      let url = "/api/jobs";
+      let url = "/rendered/job_cards";
       if (queryString) url += "?" + queryString;
       fetch(url)
         .then((response) => {
           if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-          return response.json();
+          res = response.json();
+          return res;
         })
         .then((data) => {
           if (data && data.length > 0) {
             const heading = document.createElement("h3");
             heading.textContent = "Results";
             resultsDiv.appendChild(heading);
-            data.forEach((job) => {
-              const jobCard = createJobCard(job);
-              resultsDiv.appendChild(jobCard);
+            data.forEach((jobCardHtml) => {
+              const jobCardDiv = document.createElement("div");
+              jobCardDiv.className = "job-card";
+              jobCardDiv.innerHTML = jobCardHtml;
+              resultsDiv.appendChild(jobCardDiv);
             });
           } else {
             const noResults = document.createElement("p");
@@ -105,51 +125,26 @@
         });
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const form = document.getElementById("jobFilterForm");
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const queryString = getQueryStringFromForm(form);
-        window.history.replaceState(null, "", `?${queryString}`);
-        updateJobsList(queryString);
-      });
-      updateJobsList(window.location.search.slice(1));
-    });
-
-    function createJobCard(job) {
-      const card = document.createElement("div");
-      card.className = "job-card";
-
-      // Title
-      const title = document.createElement("h3");
-      title.textContent = `${job.role_name || "Untitled Role"} at ${job.company_name || "Unknown Company"}`;
-      card.appendChild(title);
-
-      const skipFields = [
-        "id", "created_at", "updated_at", "company_id", "role_name", "company_name", "user_id", "company_profile_id",
-      ];
-
-      const dateFields = ["application_period_start", "application_period_end"];
-
-      Object.entries(job).forEach(([key, value]) => {
-        if (skipFields.includes(key) || value === null || value === undefined || value.toString().trim() === "") return;
-        let label = key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
-        let displayValue = value;
-        if (Array.isArray(value)) {
-          displayValue = value.join(", ");
-        } else if (typeof value === "boolean") {
-          displayValue = value ? "Open" : "Closed";
+    // Helper functions
+    function getQueryStringFromForm(form) {
+      const params = new URLSearchParams();
+      for (const el of form.elements) {
+        if (el.name && (el.type !== "checkbox" && el.value)) {
+          if (el.name == 'application_status') {
+            params.append(el.name, el.value === 'Open');
+            continue;
+          }
+          params.append(el.name, el.value);
         }
-        if (key === "role_name" || key === "company_name") return;
-        if (dateFields.includes(key) && value) {
-          displayValue = new Date(value).toLocaleDateString();
+        if (el.name === "includecompatibility" && el.type === "checkbox") {
+          if (el.checked) {
+            params.append("include_compatibility", "true");
+          } else {
+            params.append("include_compatibility", "false");
+          }
         }
-        const p = document.createElement("p");
-        p.textContent = `${label}: ${displayValue}`;
-        card.appendChild(p);
-      });
-
-      return card;
+      }
+      return params.toString();
     }
   </script>
 {% endblock %}

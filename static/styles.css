@@ -277,7 +277,7 @@ label {
     display: flex;
     align-items: center;
 }
-
+ 
 .checkbox-item input[type="checkbox"] {
     margin-right: 8px;
     opacity: 0;
@@ -296,10 +296,10 @@ label {
     align-items: center;
 }
 
-.checkbox-item .custom-checkbox {
+.checkbox-item .styled-checkbox {
     position: absolute;
     left: 0;
-    top: 50%;
+    top: 36%;
     transform: translateY(-50%);
     height: 20px;
     width: 20px;
@@ -313,28 +313,29 @@ label {
     justify-content: center;
 }
 
-.checkbox-item input[type="checkbox"]:checked ~ .custom-checkbox {
+.checkbox-item input[type="checkbox"]:checked ~ .styled-checkbox {
     background-color: var(--primary-color);
     border-color: var(--primary-dark);
 }
 
 /* Checkmark (SVG or pseudo-element) */
-.checkbox-item .custom-checkbox::after {
+.checkbox-item .styled-checkbox::after {
     content: '';
     display: none;
     width: 10px;
     height: 6px;
+    bottom: 33%;
     border-left: 3px solid var(--secondary-color);
     border-bottom: 3px solid var(--secondary-color);
     transform: rotate(-45deg);
     position: absolute;
 }
 
-.checkbox-item input[type="checkbox"]:checked ~ .custom-checkbox::after {
+.checkbox-item input[type="checkbox"]:checked ~ .styled-checkbox::after {
     display: block;
 }
 
-/* .checkbox-item input[type="checkbox"]:focus ~ .custom-checkbox {
+/* .checkbox-item input[type="checkbox"]:focus ~ .styled-checkbox {
     box-shadow: 0 0 0 2px var(--primary-color-transparent);
 } */
 
@@ -472,17 +473,6 @@ label {
     color: var(--accent-color);
 }
 
-.job-details-section, .compatibility-factors {
-    margin-bottom: 25px;
-}
-
-.job-details-section h4, .compatibility-factors h4 {
-    color: var(--secondary-color);
-    margin-bottom: 15px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--medium-gray);
-}
- 
 .factors-table {
     width: 100%;
     border-collapse: collapse;
@@ -699,6 +689,33 @@ footer p {
   justify-content: center;
   color: var(--medium-gray);
 
+}
+
+/* Not found page styles */
+.notfound-container {
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+.notfound-404 {
+    font-size: 8rem;
+    font-weight: 900;
+    color: transparent;
+    -webkit-text-stroke: 3px #fff;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.2rem;
+    line-height: 1;
+    user-select: none;
+}
+.notfound-message {
+    font-size: 1.6rem;
+    color: #fff;
+    margin-bottom: 2rem;
+    font-weight: 400;
+    text-shadow: 0 2px 16px rgba(31,38,135,0.18);
 }
 
 /* Responsive Styles */

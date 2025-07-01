@@ -1,49 +1,21 @@
 from flask import Blueprint, jsonify, request
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-
-from features.jobs.util.job_scoring import calculate_accommodations_match, calculate_hours_compatibility, calculate_location_similarity, calculate_work_mode_compatibility
+from debug.util.mock_data import MOCK_JOB, MOCK_USER_PROFILE
+from features.jobs.util import job_scoring as scoring
 from main.supabase_client import get_supabase
 from util.decorators import sb_login_required
 
+JOB_FIELDS = [
+    'id', 'company_profile_id', 'company_name', 'role_name', 'industry', 'weekly_hours', 'work_mode', 'location',
+    'qualifications', 'accommodations', 'application_period_start', 'application_period_end', 'application_status',
+    'job_type', 'application_materials', 'job_description', 'application_link', 'created_at', 'updated_at'
+]
+
 jobs_api_bp = Blueprint('jobs_api', __name__)
 
-# API routes
-# @jobs_api_bp.route('/users/<user_id>', methods=['GET'])
-# def get_user(user_id):
-#     supabase = get_supabase()
-#     try:
-#       user_id = int(user_id)
-#     except ValueError:
-#       return jsonify({"error": "Invalid user ID"}), 400
-    
-#     user = supabase.table('users').select('*').eq('id', user_id).single().execute()
-    
-#     if not user:
-#       return jsonify({"error": "User not found"}), 404
-    
-#     return jsonify(user.to_dict())
-
-# @jobs_api_bp.route('/current_user', methods=['GET'])
-# @sb_login_required
-# def get_current_user():
-#     supabase = get_supabase()
-#     user = supabase.table('users').select('*').eq('id', supabase_user.id).single().execute()
-#     if not user:
-#         return jsonify({"error": "User not found"}), 404
-#     return jsonify(user.to_dict())
-
-@jobs_api_bp.route('/jobs', methods=['GET'])
-@sb_login_required
-def get_jobs():
+def fetch_jobs(include_compatibility=False):
     supabase = get_supabase()
-    job_fields = [
-        'id', 'company_profile_id', 'company_name', 'role_name', 'industry', 'weekly_hours', 'work_mode', 'location',
-        'qualifications', 'accommodations', 'application_period_start', 'application_period_end', 'application_status',
-        'job_type', 'application_materials', 'job_description', 'application_link', 'created_at', 'updated_at'
-    ]
     query = supabase.table('jobs').select('*')
-    for field in job_fields:
+    for field in JOB_FIELDS:
         value = request.args.get(field)
         if value is not None:
             if field in ['industry', 'qualifications', 'accommodations', 'application_materials']:
@@ -52,240 +24,93 @@ def get_jobs():
                     query = query.contains(field, values)
             else:
                 query = query.eq(field, value)
-    jobs = query.execute()
-    return jsonify(jobs.data)
+    jobs_resp = query.execute()
+    jobs = jobs_resp.data if hasattr(jobs_resp, "data") else []
+    # jobs = [MOCK_JOB]  
+    if include_compatibility:
+        # user_profile = MOCK_USER_PROFILE
+        # for job in jobs:
+        #     factors = scoring.calculate_job_compatibility_factors(job, user_profile).get('factors', [])
+        #     job['factors'] = factors
+        # return jobs
+        user_profile_resp = supabase.table('user_profiles').select('*').limit(1).execute()
+        if not user_profile_resp or not getattr(user_profile_resp, 'data', None) or not user_profile_resp.data:
+            return jobs
+        user_profile = user_profile_resp.data[0]
+        result = scoring.calculate_jobs_compatibility(jobs, user_profile)
+        if result.is_success():
+            for job in jobs:
+                factors = scoring.calculate_job_compatibility_factors(job, user_profile).get('factors', [])
+                job['factors'] = factors
+            return jobs
+        else:
+            print(f"Error calculating job compatibility: {result.error}")
+            return jobs
+    return jobs
+
+def fetch_job(job_id, include_compatibility=True):
+    supabase = get_supabase()
+    try:
+        job_resp = supabase.table('jobs').select('*').eq('id', job_id).single().execute()
+        job = job_resp.data if hasattr(job_resp, 'data') else job_resp
+    except Exception as e:
+        print(f"Error fetching job: {e}")
+        return None
+    if not job:
+        print(f"Job with ID {job_id} not found.")
+        return None
+    # job = MOCK_JOB
+    if include_compatibility:
+        try:
+            user_profile_resp = supabase.table('user_profiles').select('*').limit(1).execute()
+        except Exception as e:
+            print(f"Error fetching user profile: {e}")
+            return job
+        if not user_profile_resp:
+            print("User profile not found.")
+            return job
+        user_profile = user_profile_resp.data[0]
+        # user_profile = MOCK_USER_PROFILE
+        scores = scoring.calculate_job_compatibility_factors(job, user_profile)
+        factors = scores.get('factors', [])
+        overall_score = scores.get('overall_score', 0.0)
+        job['factors'] = factors
+        job['overall_score'] = overall_score
+    return job
+
+@jobs_api_bp.route('/jobs', methods=['GET'])
+@sb_login_required
+def get_jobs():
+    include_compatibility = request.args.get('include_compatibility', 'false').lower() == 'true'
+    jobs = fetch_jobs(include_compatibility)
+    return jsonify(jobs)
+
+@jobs_api_bp.route('/job_click', methods=['POST'])
+@sb_login_required
+def job_click():
+    supabase = get_supabase()
+    data = request.get_json()
+    job_id = data.get('job_id')
+    if not job_id:
+        return jsonify({'error': 'Missing job_id'}), 400
+    user_profile_resp = supabase.table('user_profiles').select('id').limit(1).execute()
+    if not user_profile_resp or not getattr(user_profile_resp, 'data', None) or not user_profile_resp.data:
+        return jsonify({'error': 'User profile not found'}), 404
+    user_profile_id = user_profile_resp.data[0]['id']
+    try:
+        supabase.table('job_clicks').upsert({
+            'job_id': job_id,
+            'user_profile_id': user_profile_id
+        }, on_conflict='job_id, user_profile_id').execute()
+    except Exception as e:
+        print(f"Error upserting job click: {e}")
+        return jsonify({'error': 'Failed to record job click'}), 500
+    return jsonify({'success': True})
 
 @jobs_api_bp.route('/jobs/<job_id>', methods=['GET'])
 @sb_login_required
 def get_job(job_id):
-    supabase = get_supabase()
-    job = supabase.table('jobs').select('*').eq('id', job_id).single().execute()
-    
+    job = fetch_job(job_id)
     if not job:
-        return jsonify({"error": "Job not found"}), 404
-        
-    return jsonify(job.data)
-
-# @jobs_api_bp.route('/matches', methods=['GET'])
-# @sb_login_required
-# def get_matches_for_current_user():
-#     supabase_user = get_supabase_user()
-#     if not supabase_user:
-#         return jsonify({"error": "User not authenticated"}), 401
-#     supabase = get_supabase()
-#     user = supabase.table('users').select('*').eq('id', supabase_user.id).single().execute()
-#     if not user:
-#         return jsonify({"error": "User not found"}), 404
-#     return generate_matches_response(user)
-
-# @jobs_api_bp.route('/matches/<user_id>', methods=['GET'])
-# def get_matches(user_id):
-#     supabase = get_supabase()
-#     try:
-#         user_id = int(user_id)
-#     except ValueError:
-#         return jsonify({"error": "Invalid user ID"}), 400
-        
-#     user = supabase.table('users').select('*').eq('id', user_id).single().execute()
-    
-#     if not user:
-#         return jsonify({"error": "User not found"}), 404
-        
-#     return generate_matches_response(user)
-
-# def generate_matches_response(user):
-#     # Calculate compatibility scores for each job
-#     try:
-#         jobs = get_supabase().table('jobs').select('*').execute()
-#         scores = []
-        
-#         for job in jobs:
-#             # Calculate various compatibility factors
-#             location_score = calculate_location_similarity(user.location, job.location)
-#             hours_score = calculate_hours_compatibility(user.hours_per_week, job.weekly_hours)
-#             work_mode_score = calculate_work_mode_compatibility(
-#                 [user.remote_preference, user.hybrid_preference, user.in_person_preference],
-#                 job.work_mode
-#             )
-            
-#             accommodations_score = calculate_accommodations_match(
-#                 user.get_accommodations_list(),
-#                 job.get_accommodations_list()
-#             )
-            
-#             # Calculate text similarity between user background and job qualifications
-#             user_text = user.educational_background or ""
-#             job_text = ' '.join(job.get_qualifications_list())
-            
-#             # Use TF-IDF for text matching
-#             try:
-#                 vectorizer = TfidfVectorizer()
-#                 tfidf_matrix = vectorizer.fit_transform([user_text.lower(), job_text.lower()])
-#                 qualification_score = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
-#             except:
-#                 qualification_score = 0.0
-                
-#             # Weighted average of all scores
-#             total_score = (
-#                 location_score * 0.3 +
-#                 hours_score * 0.1 +
-#                 work_mode_score * 0.2 +
-#                 accommodations_score * 0.1 +
-#                 qualification_score * 0.3
-#             )
-            
-#             job_dict = job.to_dict()
-#             scores.append({
-#                 "job_id": job.id,
-#                 "company_name": job.company_name,
-#                 "role_name": job.role_name,
-#                 "industry": job.get_industry_list(),
-#                 "weekly_hours": job.weekly_hours,
-#                 "work_mode": job.work_mode,
-#                 "location": job.location,
-#                 "qualifications": job.get_qualifications_list(),
-#                 "compatibility_score": total_score,
-#                 "factors": {
-#                     "location": location_score,
-#                     "hours": hours_score,
-#                     "work_mode": work_mode_score,
-#                     "accommodations": accommodations_score,
-#                     "qualifications": qualification_score
-#                 }
-#             })
-            
-#         # Sort jobs by compatibility score
-#         sorted_scores = sorted(scores, key=lambda x: x['compatibility_score'], reverse=True)
-        
-#         return jsonify({
-#             "user_id": str(user.id).zfill(10),
-#             "matches": sorted_scores
-#         })
-#     except Exception as e:
-#         print(f"Error generating matches: {e}")
-#         return jsonify({
-#             "user_id": str(user.id).zfill(10),
-#             "matches": [],
-#             "error": "There was an error generating matches. Please try again later."
-#         }), 500
-
-# @jobs_api_bp.route('/compatibility/<user_id>/<job_id>', methods=['GET'])
-# def get_compatibility(user_id, job_id):
-#     supabase = get_supabase()
-#     try:
-#         user_id = int(user_id)
-#     except ValueError:
-#         return jsonify({"error": "Invalid user ID"}), 400
-        
-#     user = supabase.table('users').select('*').eq('id', user_id).single().execute()
-#     job = supabase.table('jobs').select('*').eq('id', job_id).single().execute()
-    
-#     if not user or not job:
-#         return jsonify({"error": "User or job not found"}), 404
-    
-#     try:    
-#         location_score = calculate_location_similarity(user.location, job.location)
-#         hours_score = calculate_hours_compatibility(user.hours_per_week, job.weekly_hours)
-#         work_mode_score = calculate_work_mode_compatibility(
-#             [user.remote_preference, user.hybrid_preference, user.in_person_preference],
-#             job.work_mode
-#         )
-        
-#         accommodations_score = calculate_accommodations_match(
-#             user.get_accommodations_list(),
-#             job.get_accommodations_list()
-#         )
-        
-#         user_text = user.educational_background or ""
-#         job_text = ' '.join(job.get_qualifications_list())
-        
-#         try:
-#             vectorizer = TfidfVectorizer()
-#             tfidf_matrix = vectorizer.fit_transform([user_text.lower(), job_text.lower()])
-#             qualification_score = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
-#         except:
-#             qualification_score = 0.0
-            
-#         total_score = (
-#             location_score * 0.3 +
-#             hours_score * 0.1 +
-#             work_mode_score * 0.2 +
-#             accommodations_score * 0.1 +
-#             qualification_score * 0.3
-#         )
-        
-#         job_dict = job.to_dict()
-#         job_dict.update({
-#             "overall_compatibility": total_score,
-#             "factors": {
-#                 "location": location_score,
-#                 "hours": hours_score,
-#                 "work_mode": work_mode_score,
-#                 "accommodations": accommodations_score,
-#                 "qualifications": qualification_score
-#             }
-#         })
-        
-#         return jsonify(job_dict)
-#     except Exception as e:
-#         print(f"Error calculating compatibility: {e}")
-#         return jsonify({"error": "There was an error calculating compatibility. Please try again later."}), 500
-
-# @jobs_api_bp.route('/compatibility/current/<job_id>', methods=['GET'])
-# @sb_login_required
-# def get_compatibility_current_user(job_id):
-#     supabase_user = get_supabase_user()
-#     if not supabase_user:
-#         return jsonify({"error": "User not authenticated"}), 401
-#     supabase = get_supabase()
-#     user = supabase.table('users').select('*').eq('id', supabase_user.id).single().execute()
-#     if not user:
-#         return jsonify({"error": "User not found"}), 404
-#     job = supabase.table('jobs').select('*').eq('id', job_id).single().execute()
-    
-#     if not job:
-#         return jsonify({"error": "Job not found"}), 404
-        
-#     location_score = calculate_location_similarity(user.location, job.location)
-#     hours_score = calculate_hours_compatibility(user.hours_per_week, job.weekly_hours)
-#     work_mode_score = calculate_work_mode_compatibility(
-#         [user.remote_preference, user.hybrid_preference, user.in_person_preference],
-#         job.work_mode
-#     )
-    
-#     accommodations_score = calculate_accommodations_match(
-#         user.get_accommodations_list(),
-#         job.get_accommodations_list()
-#     )
-    
-#     user_text = user.educational_background or ""
-#     job_text = ' '.join(job.get_qualifications_list())
-    
-#     try:
-#         vectorizer = TfidfVectorizer()
-#         tfidf_matrix = vectorizer.fit_transform([user_text.lower(), job_text.lower()])
-#         qualification_score = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
-#     except:
-#         qualification_score = 0.0
-        
-#     total_score = (
-#         location_score * 0.3 +
-#         hours_score * 0.1 +
-#         work_mode_score * 0.2 +
-#         accommodations_score * 0.1 +
-#         qualification_score * 0.3
-#     )
-    
-#     job_dict = job.to_dict()
-#     job_dict.update({
-#         "overall_compatibility": total_score,
-#         "factors": {
-#             "location": location_score,
-#             "hours": hours_score,
-#             "work_mode": work_mode_score,
-#             "accommodations": accommodations_score,
-#             "qualifications": qualification_score
-#         }
-#     })
-    
-#     return jsonify(job_dict)
+        return jsonify({"error": "Job not found or failed to calculate compatibility"}), 404
+    return jsonify(job)

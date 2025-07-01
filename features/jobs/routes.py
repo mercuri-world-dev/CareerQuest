@@ -1,29 +1,37 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, jsonify, render_template, request
 from util.decorators import sb_login_required
 from main.supabase_client import get_supabase
+from features.jobs import api
 
-jobs_bp = Blueprint('jobs', __name__, template_folder='templates', static_folder='static')
+jobs_bp = Blueprint('jobs', __name__, template_folder='templates', static_folder='static', static_url_path='/static/jobs')
 
-@jobs_bp.route('/all_jobs')
+def get_rendered_job_cards(include_compatibility=False):
+    jobs = api.fetch_jobs(include_compatibility)
+    return [render_template('components/job_card.html', job=job, include_compatibility=include_compatibility) for job in jobs]
+
+@jobs_bp.route('/jobs')
 @sb_login_required
 def all_jobs():
-    supabase = get_supabase()
-    job_fields = [
-        'id', 'company_profile_id', 'company_name', 'role_name', 'industry', 'weekly_hours', 'work_mode', 'location',
-        'qualifications', 'accommodations', 'application_period_start', 'application_period_end', 'application_status',
-        'job_type', 'application_materials', 'job_description', 'application_link', 'created_at', 'updated_at'
-    ]
-    query = supabase.table('jobs').select('*')
-    for field in job_fields:
-        value = request.args.get(field)
-        if value is not None:
-            if field in ['industry', 'qualifications', 'accommodations', 'application_materials']:
-                values = [v.strip() for v in value.split(',') if v.strip()]
-                if values:
-                    query = query.contains(field, values)
-            else:
-                query = query.eq(field, value)
-    jobs = query.execute()
-    jobs_resp = query.execute()
-    jobs = jobs_resp.data if hasattr(jobs_resp, "data") else []
-    return render_template('all_jobs.html', jobs=jobs)
+    rendered_jobs = get_rendered_job_cards()
+    return render_template('all_jobs.html', rendered_jobs=rendered_jobs)
+
+@jobs_bp.route('/rendered/job_cards')
+@sb_login_required
+def rendered_job_cards():
+    include_compatibility = request.args.get('include_compatibility', 'false').lower() == 'true'
+    rendered = get_rendered_job_cards(include_compatibility)
+    return jsonify(rendered)
+
+@jobs_bp.route('/jobs/<job_id>')
+@sb_login_required
+def job_details(job_id):
+    job = api.fetch_job(job_id)
+    return render_template('job_details.html', job=job)
+
+@jobs_bp.route('/recommended_jobs')
+@sb_login_required
+def recommended_jobs():
+    jobs = api.fetch_jobs(include_compatibility=True)
+    sorted_jobs = sorted(jobs, key=lambda j: j.get('compatibility_score', 0), reverse=True)[:10]
+    rendered_jobs = [render_template('components/detailed_job_card.html', job=job) for job in sorted_jobs]
+    return render_template('recommended_jobs.html', rendered_jobs=rendered_jobs, include_compatibility=True)

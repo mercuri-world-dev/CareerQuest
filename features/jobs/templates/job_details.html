@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('jobs.static', filename='jobs.css') }}">
+{% endblock %}
+{% block title %}Job Details - CareerQuest{% endblock %}
+{% block content %}
+<div class="detailed-job-page card">
+  {% with job=job %}
+    {% include 'components/detailed_job_card.html' %}
+  {% endwith %}
+</div>
+{% endblock %}
