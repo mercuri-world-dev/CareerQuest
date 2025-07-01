@@ -6,9 +6,29 @@
   color: var(--dark-gray) !important;
 }
 
-.factor-bar-container {
+.job-details {
   width: 100%;
-  background: #eee;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.compatibility-factors {
+  color: var(--white-translucent);
+  margin-top: 20px;
+  width: 100%;
+  font-style: italic;
+}
+
+.compatibility-factors h4 {
+  font-size: large;
+  margin-bottom: 10px;
+}
+
+.factor-bar-container {
+  width: 80%;
+  background: var(--dark-gray-transparent);
   border-radius: 6px;
   margin-bottom: 10px;
   height: 22px;
@@ -18,7 +38,7 @@
 .factor-bar {
   height: 100%;
   border-radius: 6px;
-  background: linear-gradient(90deg, #4caf50 0%, #2196f3 100%);
+  background: var(--primary-dark);
   transition: width 0.5s;
   text-align: right;
   color: #fff;
@@ -30,17 +50,4 @@
 .factor-label {
   margin-bottom: 2px;
   font-size: 0.97em;
-}
-
-.detailed-job-page {
-  max-width: 700px;
-  margin: 40px auto;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
-  padding: 32px 36px 24px 36px;
-}
-
-.apply-button {
-  margin-top: 24px;
 }

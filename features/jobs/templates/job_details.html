@@ -5,68 +5,59 @@
 {% block title %}Job Details - CareerQuest{% endblock %}
 {% block content %}
 <div class="detailed-job-page card">
-  <h2>{{ job.role_name }} at {{ job.company_name }}</h2>
-  <p class="location">{{ job.location }}</p>
-
-  <div class="job-description">
-    <p>{{ job.description }}</p>
-  </div>
-  
-  <div class="job-details">
-    <p><strong>Industry:</strong> {{ job.industry | join(', ') }}</p>
-    <p><strong>Work Mode:</strong> {{ job.work_mode }}</p>
-    <p><strong>Weekly Hours:</strong> {{ job.weekly_hours }}</p>
-    <p><strong>Qualifications:</strong> {{ job.qualifications | join(', ') }}</p>
-    <p><strong>Accommodations:</strong> {{ job.accommodations | join(', ') }}</p>
+  <div class="card-header">
+    <h2>{{ job.role_name }} at {{ job.company_name }}</h2>
+    <p class="location">{{ job.location }}</p>
   </div>
 
-  {% if job.compatibility_score %}
-  <div class="compatibility-score">
-    <h4>Overall Compatibility</h4>
-    <p class="score">{{ (job.compatibility_score * 100)|round(0, 'floor') }}%</p>
-  </div>
-  {% endif %}
-
-  {% if job.factors %}
-    <div class="compatibility-factors">
-      <h4>Compatibility Factors</h4>
-      {% for factor in job.factors %}
-        <div class="factor-label">{{ factor.name }}: {{ factor.score }}%</div>
-        <div class="factor-bar-container">
-          <div class="factor-bar" style="width: {{ factor.score }}%;">
-            {{ factor.score }}%
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
-
-  {% if job.application_period_start or job.application_period_end %}
-  <div class="application-period">
-    <p><strong>Application Period:</strong> 
-      {% if job.application_period_start %}{{ job.application_period_start[:10] }}{% endif %}
-      {% if job.application_period_end %} - {{ job.application_period_end[:10] }}{% endif %}
-      {% if job.application_status == 'Open' %}
-      <span class="job-open-text">(Open)</span>
-      {% elif job.application_status == 'Closed' %}
-      <span class="job-closed-text">(Closed)</span>
+  <div class="card-body">
+    <div class="job-details">
+      <p><strong>Industry:</strong> {{ job.industry | join(', ') }}</p>
+      <p><strong>Work Mode:</strong> {{ job.work_mode }}</p>
+      <p><strong>Weekly Hours:</strong> {{ job.weekly_hours }}</p>
+      <p><strong>Qualifications:</strong> {{ job.qualifications | join(', ') }}</p>
+      <p><strong>Accommodations:</strong> {{ job.accommodations | join(', ') }}</p>
+      {% if job.application_materials %}
+      <div class="application-materials">
+        <p><strong>Application Materials:</strong> {{ job.application_materials | join(', ') }}</p>
+      </div>
       {% endif %}
-    </p>
-  </div>
-  {% endif %}
-
-  {% if job.application_materials %}
-  <div class="application-materials">
-    <p><strong>Application Materials:</strong> {{ job.application_materials | join(', ') }}</p>
-  </div>
-  {% endif %}
-
-  {% if job.application_link %}
-    <div class="apply-button">
-      <a href="{{ job.application_link }}" class="btn btn-primary apply-now-btn" 
-         data-job-id="{{ job.id }}" target="_blank" rel="noopener">Apply Now</a>
+      {% if job.application_period_start or job.application_period_end %}
+      <div class="application-period">
+        <p><strong>Application Period:</strong> 
+          {% if job.application_period_start %}{{ job.application_period_start[:10] }}{% endif %}
+          {% if job.application_period_end %} - {{ job.application_period_end[:10] }}{% endif %}
+          {% if job.application_status == 'Open' %}
+          <span class="job-open-text">(Open)</span>
+          {% elif job.application_status == 'Closed' %}
+          <span class="job-closed-text">(Closed)</span>
+          {% endif %}
+        </p>
+      </div>
+      {% endif %}
     </div>
-  {% endif %}
+
+    {% if job.factors %}
+      <div class="compatibility-factors">
+        <h4>Compatibility Factors</h4>
+        {% for factor in job.factors %}
+          <div class="factor-label">{{ factor.name }}:</div>
+          <div class="factor-bar-container">
+            <div class="factor-bar" style="width: {{ factor.score }}%;">
+              {{ factor.score }}%
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if job.application_link %}
+      <div class="apply-button">
+        <a href="{{ job.application_link }}" class="btn btn-primary apply-now-btn" 
+          data-job-id="{{ job.id }}" target="_blank" rel="noopener">Apply Now</a>
+      </div>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}
 {% block scripts %}

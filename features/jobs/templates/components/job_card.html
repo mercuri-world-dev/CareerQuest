@@ -1,11 +1,11 @@
 <h3>{{ job.role_name }} at {{ job.company_name }}</h3>
 <p class="location">{{ job.location }}</p>
 
-<div class="job-description">
+<div>
   <p>{{ job.description }}</p>
 </div>
 
-<div class="job-details">
+<div>
   <p>Industry: {{ job.industry | join(', ') }}</p>
   <p>Work Mode: {{ job.work_mode }}</p>
   <p>Weekly Hours: {{ job.weekly_hours }}</p>
@@ -35,9 +35,7 @@
 {% endif %}
 
 {% if job.application_materials %}
-<div class="application-materials">
   <p>Application Materials: {{ job.application_materials | join(', ') }}</p>
-</div>
 {% endif %}
 
 {% if job.application_link %}

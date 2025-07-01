@@ -28,6 +28,7 @@ def calculate_job_compatibility(job, user_profile):
 
     return total_score
 
+# TODO: fix this godawful function
 def calculate_job_compatibility_factors(job, user_profile):
     # Extract user preferences
     user_location = user_profile.get('location')
@@ -54,12 +55,20 @@ def calculate_job_compatibility_factors(job, user_profile):
     accommodations_score = calculate_accommodations_match(user_accommodations, job_accommodations)
     qualifications_score = calculate_qualifications_match(user_qualifications, job_qualifications)
     
+    factors_list = [
+        {"name": "Location", "score": round(location_score * 100)},
+        {"name": "Weekly Hours", "score": round(hours_score * 100)},
+        {"name": "Work Mode", "score": round(work_mode_score * 100)},
+        {"name": "Accommodations", "score": round(accommodations_score * 100)},
+        {"name": "Qualifications", "score": round(qualifications_score * 100)}
+    ]
     return {
         'location_score': location_score,
         'hours_score': hours_score,
         'work_mode_score': work_mode_score,
         'accommodations_score': accommodations_score,
-        'qualifications_score': qualifications_score
+        'qualifications_score': qualifications_score,
+        'factors_list': factors_list
     }
 
 def calculate_location_similarity(user_location, job_location):

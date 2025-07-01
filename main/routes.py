@@ -11,3 +11,7 @@ def index():
             return redirect(url_for('cms.dashboard'))
         return redirect(url_for('users.dashboard')) 
     return render_template('index.html')
+
+@main_bp.route('/notfound')
+def not_found():
+    return render_template('notfound.html'), 404

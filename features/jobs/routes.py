@@ -5,33 +5,11 @@ from features.jobs import api
 
 jobs_bp = Blueprint('jobs', __name__, template_folder='templates', static_folder='static', static_url_path='/static/jobs')
 
-# MOCK_JOB = {
-#     "id": "1",
-#     "company_profile_id": "123",
-#     "company_name": "Tech Innovations Inc.",
-#     "role_name": "Software Engineer",
-#     "industry": ["Technology"],
-#     "weekly_hours": "40",
-#     "work_mode": "Remote",
-#     "location": "San Francisco, CA",
-#     "qualifications": ["Bachelor's degree in Computer Science or related field"],
-#     "accommodations": ["Wheelchair accessible office", "flexible work hours"],
-#     "application_period_start": "2023-10-01",
-#     "application_period_end": "2023-11-01",
-#     "application_status": "Open",
-#     "job_type": "Full-time",
-#     "application_materials": ["Resume", "Cover Letter"],
-#     "job_description": "We are looking for a skilled software engineer to join our team. The ideal candidate will have experience in full-stack development and a passion for building innovative solutions.",
-#     "application_link": "https://techinnovations.com/careers/apply",
-#     "created_at": "2023-09-01T12:00:00Z",
-#     "updated_at": "2023-09-15T12:00:00Z"
-# }
-
 def get_rendered_job_cards(include_compatibility=False):
     jobs = api.fetch_jobs(include_compatibility)
     return [render_template('components/job_card.html', job=job, include_compatibility=include_compatibility) for job in jobs]
 
-@jobs_bp.route('/all_jobs')
+@jobs_bp.route('/jobs')
 @sb_login_required
 def all_jobs():
     rendered_jobs = get_rendered_job_cards()
@@ -44,9 +22,9 @@ def rendered_job_cards():
     rendered = get_rendered_job_cards(include_compatibility)
     return jsonify(rendered)
 
-@jobs_bp.route('/job/<job_id>')
+@jobs_bp.route('/jobs/<job_id>')
 @sb_login_required
 def job_details(job_id):
-    job = api.get_job(job_id)
+    job = api.fetch_job(job_id)
     return render_template('job_details.html', job=job)
     
