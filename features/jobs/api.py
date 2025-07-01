@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from debug.util.mock_data import MOCK_JOB, MOCK_USER_PROFILE
 from features.jobs.util import job_scoring as scoring
-from main.supabase_client import get_supabase
+from util.supabase.supabase_client import get_supabase
 from util.decorators import sb_login_required
 
 JOB_FIELDS = [

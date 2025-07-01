@@ -41,7 +41,7 @@
       {% for factor in job.factors %}
         <div class="factor-label">{{ factor.name }}:</div>
         <div class="factor-bar-container">
-          <div class="factor-bar" style="width: {{ factor.score }}%;">
+          <div class="factor-bar" style="--factor-width: {{ factor.score }}%;">
             {{ factor.score }}%
           </div>
         </div>

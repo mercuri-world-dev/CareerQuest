@@ -1,7 +1,7 @@
 from flask import Flask
 import os
 
-from main.supabase_client import get_supabase
+from util.supabase.supabase_client import get_supabase
 from util.auth import get_access_token
 
 def create_app(config_object=None):
@@ -21,7 +21,7 @@ def create_app(config_object=None):
         if access_token:
             supabase.postgrest.auth(access_token)
     
-    from main.routes import main_bp
+    from routes import main_bp
     from features.jobs.routes import jobs_bp
     from features.jobs.api import jobs_api_bp
     from features.user.routes import user_bp

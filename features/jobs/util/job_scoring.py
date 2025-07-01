@@ -1,7 +1,7 @@
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-from util.result import Result
+from util.classes.result import Result
 
 def calculate_jobs_compatibility(jobs, user_profile) -> Result[list[dict]]:
     try:

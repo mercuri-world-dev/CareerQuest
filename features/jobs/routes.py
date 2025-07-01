@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, render_template, request
 from util.auth import check_has_profile, get_access_token
 from util.decorators import profile_required, sb_login_required
-from main.supabase_client import get_supabase
+from util.supabase.supabase_client import get_supabase
 from features.jobs import api
 
 jobs_bp = Blueprint('jobs', __name__, template_folder='templates', static_folder='static', static_url_path='/static/jobs')

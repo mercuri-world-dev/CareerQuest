@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from flask import Blueprint, render_template, redirect, request, url_for, flash
 
-from main.supabase_client import get_supabase
+from util.supabase.supabase_client import get_supabase
 from util.auth import check_has_profile, refresh_access_token
 from util.decorators import sb_login_required
 
@@ -11,22 +11,6 @@ user_bp = Blueprint('users', __name__, template_folder='templates', static_folde
 @sb_login_required
 def dashboard():
     return render_template('dashboard.html')
-
-# @user_bp.route('/job_recommendations')
-# @sb_login_required
-# def job_recommendations():
-#     return render_template('job_recommendations.html')
-
-# @user_bp.route('/job_compatibility/<job_id>')
-# @sb_login_required
-# def job_compatibility(job_id):
-#     supabase = get_supabase()
-#     job = supabase.table('jobs').select('*').eq('id', job_id).single().execute()
-#     if not job:
-#         flash('Job not found', 'error')
-#         return redirect(url_for('jobs.all_jobs'))
-    
-#     return render_template('job_compatibility.html', job=job)
 
 #TODO: fix this with final user profile model  
 @user_bp.route('/profile', methods=['GET', 'POST'])

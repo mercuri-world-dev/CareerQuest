@@ -37,6 +37,7 @@
 
 .factor-bar {
   height: 100%;
+  width: var(--factor-width, 0%);
   border-radius: 6px;
   background: var(--primary-dark);
   transition: width 0.5s;

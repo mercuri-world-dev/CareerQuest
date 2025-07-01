@@ -1,12 +1,10 @@
 import json
 import os
 from flask import session
-from requests import Session
-from supabase.client import Client
 from dotenv import load_dotenv, find_dotenv
 import jwt
 
-from main.supabase_client import get_supabase
+from util.supabase.supabase_client import get_supabase
 
 load_dotenv(find_dotenv())
 
@@ -66,24 +64,3 @@ def is_authenticated():
   if not access_token:
     return False
   return True
-
-# def create_jwt_token(user_id, permissions, roles):
-#     payload = { 
-#         "sub": user_id,
-#         "permissions": permissions,
-#         "roles": roles,
-#         "exp": datetime.now(tz=timezone.utc) + timedelta(hours=JWT_EXPIRY_HOURS)
-#     }
-#     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
-#     if isinstance(token, bytes):
-#         token = token.decode('utf-8')
-#     return token
-
-# def verify_jwt_token(token):
-#     try:
-#         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-#         return payload
-#     except jwt.ExpiredSignatureError:
-#         return None
-#     except jwt.InvalidTokenError:
-#         return None

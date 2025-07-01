@@ -180,6 +180,11 @@ header h1 span {
     flex-direction: column;
 }  
 
+.widecard {
+    width: 80vw; 
+    margin: 0 auto;
+}
+
 .card-header {
     background-color: var(--white-more-transparent);
     color: var(--white);
@@ -776,7 +781,7 @@ footer p {
 }
 
 /* Role selection styles */
-.role-selector {
+/* .role-selector {
     display: flex;
     gap: 15px;
     margin-bottom: 20px;
@@ -810,4 +815,4 @@ footer p {
 .role-card p {
     color: var(--dark-gray);
     font-size: 0.9rem;
-}
+} */

@@ -2,7 +2,7 @@ import os
 from flask import g
 from werkzeug.local import LocalProxy
 from supabase.client import Client, ClientOptions
-from main.flask_storage import FlaskSessionStorage
+from util.supabase.flask_storage import FlaskSessionStorage
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
