@@ -27,9 +27,9 @@ jobs_bp = Blueprint('jobs', __name__, template_folder='templates', static_folder
 #     "updated_at": "2023-09-15T12:00:00Z"
 # }
 
-def get_rendered_job_cards():
-    jobs = api.get_jobs()
-    return [render_template('components/job_card.html', job=job) for job in jobs]
+def get_rendered_job_cards(include_compatibility=False):
+    jobs = api.fetch_jobs(include_compatibility)
+    return [render_template('components/job_card.html', job=job, include_compatibility=include_compatibility) for job in jobs]
 
 @jobs_bp.route('/all_jobs')
 @sb_login_required
@@ -40,5 +40,13 @@ def all_jobs():
 @jobs_bp.route('/rendered/job_cards')
 @sb_login_required
 def rendered_job_cards():
-    rendered = get_rendered_job_cards()
+    include_compatibility = request.args.get('include_compatibility', 'false').lower() == 'true'
+    rendered = get_rendered_job_cards(include_compatibility)
     return jsonify(rendered)
+
+@jobs_bp.route('/job/<job_id>')
+@sb_login_required
+def job_details(job_id):
+    job = api.get_job(job_id)
+    return render_template('job_details.html', job=job)
+    

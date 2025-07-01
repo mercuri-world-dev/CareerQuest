@@ -13,20 +13,11 @@
   <p>Accommodations: {{ job.accommodations | join(', ') }}</p>
 </div>
 
-{% if job.compatibility_score %}
+{% if include_compatibility and job.compatibility_score %}
 <div class="compatibility-score">
   <h4>Overall Compatibility</h4>
   <p class="score">{{ (job.compatibility_score * 100)|round(0, 'floor') }}%</p>
 </div>
-{% endif %}
-
-{% if job.factors %}
-  <div class="compatibility-factors">
-    <h4>Compatibility Factors</h4>
-    {% for factor in job.factors %}
-      <p>{{ factor.name }}: {{ factor.score }}%</p>
-    {% endfor %}
-  </div>
 {% endif %}
 
 {% if job.application_period_start or job.application_period_end %}

@@ -15,11 +15,9 @@ JOB_FIELDS = [
 
 jobs_api_bp = Blueprint('jobs_api', __name__)
 
-@jobs_api_bp.route('/jobs', methods=['GET'])
-@sb_login_required
-def get_jobs():
+def fetch_jobs(include_compatibility=False):
+    print(f"Include compatibility: {include_compatibility}")
     # supabase = get_supabase()
-    include_compatibility = request.args.get('includecompatibility', 'true').lower() == 'true'
     # query = supabase.table('jobs').select('*')
     # for field in JOB_FIELDS:
     #     value = request.args.get(field)
@@ -53,17 +51,12 @@ def get_jobs():
         return jobs_with_compatibility
     return jobs
 
-@jobs_api_bp.route('/jobs/<job_id>', methods=['GET'])
+@jobs_api_bp.route('/jobs', methods=['GET'])
 @sb_login_required
-def get_job(job_id):
-    supabase = get_supabase()
-    job = supabase.table('jobs').select('*').eq('id', job_id).single().execute()
+def get_jobs():
+    include_compatibility = request.args.get('include_compatibility', 'false').lower() == 'true'
+    return fetch_jobs(include_compatibility)
     
-    if not job:
-        return jsonify({"error": "Job not found"}), 404
-        
-    return jsonify(job.data)
-
 @jobs_api_bp.route('/job_click', methods=['POST'])
 @sb_login_required
 def job_click():
@@ -90,3 +83,43 @@ def job_click():
         return jsonify({'error': 'Failed to record job click'}), 500
     
     return jsonify({'success': True})
+
+@jobs_api_bp.route('/jobs/<job_id>', methods=['GET'])
+@sb_login_required
+def get_job(job_id):
+    # supabase = get_supabase()
+    include_compatibility = request.args.get('include_compatibility', 'false').lower() == 'true'
+    # try:
+    #     job = supabase.table('jobs').select('*').eq('id', job_id).single().execute()
+    # except Exception as e:
+    #     print(f"Error fetching job: {e}")
+    #     return jsonify({"error": "Failed to fetch job"}), 500
+    
+    # if not job:
+    #     return jsonify({"error": "Job not found"}), 404
+    
+    job = MOCK_JOB
+
+    if include_compatibility:
+        # user_profile_resp = supabase.table('user_profiles').select('*').limit(1).execute()
+        # if not user_profile_resp or not getattr(user_profile_resp, 'data', None) or not user_profile_resp.data:
+        #     return jsonify({"error": "User profile not found"}), 404
+        
+        # user_profile = user_profile_resp.data[0]
+        user_profile = MOCK_USER_PROFILE
+        job_with_compatibility = scoring.calculate_job_compatibility_factors(job, user_profile)
+        # job_with_compatibility_result = scoring.calculate_job_compatibility_factors(job.data, user_profile)
+
+        if job_with_compatibility:
+            job.data.update({
+                'compatibility_score': job_with_compatibility.get('compatibility_score', 0),
+                'factors': job_with_compatibility.get('factors', [])
+            })
+            print(f"Job compatibility factors: {job.data.get('factors', [])}")
+        else:
+            print("No compatibility factors found for job")
+            job.data['compatibility_score'] = 0
+            job.data['factors'] = []
+
+    # return jsonify(job.data)
+    return jsonify(job)

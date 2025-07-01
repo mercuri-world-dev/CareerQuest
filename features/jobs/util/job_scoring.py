@@ -13,6 +13,22 @@ def calculate_jobs_compatibility(jobs, user_profile) -> Result[list[dict]]:
     return Result(success=True, data=jobs)
 
 def calculate_job_compatibility(job, user_profile):
+    data = calculate_job_compatibility_factors(job, user_profile)
+
+    if not data:
+        return 0.0
+    
+    total_score = (
+        data['location_score'] * 0.3 +
+        data['hours_score'] * 0.1 +
+        data['work_mode_score'] * 0.2 +
+        data['accommodations_score'] * 0.1 +
+        data['qualifications_score'] * 0.3
+    )
+
+    return total_score
+
+def calculate_job_compatibility_factors(job, user_profile):
     # Extract user preferences
     user_location = user_profile.get('location')
     user_hours = int(user_profile.get('hours_per_week', 0))
@@ -38,16 +54,13 @@ def calculate_job_compatibility(job, user_profile):
     accommodations_score = calculate_accommodations_match(user_accommodations, job_accommodations)
     qualifications_score = calculate_qualifications_match(user_qualifications, job_qualifications)
     
-    # Combine scores with weights 
-    total_score = (
-        location_score * 0.3 +
-        hours_score * 0.1 +
-        work_mode_score * 0.2 +
-        accommodations_score * 0.1 +
-        qualifications_score * 0.3
-    )
-    
-    return total_score
+    return {
+        'location_score': location_score,
+        'hours_score': hours_score,
+        'work_mode_score': work_mode_score,
+        'accommodations_score': accommodations_score,
+        'qualifications_score': qualifications_score
+    }
 
 def calculate_location_similarity(user_location, job_location):
     """Calculate location similarity based on city/state/country match"""
