@@ -18,19 +18,32 @@ def calculate_job_compatibility(job, user_profile):
     if not data:
         return 0.0
     
-    total_score = (
-        data['location_score'] * 0.3 +
-        data['hours_score'] * 0.1 +
-        data['work_mode_score'] * 0.2 +
-        data['accommodations_score'] * 0.1 +
-        data['qualifications_score'] * 0.3
-    )
+    total_score = calculate_total_compatibility(job)
 
     return total_score
 
+def calculate_total_compatibility_from_scores(location_score, hours_score, work_mode_score, accommodations_score, qualifications_score):
+    return (
+        location_score * 0.3 +
+        hours_score * 0.1 +
+        work_mode_score * 0.2 +
+        accommodations_score * 0.1 +
+        qualifications_score * 0.3
+    )
+
+def calculate_total_compatibility(job):
+    if not job:
+        return 0.0
+    return calculate_total_compatibility_from_scores(
+        job['location_score'],
+        job['hours_score'],
+        job['work_mode_score'],
+        job['accommodations_score'],
+        job['qualifications_score']
+    )
+
 # TODO: fix this godawful function
 def calculate_job_compatibility_factors(job, user_profile):
-    # Extract user preferences
     user_location = user_profile.get('location')
     user_hours = int(user_profile.get('hours_per_week', 0))
     user_accommodations = user_profile.get('accommodations', [])
@@ -41,34 +54,38 @@ def calculate_job_compatibility_factors(job, user_profile):
     )
     user_qualifications = user_profile.get('educational_background')
     
-    # Extract job details
     job_location = job.get('location')
     job_hours = int(job.get('weekly_hours'))
     job_accommodations = job.get('accommodations')
     job_mode = job.get('work_mode')
     job_qualifications = ','.join(job.get('qualifications'))
 
-    # Calculate individual scores
     location_score = calculate_location_similarity(user_location, job_location)
     hours_score = calculate_hours_compatibility(user_hours, job_hours)
     work_mode_score = calculate_work_mode_compatibility(user_prefs, job_mode)
     accommodations_score = calculate_accommodations_match(user_accommodations, job_accommodations)
     qualifications_score = calculate_qualifications_match(user_qualifications, job_qualifications)
-    
-    factors_list = [
+ 
+    factors = [
         {"name": "Location", "score": round(location_score * 100)},
         {"name": "Weekly Hours", "score": round(hours_score * 100)},
         {"name": "Work Mode", "score": round(work_mode_score * 100)},
         {"name": "Accommodations", "score": round(accommodations_score * 100)},
         {"name": "Qualifications", "score": round(qualifications_score * 100)}
     ]
+
+    overall_score = round(calculate_total_compatibility_from_scores(
+        location_score, hours_score, work_mode_score, accommodations_score, qualifications_score
+    ) * 100)
+
     return {
         'location_score': location_score,
         'hours_score': hours_score,
         'work_mode_score': work_mode_score,
         'accommodations_score': accommodations_score,
         'qualifications_score': qualifications_score,
-        'factors_list': factors_list
+        'factors': factors,
+        'overall_score': overall_score
     }
 
 def calculate_location_similarity(user_location, job_location):

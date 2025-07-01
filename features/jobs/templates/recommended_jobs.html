@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('jobs.static', filename='jobs.css') }}">
+{% endblock %}
+{% block title %} Recommended Jobs - CareerQuest {% endblock %}
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h2>Recommended Jobs</h2>
+      <p>Top job matches for your skills and preferences</p>
+    </div>
+    <div class="card-body">
+      <div id="recommendedJobsResults" class="results-container">
+        {% if rendered_jobs %}
+          <h3>Top Matches</h3>
+          {% for job in rendered_jobs %}
+            <div class="job-card">
+              {{ job | safe }}
+            </div>
+          {% endfor %}
+        {% else %}
+          <p>No recommended jobs found.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
