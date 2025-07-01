@@ -18,7 +18,7 @@ def calculate_job_compatibility(job, user_profile):
     if not data:
         return 0.0
     
-    total_score = calculate_total_compatibility(job)
+    total_score = calculate_total_compatibility(data)
 
     return total_score
 
