@@ -1,6 +1,7 @@
 from flask import Blueprint, redirect, render_template, url_for
 
 from util.auth import fetch_user_role, get_access_token, is_authenticated
+from util.decorators import profile_required
 
 main_bp = Blueprint('main', __name__, template_folder='templates', static_folder='static')
 
@@ -13,5 +14,6 @@ def index():
     return render_template('index.html')
 
 @main_bp.route('/notfound')
+@profile_required
 def not_found():
-    return render_template('notfound.html'), 404
+    return render_template('notfound.html'), 404 

@@ -35,6 +35,7 @@
           <option value="Closed">Closed</option>
           <option value="Draft">Draft</option>
         </select>
+        {% if has_profile %}
         <div class="checkbox-item" style="display: inline-block; margin-left: 1rem;">
           <label class="checkbox-label" for="includecompatibility">
             <input type="checkbox" id="includecompatibility" name="includecompatibility">
@@ -42,6 +43,12 @@
             Include Compatibility
           </label>
         </div>
+        {% else %}
+        <div>
+          <p>You must complete your profile to filter jobs by compatibility.</p>
+          <a href="{{ url_for('users.profile') }}" class="btn btn-primary">Complete Profile</a>
+        </div>
+        {% endif %}
         <button type="submit" class="btn btn-primary">Filter</button>
         <button type="reset" class="btn btn-secondary" onclick="clearFilterForm()">Reset</button>
       </form>

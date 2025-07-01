@@ -13,17 +13,22 @@
 </header>
 
 <div class="dashboard-grid">
-  <div class="card">
-    <div class="card-header">
-      <h2>Job Recommendations</h2>
-      <p>Personalized job matches based on your profile</p>
-    </div>
-    <div class="card-body">
-      <p>
-        Get job recommendations tailored to your skills, preferences, and
-        accommodations.
-      </p>
-      <p style="font-style: italic;">Coming soon</p>
+  <div class="dashboard-grid">
+    <div class="card">
+      <div class="card-header">
+        <h2>Job Recommendations</h2>
+        <p>Personalized job matches based on your profile</p>
+      </div>
+      <div class="card-body">
+        <p>
+          Get job recommendations tailored to your skills, preferences, and
+          accommodations.
+        </p>
+        <a
+          href="{{ url_for('jobs.recommended_jobs') }}"
+          class="btn btn-secondary"
+          >View Recommendations</a
+        >
     </div>
   </div>
 

@@ -2,7 +2,7 @@ from functools import wraps
 
 from flask import flash, redirect, url_for
 
-from util.auth import fetch_user_role, get_access_token, is_authenticated
+from util.auth import check_has_profile, fetch_user_role, get_access_token, is_authenticated
 
 def role_required(required_roles: list):
     def wrapper(f):
@@ -26,5 +26,19 @@ def sb_login_required(fn):
         if not is_authenticated():
             flash('Please log in to access this page.', 'warning')
             return redirect(url_for('auth.login'))
+        return fn(*args, **kwargs)
+    return wrapper
+
+def profile_required(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        access_token = get_access_token()
+        if not access_token:
+            flash('You must be logged in to access this page.', 'warning')
+            return redirect(url_for('auth.login'))
+        has_profile = check_has_profile(access_token)
+        if not has_profile:
+            flash('You must complete your profile to access this page.', 'warning')
+            return redirect(url_for('users.profile'))
         return fn(*args, **kwargs)
     return wrapper

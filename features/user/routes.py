@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from flask import Blueprint, render_template, redirect, request, url_for, flash
 
 from main.supabase_client import get_supabase
+from util.auth import check_has_profile, refresh_access_token
 from util.decorators import sb_login_required
 
 user_bp = Blueprint('users', __name__, template_folder='templates', static_folder='static', static_url_path='/static/user')
@@ -56,6 +57,14 @@ def profile():
 
             resp = supabase.table('user_profiles').upsert(profile_data).execute()
             flash('User profile updated successfully!', 'message')
+            try:
+                access_token = request.cookies.get('supabase.auth.token')
+                if not check_has_profile(access_token):
+                    refresh_access_token()
+            except Exception as e:
+                print(f"Error refreshing access token: {e}")
+                flash('There was an error refreshing your session. Please log in again.', 'error')
+                return redirect(url_for('users.dashboard'))
             return render_template('profile.html', profile=resp.data[0] if resp.data else None)
         except Exception as e:
             print(f"Error updating user profile: {e}")

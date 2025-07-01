@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, render_template, request
-from util.decorators import sb_login_required
+from util.auth import check_has_profile, get_access_token
+from util.decorators import profile_required, sb_login_required
 from main.supabase_client import get_supabase
 from features.jobs import api
 
@@ -30,8 +31,15 @@ def job_details(job_id):
 
 @jobs_bp.route('/recommended_jobs')
 @sb_login_required
+@profile_required
 def recommended_jobs():
     jobs = api.fetch_jobs(include_compatibility=True)
     sorted_jobs = sorted(jobs, key=lambda j: j.get('compatibility_score', 0), reverse=True)[:10]
     rendered_jobs = [render_template('components/detailed_job_card.html', job=job) for job in sorted_jobs]
-    return render_template('recommended_jobs.html', rendered_jobs=rendered_jobs, include_compatibility=True)
+    access_token = get_access_token()
+    return render_template(
+            'recommended_jobs.html', 
+            rendered_jobs=rendered_jobs, 
+            include_compatibility=True,
+            has_profile=check_has_profile(access_token) if access_token else False
+            )

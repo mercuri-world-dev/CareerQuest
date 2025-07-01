@@ -1,9 +1,12 @@
 import json
 import os
 from flask import session
+from requests import Session
 from supabase.client import Client
 from dotenv import load_dotenv, find_dotenv
 import jwt
+
+from main.supabase_client import get_supabase
 
 load_dotenv(find_dotenv())
 
@@ -27,6 +30,12 @@ def fetch_user_role(token):
     return None
   return res.get('user_role')
 
+def check_has_profile(token):
+  res = decode_jwt(token)
+  if not res:
+    return False
+  return res.get('has_profile', False)
+
 def get_access_token():
   supabase_token = session.get('supabase.auth.token')
   if not supabase_token:
@@ -37,6 +46,20 @@ def get_access_token():
       except json.JSONDecodeError:
           return None
   return supabase_token_json.get('access_token')
+
+def refresh_access_token():
+  supabase = get_supabase()
+  if not supabase:
+      return None
+  try:
+      session = supabase.auth.refresh_session().session
+      if not session:
+          print("No session object returned from refresh_session.")
+          return None
+      supabase.auth.set_session(session.access_token, session.refresh_token)
+  except Exception as e:
+      print(f"Error refreshing access token: {e}")
+      return None
 
 def is_authenticated():
   access_token = get_access_token()
