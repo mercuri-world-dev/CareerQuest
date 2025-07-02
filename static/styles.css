@@ -780,6 +780,24 @@ footer p {
     margin-top: 5px;
 }
 
+/* Session expired page style */
+.session-expired-container {
+    text-align: center;
+    margin-top: 50px;
+    color: var(--white);
+}
+
+.session-expired-container h1 {
+    margin-bottom: 20px;
+}
+.session-expired-container p {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+}
+.session-expired-container a {
+    margin: 0 10px;
+}
+
 /* Role selection styles */
 /* .role-selector {
     display: flex;

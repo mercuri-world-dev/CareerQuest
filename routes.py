@@ -14,6 +14,9 @@ def index():
     return render_template('index.html')
 
 @main_bp.route('/notfound')
-@profile_required
 def not_found():
-    return render_template('notfound.html'), 404 
+    return render_template('errors/notfound.html'), 404 
+
+@main_bp.route('/session_expired')
+def session_expired():
+    return render_template('errors/session_expired.html')
