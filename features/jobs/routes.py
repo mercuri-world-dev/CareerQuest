@@ -21,7 +21,9 @@ def get_rendered_job_cards(include_compatibility=False, include_factors=False):
 @sb_login_required
 def all_jobs():
     rendered_jobs = get_rendered_job_cards()
-    return render_template('all_jobs.html', rendered_jobs=rendered_jobs)
+    access_token = get_access_token()
+    has_profile = check_has_profile(access_token) if access_token else False
+    return render_template('all_jobs.html', rendered_jobs=rendered_jobs, has_profile=has_profile)
 
 @jobs_bp.route('/rendered/job_cards')
 @sb_login_required
