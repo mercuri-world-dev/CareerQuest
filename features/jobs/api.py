@@ -1,91 +1,158 @@
 from flask import Blueprint, jsonify, request
-from debug.util.mock_data import MOCK_JOB, MOCK_USER_PROFILE
+
 from features.jobs.util import job_scoring as scoring
-from main.supabase_client import get_supabase
+from util.classes.result import Result
+from util.models import Job, JobWithCompatibility, JobWithCompatibilityFactors, UserProfile
+from util.supabase.supabase_client import get_supabase
 from util.decorators import sb_login_required
 
 JOB_FIELDS = [
     'id', 'company_profile_id', 'company_name', 'role_name', 'industry', 'weekly_hours', 'work_mode', 'location',
     'qualifications', 'accommodations', 'application_period_start', 'application_period_end', 'application_status',
-    'job_type', 'application_materials', 'job_description', 'application_link', 'created_at', 'updated_at'
+    'job_type', 'application_materials', 'job_description', 'application_link'
+]
+
+LIST_FIELDS = [
+  'industry', 'qualifications', 'accommodations', 'application_materials'
 ]
 
 jobs_api_bp = Blueprint('jobs_api', __name__)
 
-def fetch_jobs(include_compatibility=False):
-    supabase = get_supabase()
-    query = supabase.table('jobs').select('*')
-    for field in JOB_FIELDS:
-        value = request.args.get(field)
-        if value is not None:
-            if field in ['industry', 'qualifications', 'accommodations', 'application_materials']:
-                values = [v.strip() for v in value.split(',') if v.strip()]
-                if values:
-                    query = query.contains(field, values)
-            else:
-                query = query.eq(field, value)
-    jobs_resp = query.execute()
-    jobs = jobs_resp.data if hasattr(jobs_resp, "data") else []
-    # jobs = [MOCK_JOB]  
-    if include_compatibility:
-        # user_profile = MOCK_USER_PROFILE
-        # for job in jobs:
-        #     factors = scoring.calculate_job_compatibility_factors(job, user_profile).get('factors', [])
-        #     job['factors'] = factors
-        # return jobs
-        user_profile_resp = supabase.table('user_profiles').select('*').limit(1).execute()
-        if not user_profile_resp or not getattr(user_profile_resp, 'data', None) or not user_profile_resp.data:
-            return jobs
-        user_profile = user_profile_resp.data[0]
-        result = scoring.calculate_jobs_compatibility(jobs, user_profile)
-        if result.is_success():
-            for job in jobs:
-                factors = scoring.calculate_job_compatibility_factors(job, user_profile).get('factors', [])
-                job['factors'] = factors
-            return jobs
-        else:
-            print(f"Error calculating job compatibility: {result.error}")
-            return jobs
-    return jobs
-
-def fetch_job(job_id, include_compatibility=True):
-    supabase = get_supabase()
+def fetch_jobs() -> Result[list[Job]]:
     try:
-        job_resp = supabase.table('jobs').select('*').eq('id', job_id).single().execute()
-        job = job_resp.data if hasattr(job_resp, 'data') else job_resp
+        supabase = get_supabase()
+        query = supabase.table('jobs').select('*')
+        for field in JOB_FIELDS:
+            value = request.args.get(field)
+            if value is not None: 
+                if field in LIST_FIELDS:
+                    values = [v.strip() for v in value.split(',') if v.strip()]
+                    if values:
+                        query = query.contains(field, values)
+                else:
+                    query = query.eq(field, value)
+        jobs_resp = query.execute()
+        if not jobs_resp or not jobs_resp.data:
+            print("No jobs found.")
+            return Result(success=False, error="No jobs found", data=[])
+        jobs_data = jobs_resp.data
+        jobs = [Job(**{k: v for k, v in job.items() if k in JOB_FIELDS}) for job in jobs_data]
+        return Result(success=True, data=jobs)
     except Exception as e:
-        print(f"Error fetching job: {e}")
-        return None
-    if not job:
-        print(f"Job with ID {job_id} not found.")
-        return None
-    # job = MOCK_JOB
-    if include_compatibility:
+        print(f"Error fetching jobs: {e}")
+        return Result(success=False, error=str(e), data=[])
+
+def fetch_jobs_with_compatibility() -> Result[list[Result[JobWithCompatibility]]]:
+    try:
+        supabase = get_supabase()
+        jobs_res = fetch_jobs()
+        if not jobs_res.is_success():
+            return Result(success=False, error=jobs_res.error, data=[])
+        jobs_data = jobs_res.data
         try:
             user_profile_resp = supabase.table('user_profiles').select('*').limit(1).execute()
+            if not user_profile_resp or not user_profile_resp.data:
+                print("User profile not found.")
+                return Result(success=False, error="User profile not found", data=[])
         except Exception as e:
             print(f"Error fetching user profile: {e}")
-            return job
-        if not user_profile_resp:
+            return Result(success=False, error="User profile not found", data=[])
+        user_profile_dict = user_profile_resp.data[0]
+        user_profile = UserProfile.from_supabase_dict(user_profile_dict)
+        jobs_with_compat = scoring.calculate_jobs_compatibility(jobs_data, user_profile)
+        return Result(success=True, data=jobs_with_compat)
+    except Exception as e:
+        print(f"Error fetching jobs with compatibility: {e}")
+        return Result(success=False, error=str(e), data=[])
+
+def fetch_jobs_with_compatibility_factors() -> Result[list[Result[JobWithCompatibilityFactors]]]:
+    supabase = get_supabase()
+    jobs_res = fetch_jobs()
+    if not jobs_res.is_success():
+        return Result(success=False, error=jobs_res.error, data=[])
+    jobs_data = jobs_res.data
+    try:
+        user_profile_resp = supabase.table('user_profiles').select('*').limit(1).execute()
+        if not user_profile_resp or not user_profile_resp.data:
+            return Result(success=False, error="User profile not found", data=[])
+        user_profile_dict = user_profile_resp.data[0]
+        user_profile = UserProfile.from_supabase_dict(user_profile_dict)
+        compat_results = [scoring.calculate_job_compatibility_factors(job, user_profile) for job in jobs_data]
+        return Result(success=True, data=compat_results)
+    except Exception as e:
+        print(f"Error fetching user profile or calculating compatibility: {e}")
+        return Result(success=False, error=str(e), data=[])
+
+def fetch_job(job_id) -> Result[Job]:
+    supabase = get_supabase()
+    try:
+        job = supabase.table('jobs').select('*').eq('id', job_id).single().execute()
+    except Exception as e:
+        print(f"Error fetching job: {e}")
+        return Result(success=False, error=str(e))
+    if not job:
+        print(f"Job with ID {job_id} not found.")
+        return Result(success=False, error=f"Job with ID {job_id} not found.")
+    return Result(success=True, data=job)
+
+def fetch_job_with_compatibility(job_id) -> Result[JobWithCompatibility]:
+    job_result = fetch_job(job_id)
+    if not job_result.is_success():
+        return job_result
+    job = job_result.data
+    supabase = get_supabase()
+    try:
+        user_profile_resp = supabase.table('user_profiles').select('*').limit(1).execute()
+        if not user_profile_resp or not user_profile_resp.data:
             print("User profile not found.")
-            return job
-        user_profile = user_profile_resp.data[0]
-        # user_profile = MOCK_USER_PROFILE
-        scores = scoring.calculate_job_compatibility_factors(job, user_profile)
-        factors = scores.get('factors', [])
-        overall_score = scores.get('overall_score', 0.0)
-        job['factors'] = factors
-        job['overall_score'] = overall_score
-    return job
+            return Result(success=False, error="User profile not found.")
+        user_profile_dict = user_profile_resp.data[0]
+        user_profile = UserProfile.from_supabase_dict(user_profile_dict)
+        compat_result = scoring.calculate_job_compatibility_factors(job, user_profile)
+        if compat_result.is_success():
+            job_with_factors = compat_result.data
+            return Result(success=True, data=job_with_factors)
+        else:
+            print(f"Error calculating compatibility factors: {compat_result.error}")
+            return Result(success=False, error=compat_result.error)
+    except Exception as e:
+        print(f"Error fetching user profile or calculating compatibility: {e}")
+        return Result(success=False, error=str(e))
+
+def fetch_job_with_compatibility_factors(job_id) -> Result[JobWithCompatibilityFactors]:
+    job_result = fetch_job(job_id)
+    if not job_result.is_success():
+        return job_result
+    job = job_result.data
+    supabase = get_supabase()
+    try:
+        user_profile_resp = supabase.table('user_profiles').select('*').limit(1).execute()
+        if not user_profile_resp or not user_profile_resp.data:
+            print("User profile not found.")
+            return Result(success=False, error="User profile not found.")
+        user_profile_dict = user_profile_resp.data[0]
+        user_profile = UserProfile.from_supabase_dict(user_profile_dict)
+        compat_result = scoring.calculate_job_compatibility_factors(job, user_profile)
+        return compat_result
+    except Exception as e:
+        print(f"Error fetching user profile or calculating compatibility: {e}")
+        return Result(success=False, error=str(e))
 
 @jobs_api_bp.route('/jobs', methods=['GET'])
 @sb_login_required
 def get_jobs():
     include_compatibility = request.args.get('include_compatibility', 'false').lower() == 'true'
-    jobs = fetch_jobs(include_compatibility)
-    return jsonify(jobs)
+    include_factors = request.args.get('include_factors', 'false').lower() == 'true'
+    if include_factors:
+        result = fetch_jobs_with_compatibility_factors()
+    else:
+        result = fetch_jobs_with_compatibility() if include_compatibility else fetch_jobs()
+    if result.is_success():
+        return jsonify(result.data)
+    else:
+        return jsonify({'error': result.error}), 500
 
-@jobs_api_bp.route('/job_click', methods=['POST'])
+@jobs_api_bp.route('/job_click', methods=['POST']) 
 @sb_login_required
 def job_click():
     supabase = get_supabase()
@@ -94,7 +161,7 @@ def job_click():
     if not job_id:
         return jsonify({'error': 'Missing job_id'}), 400
     user_profile_resp = supabase.table('user_profiles').select('id').limit(1).execute()
-    if not user_profile_resp or not getattr(user_profile_resp, 'data', None) or not user_profile_resp.data:
+    if not user_profile_resp:
         return jsonify({'error': 'User profile not found'}), 404
     user_profile_id = user_profile_resp.data[0]['id']
     try:
@@ -110,7 +177,7 @@ def job_click():
 @jobs_api_bp.route('/jobs/<job_id>', methods=['GET'])
 @sb_login_required
 def get_job(job_id):
-    job = fetch_job(job_id)
-    if not job:
-        return jsonify({"error": "Job not found or failed to calculate compatibility"}), 404
-    return jsonify(job)
+    result = fetch_job(job_id)
+    if not result.is_success():
+        return jsonify({"error": result.error or "Job not found or failed to calculate compatibility"}), 404
+    return jsonify(result.data)

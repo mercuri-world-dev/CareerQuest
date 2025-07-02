@@ -1,7 +1,6 @@
-from datetime import datetime, timezone
 from flask import Blueprint, render_template, redirect, request, url_for, flash
 
-from main.supabase_client import get_supabase
+from util.supabase.supabase_client import get_supabase
 from util.auth import check_has_profile, refresh_access_token
 from util.decorators import sb_login_required
 
@@ -12,28 +11,17 @@ user_bp = Blueprint('users', __name__, template_folder='templates', static_folde
 def dashboard():
     return render_template('dashboard.html')
 
-# @user_bp.route('/job_recommendations')
-# @sb_login_required
-# def job_recommendations():
-#     return render_template('job_recommendations.html')
-
-# @user_bp.route('/job_compatibility/<job_id>')
-# @sb_login_required
-# def job_compatibility(job_id):
-#     supabase = get_supabase()
-#     job = supabase.table('jobs').select('*').eq('id', job_id).single().execute()
-#     if not job:
-#         flash('Job not found', 'error')
-#         return redirect(url_for('jobs.all_jobs'))
-    
-#     return render_template('job_compatibility.html', job=job)
-
-#TODO: fix this with final user profile model  
 @user_bp.route('/profile', methods=['GET', 'POST'])
 @sb_login_required
 def profile():
     supabase = get_supabase()
-    profile_resp = supabase.table('user_profiles').select('*').limit(1).execute() # Secure (RLS)
+    try:
+        profile_resp = supabase.table('user_profiles').select('*').limit(1).execute() # Secure (RLS)
+    except Exception as e:
+        if 'PGRST301' in str(e):
+            return redirect(url_for('main.session_expired'))
+        flash('There was an error fetching your profile. Please try again.', 'error')
+        return redirect(url_for('users.dashboard'))
     profile = profile_resp.data[0] if profile_resp.data else None
     if request.method == 'POST':
         try:
@@ -49,7 +37,6 @@ def profile():
                 "remote_preference": request.form.get('remote_preference') == 'on',
                 "hybrid_preference": request.form.get('hybrid_preference') == 'on',
                 "in_person_preference": request.form.get('in_person_preference') == 'on',
-                "updated_at": datetime.now(tz=timezone.utc).isoformat()
             }
 
             if profile and profile.get('id'):

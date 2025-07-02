@@ -5,8 +5,14 @@
 {% block title %}Job Details - CareerQuest{% endblock %}
 {% block content %}
 <div class="detailed-job-page card">
-  {% with job=job %}
-    {% include 'components/detailed_job_card.html' %}
-  {% endwith %}
+  {% if err %}
+    {% with msg=err %}
+      {% include 'components/job_error.html' %}
+    {% endwith %}
+  {% else %}
+    {% with job=job %}
+      {% include 'components/detailed_job_card.html' %}
+    {% endwith %}
+  {% endif %}
 </div>
 {% endblock %}

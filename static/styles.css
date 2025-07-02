@@ -180,6 +180,11 @@ header h1 span {
     flex-direction: column;
 }  
 
+.widecard {
+    width: 80vw; 
+    margin: 0 auto;
+}
+
 .card-header {
     background-color: var(--white-more-transparent);
     color: var(--white);
@@ -775,8 +780,26 @@ footer p {
     margin-top: 5px;
 }
 
+/* Session expired page style */
+.session-expired-container {
+    text-align: center;
+    margin-top: 50px;
+    color: var(--white);
+}
+
+.session-expired-container h1 {
+    margin-bottom: 20px;
+}
+.session-expired-container p {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+}
+.session-expired-container a {
+    margin: 0 10px;
+}
+
 /* Role selection styles */
-.role-selector {
+/* .role-selector {
     display: flex;
     gap: 15px;
     margin-bottom: 20px;
@@ -810,4 +833,4 @@ footer p {
 .role-card p {
     color: var(--dark-gray);
     font-size: 0.9rem;
-}
+} */

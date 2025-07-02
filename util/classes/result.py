@@ -4,7 +4,7 @@ T = TypeVar('T')
 
 class Result(Generic[T]):
     """
-    A generic Result class to encapsulate the outcome of an operation.
+    Encapsulates outcome of operation.
     
     Attributes:
         success (bool): Indicates if the operation was successful.
