@@ -11,15 +11,21 @@
     </div>
     <div class="card-body">
       <div id="recommendedJobsResults" class="results-container">
-        {% if rendered_jobs %}
-          <h3>Top Matches</h3>
-          {% for job in rendered_jobs %}
-            <div class="job-card">
-              {{ job | safe }}
-            </div>
-          {% endfor %}
+        {% if err %}
+          {% with msg=err %}
+            {% include 'components/job_error.html' %}
+          {% endwith %}
         {% else %}
-          <p>No recommended jobs found.</p>
+          {% if rendered_jobs %}
+            <h3>Top Matches</h3>
+            {% for job in rendered_jobs %}
+              <div class="job-card">
+                {{ job | safe }}
+              </div>
+            {% endfor %}
+          {% else %}
+            <p>No recommended jobs found.</p>
+          {% endif %}
         {% endif %}
       </div>
     </div>

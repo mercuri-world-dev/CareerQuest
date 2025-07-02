@@ -70,11 +70,6 @@
     color: #721c24;
 }
 
-.status-draft {
-    background-color: #fff3cd;
-    color: #856404;
-}
-
 .company-profile-form {
   color: var(--white-translucent);
   width: 100%;

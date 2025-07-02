@@ -38,10 +38,10 @@ def edit_job(job_id):
         return redirect(url_for('cms.manage_jobs'))
     if request.method == 'POST':
         application_status_response = request.form.get('application_status', 'Open')
-        if application_status_response in ['Closed', 'Draft']:
-            application_status = False
-        else:
+        if application_status_response == 'Open':
             application_status = True
+        else:
+            application_status = False
         update_data = {
             'role_name': request.form.get('role_name'),
             'weekly_hours': int(request.form.get('weekly_hours')) if request.form.get('weekly_hours') else None,
@@ -83,10 +83,10 @@ def add_job():
         try:
             application_status_response = request.form.get('application_status', 'Open')
             
-            if application_status_response in ['Closed', 'Draft']:
-                application_status = False
-            else:
+            if application_status_response == 'Open':
                 application_status = True
+            else:
+                application_status = False
 
             company_profile_id=selected_company['id']
             company_name=selected_company.get('company_name')

@@ -2,104 +2,93 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 from util.classes.result import Result
+from util.models import Job, JobFactors, JobWithCompatibility, JobWithCompatibilityFactors, UserProfile
 
-def calculate_jobs_compatibility(jobs, user_profile) -> Result[list[dict]]:
+WEIGHTS = {
+    "location_score": 0.3,
+    "hours_score": 0.1,
+    "work_mode_score": 0.2,
+    "accommodations_score": 0.1,
+    "qualifications_score": 0.3
+}
+
+# Public (should return Result or list[Result])
+
+def calculate_jobs_compatibility(jobs: list[Job], user_profile: UserProfile) -> list[Result[JobWithCompatibility]]:
+    jobs_with_compatibility: list[Result[JobWithCompatibility]] = []
+    for job in jobs:
+        compatibility_result = calculate_job_compatibility(job, user_profile)
+        if compatibility_result.is_success():
+            job_with_compatibility = JobWithCompatibility(
+                **job.__dict__,
+                compatibility_score=compatibility_result.data
+            )
+            jobs_with_compatibility.append(Result[JobWithCompatibility](success=True, data=job_with_compatibility))
+        else:
+            jobs_with_compatibility.append(Result[JobWithCompatibility](success=False, error=compatibility_result.error))
+    return jobs_with_compatibility
+
+def calculate_job_compatibility(job: Job, user_profile: UserProfile) -> Result[float]:
+    data_res = calculate_job_compatibility_factors(job, user_profile)
+    if not data_res.is_success():
+        return Result[float](success=False, error=data_res.error)
+    data = data_res.data
+    total_score = _calculate_total_compatibility(data)
+    return Result(success=True, data=total_score)
+
+def calculate_job_compatibility_factors(job: Job, user_profile: UserProfile) -> Result[JobWithCompatibilityFactors]:
     try:
-        for job in jobs:
-            job['compatibility_score'] = calculate_job_compatibility(job, user_profile)
+        user_prefs = (
+            user_profile.remote_preference,
+            user_profile.hybrid_preference,
+            user_profile.in_person_preference
+        )
+        
+        job_qualifications = ','.join(job.qualifications)
+
+        location_score = _calculate_location_similarity(user_profile.location, job.location)
+        hours_score = _calculate_hours_compatibility(user_profile.hours_per_week, job.weekly_hours)
+        accommodations_score = _calculate_accommodations_match(user_profile.accommodations, job.accommodations)
+        work_mode_score = _calculate_work_mode_compatibility(user_prefs, job.work_mode)
+        qualifications_score = _calculate_qualifications_match(user_profile.educational_background, job_qualifications)
+
+        overall_score: float = _calculate_total_compatibility_from_scores(
+            location_score, 
+            hours_score, 
+            work_mode_score, 
+            accommodations_score, 
+            qualifications_score
+        )
+
+        factors: JobFactors = JobFactors(
+            location_score=location_score,
+            hours_score=hours_score,
+            work_mode_score=work_mode_score,
+            accommodations_score=accommodations_score,
+            qualifications_score=qualifications_score
+        )
+
+        job_with_factors = JobWithCompatibilityFactors(
+            **job.__dict__,
+            compatibility_score=overall_score,
+            factors=factors
+        )
+
+        return Result[JobWithCompatibilityFactors](success=True, data=job_with_factors)
     except Exception as e:
-        print(f"Error calculating job compatibility: {e}")
-        return Result(success=False, error=str(e))
-    return Result(success=True, data=jobs)
+        return Result[JobWithCompatibilityFactors](success=False, error=str(e))
 
-def calculate_job_compatibility(job, user_profile):
-    data = calculate_job_compatibility_factors(job, user_profile)
+# Private
 
-    if not data:
-        return 0.0
-    
-    total_score = calculate_total_compatibility(data)
-
-    return total_score
-
-def calculate_total_compatibility_from_scores(location_score, hours_score, work_mode_score, accommodations_score, qualifications_score):
-    return (
-        location_score * 0.3 +
-        hours_score * 0.1 +
-        work_mode_score * 0.2 +
-        accommodations_score * 0.1 +
-        qualifications_score * 0.3
-    )
-
-def calculate_total_compatibility(job):
-    if not job:
-        return 0.0
-    return calculate_total_compatibility_from_scores(
-        job['location_score'],
-        job['hours_score'],
-        job['work_mode_score'],
-        job['accommodations_score'],
-        job['qualifications_score']
-    )
-
-# TODO: fix this godawful function
-def calculate_job_compatibility_factors(job, user_profile):
-    user_location = user_profile.get('location')
-    user_hours = int(user_profile.get('hours_per_week', 0))
-    user_accommodations = user_profile.get('accommodations', [])
-    user_prefs = (
-        user_profile.get('remote_preference', False),
-        user_profile.get('hybrid_preference', False),
-        user_profile.get('in_person_preference', False)
-    )
-    user_qualifications = user_profile.get('educational_background')
-    
-    job_location = job.get('location')
-    job_hours = int(job.get('weekly_hours'))
-    job_accommodations = job.get('accommodations')
-    job_mode = job.get('work_mode')
-    job_qualifications = ','.join(job.get('qualifications'))
-
-    location_score = calculate_location_similarity(user_location, job_location)
-    hours_score = calculate_hours_compatibility(user_hours, job_hours)
-    work_mode_score = calculate_work_mode_compatibility(user_prefs, job_mode)
-    accommodations_score = calculate_accommodations_match(user_accommodations, job_accommodations)
-    qualifications_score = calculate_qualifications_match(user_qualifications, job_qualifications)
- 
-    factors = [
-        {"name": "Location", "score": round(location_score * 100)},
-        {"name": "Weekly Hours", "score": round(hours_score * 100)},
-        {"name": "Work Mode", "score": round(work_mode_score * 100)},
-        {"name": "Accommodations", "score": round(accommodations_score * 100)},
-        {"name": "Qualifications", "score": round(qualifications_score * 100)}
-    ]
-
-    overall_score = round(calculate_total_compatibility_from_scores(
-        location_score, hours_score, work_mode_score, accommodations_score, qualifications_score
-    ) * 100)
-
-    return {
-        'location_score': location_score,
-        'hours_score': hours_score,
-        'work_mode_score': work_mode_score,
-        'accommodations_score': accommodations_score,
-        'qualifications_score': qualifications_score,
-        'factors': factors,
-        'overall_score': overall_score
-    }
-
-def calculate_location_similarity(user_location, job_location):
-    """Calculate location similarity based on city/state/country match"""
-    if not user_location or not job_location:
-        return 0.5 # Neutral score if data is missing
-    
+def _calculate_location_similarity(user_location: str, job_location: str) -> float:
+    """Calculate location similarity based on city/state/country match"""    
     user_loc_parts = user_location.lower().split(', ')
     job_loc_parts = job_location.lower().split(', ')
     
     matches = sum(p1 == p2 for p1, p2 in zip(user_loc_parts, job_loc_parts))
     return matches / max(len(user_loc_parts), len(job_loc_parts))
 
-def calculate_hours_compatibility(user_hours, job_hours):
+def _calculate_hours_compatibility(user_hours, job_hours):
     """Calculate hours compatibility"""
     if not user_hours or not job_hours:
         return 0.5 # Neutral score if data is missing
@@ -108,7 +97,7 @@ def calculate_hours_compatibility(user_hours, job_hours):
     difference = abs(user_hours - job_hours)
     return max(0, 1 - (difference / 10))
 
-def calculate_work_mode_compatibility(user_prefs, job_mode):
+def _calculate_work_mode_compatibility(user_prefs, job_mode):
     """Calculate work mode compatibility"""
     if not job_mode:
         return 0.5 # Neutral score if data is missing
@@ -124,7 +113,7 @@ def calculate_work_mode_compatibility(user_prefs, job_mode):
     
     return 0.2 # Low compatibility but not zero
 
-def calculate_accommodations_match(user_accommodations, job_accommodations):
+def _calculate_accommodations_match(user_accommodations, job_accommodations):
     """Calculate accommodations match"""
     if not user_accommodations:
         return 1.0 # No specific accommodations needed
@@ -139,7 +128,7 @@ def calculate_accommodations_match(user_accommodations, job_accommodations):
 
 # BETA FUNCTION, NOT PARTICULARLY ACCURATE
 # TODO: Improve qualifications matching
-def calculate_qualifications_match(user_qualifications, job_qualifications):
+def _calculate_qualifications_match(user_qualifications, job_qualifications):
     try: 
         vectorizer = TfidfVectorizer()
         tfidf_matrix = vectorizer.fit_transform([user_qualifications, job_qualifications])
@@ -147,3 +136,21 @@ def calculate_qualifications_match(user_qualifications, job_qualifications):
     except:
         qualification_score = 0.0
     return qualification_score if qualification_score else 0.0
+
+def _calculate_total_compatibility_from_scores(scores: JobFactors) -> float:
+    present = {k: v for k, v in scores.to_dict() if v is not None}
+    present_weights = {k: w for k, w in WEIGHTS.items() if k in present}
+    total_weight = sum(present_weights.values())
+    if total_weight == 0:
+        return 0.0
+    normalized_weights = {k: w / total_weight for k, w in present_weights.items()}
+    return sum(present[k] * normalized_weights[k] for k in present)
+
+def _calculate_total_compatibility(job: JobWithCompatibilityFactors) -> float:
+    return _calculate_total_compatibility_from_scores(
+        job.factors.location_score,
+        job.factors.hours_score,
+        job.factors.work_mode_score,
+        job.factors.accommodations_score,
+        job.factors.qualifications_score
+    )
