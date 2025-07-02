@@ -18,7 +18,8 @@
                     <label for="age_range">Age Range</label>
                     <select class="form-control form-select" id="age_range" name="age_range">
                         <option value="" {% if not profile.age_range %}selected{% endif %}>Select age range</option>
-                        <option value="18-22" {% if profile.age_range == "18-22" %}selected{% endif %}>18-22</option>
+                        <option value="18-22" {% if profile.age_range == "13-18" %}selected{% endif %}>13-18</option>
+                        <option value="18-22" {% if profile.age_range == "19-22" %}selected{% endif %}>19-22</option>
                         <option value="23-30" {% if profile.age_range == "23-30" %}selected{% endif %}>23-30</option>
                         <option value="31-40" {% if profile.age_range == "31-40" %}selected{% endif %}>31-40</option>
                         <option value="41-50" {% if profile.age_range == "41-50" %}selected{% endif %}>41-50</option>
