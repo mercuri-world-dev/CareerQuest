@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from debug.util.mock_data import MOCK_JOB, MOCK_USER_PROFILE
 from features.jobs.util import job_scoring as scoring
 from util.classes.result import Result
-from util.models import Job, JobWithCompatibility, JobWithCompatibilityFactors
+from util.models import Job, JobWithCompatibility, JobWithCompatibilityFactors, UserProfile
 from util.supabase.supabase_client import get_supabase
 from util.decorators import sb_login_required
 
@@ -57,7 +57,8 @@ def fetch_jobs_with_compatibility() -> Result[list[Result[JobWithCompatibility]]
         except Exception as e:
             print(f"Error fetching user profile: {e}")
             return Result(success=False, error="User profile not found", data=[])
-        user_profile = user_profile_resp.data[0]
+        user_profile_dict = user_profile_resp.data[0]
+        user_profile = UserProfile.from_supabase_dict(user_profile_dict)
         jobs_with_compat = scoring.calculate_jobs_compatibility(jobs_data, user_profile)
         return Result(success=True, data=jobs_with_compat)
     except Exception as e:
@@ -74,7 +75,8 @@ def fetch_jobs_with_compatibility_factors() -> Result[list[Result[JobWithCompati
         user_profile_resp = supabase.table('user_profiles').select('*').limit(1).execute()
         if not user_profile_resp or not user_profile_resp.data:
             return Result(success=False, error="User profile not found", data=[])
-        user_profile = user_profile_resp.data[0]
+        user_profile_dict = user_profile_resp.data[0]
+        user_profile = UserProfile.from_supabase_dict(user_profile_dict)
         compat_results = [scoring.calculate_job_compatibility_factors(job, user_profile) for job in jobs_data]
         return Result(success=True, data=compat_results)
     except Exception as e:
@@ -104,7 +106,8 @@ def fetch_job_with_compatibility(job_id) -> Result[JobWithCompatibility]:
         if not user_profile_resp or not user_profile_resp.data:
             print("User profile not found.")
             return Result(success=False, error="User profile not found.")
-        user_profile = user_profile_resp.data[0]
+        user_profile_dict = user_profile_resp.data[0]
+        user_profile = UserProfile.from_supabase_dict(user_profile_dict)
         compat_result = scoring.calculate_job_compatibility_factors(job, user_profile)
         if compat_result.is_success():
             job_with_factors = compat_result.data
@@ -127,7 +130,8 @@ def fetch_job_with_compatibility_factors(job_id) -> Result[JobWithCompatibilityF
         if not user_profile_resp or not user_profile_resp.data:
             print("User profile not found.")
             return Result(success=False, error="User profile not found.")
-        user_profile = user_profile_resp.data[0]
+        user_profile_dict = user_profile_resp.data[0]
+        user_profile = UserProfile.from_supabase_dict(user_profile_dict)
         compat_result = scoring.calculate_job_compatibility_factors(job, user_profile)
         return compat_result
     except Exception as e:

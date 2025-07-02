@@ -48,6 +48,19 @@
   line-height: 22px;
 }
 
+.factor-bar-disabled {
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  color: #fff;
+  font-weight: bold;
+  line-height: 22px;
+}
+
+.factor-bar-container .factor-disabled {
+  background: var(--dark-gray);
+}
+
 .factor-label {
   margin-bottom: 2px;
   font-size: 0.97em;

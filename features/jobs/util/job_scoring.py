@@ -53,11 +53,13 @@ def calculate_job_compatibility_factors(job: Job, user_profile: UserProfile) -> 
         qualifications_score = _calculate_qualifications_match(user_profile.educational_background, job_qualifications)
 
         overall_score: float = _calculate_total_compatibility_from_scores(
-            location_score, 
-            hours_score, 
-            work_mode_score, 
-            accommodations_score, 
-            qualifications_score
+            JobFactors(
+                location_score=location_score,
+                hours_score=hours_score,
+                work_mode_score=work_mode_score,
+                accommodations_score=accommodations_score,
+                qualifications_score=qualifications_score
+            )
         )
 
         factors: JobFactors = JobFactors(
@@ -138,7 +140,7 @@ def _calculate_qualifications_match(user_qualifications, job_qualifications):
     return qualification_score if qualification_score else 0.0
 
 def _calculate_total_compatibility_from_scores(scores: JobFactors) -> float:
-    present = {k: v for k, v in scores.to_dict() if v is not None}
+    present = {k: v for k, v in scores.to_dict().items() if v is not None}
     present_weights = {k: w for k, w in WEIGHTS.items() if k in present}
     total_weight = sum(present_weights.values())
     if total_weight == 0:
@@ -148,9 +150,11 @@ def _calculate_total_compatibility_from_scores(scores: JobFactors) -> float:
 
 def _calculate_total_compatibility(job: JobWithCompatibilityFactors) -> float:
     return _calculate_total_compatibility_from_scores(
-        job.factors.location_score,
-        job.factors.hours_score,
-        job.factors.work_mode_score,
-        job.factors.accommodations_score,
-        job.factors.qualifications_score
+        JobFactors(
+            location_score=job.factors.location_score,
+            hours_score=job.factors.hours_score,
+            work_mode_score=job.factors.work_mode_score,
+            accommodations_score=job.factors.accommodations_score,
+            qualifications_score=job.factors.qualifications_score
+        )
     )

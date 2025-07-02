@@ -38,13 +38,21 @@
   {% if job.factors %}
     <div class="compatibility-factors">
       <h4>Compatibility Factors</h4>
-      {% for factor in job.factors %}
-        <div class="factor-label">{{ factor.name }}:</div>
-        <div class="factor-bar-container">
-          <div class="factor-bar" style="--factor-width: {{ factor.score }}%;">
-            {{ factor.score }}%
+      {% for factor in job.factors.to_display_dict() %}
+      <div class="factor-label">{{ factor.name }}:</div>
+        {% if factor.score != null %}
+          <div class="factor-bar-container">
+            <div class="factor-bar" style="--factor-width: {{ factor.score }}%;">
+              {{ factor.score }}%
+            </div>
           </div>
-        </div>
+        {% else %}
+          <div class="factor-bar-container factor-disabled">
+            <div class="factor-bar-disabled">
+              N/A
+            </div>
+          </div>
+        {% endif %}
       {% endfor %}
     </div>
   {% endif %}

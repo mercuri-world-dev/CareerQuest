@@ -45,20 +45,18 @@ def job_details(job_id):
 @sb_login_required
 @profile_required
 def recommended_jobs():
-    jobs_res = api.fetch_jobs_with_compatibility()
+    jobs_res = api.fetch_jobs_with_compatibility_factors()
     if not jobs_res.is_success():
         return render_template('recommended_jobs.html', err=jobs_res.error)
     jobs = jobs_res.data
+    print(jobs)
     successful_jobs = [job_res.data for job_res in jobs if job_res.is_success()]
     sorted_jobs = sorted(successful_jobs, key=lambda j: j.compatibility_score, reverse=True)[:10]
     rendered_jobs = [
-        render_template('components/job_card.html', job=job, include_compatibility=True)
+        render_template('components/detailed_job_card.html', job=job)
         for job in sorted_jobs
     ]
-    access_token = get_access_token()
     return render_template(
         'recommended_jobs.html',
-        rendered_jobs=rendered_jobs,
-        include_compatibility=True,
-        has_profile=check_has_profile(access_token) if access_token else False
+        rendered_jobs=rendered_jobs
     )
