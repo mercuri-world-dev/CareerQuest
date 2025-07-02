@@ -141,16 +141,12 @@ def fetch_job_with_compatibility_factors(job_id) -> Result[JobWithCompatibilityF
 @jobs_api_bp.route('/jobs', methods=['GET'])
 @sb_login_required
 def get_jobs():
-    result = fetch_jobs()
-    if result.is_success():
-        return jsonify(result.data)
+    include_compatibility = request.args.get('include_compatibility', 'false').lower() == 'true'
+    include_factors = request.args.get('include_factors', 'false').lower() == 'true'
+    if include_factors:
+        result = fetch_jobs_with_compatibility_factors()
     else:
-        return jsonify({'error': result.error}), 500
-
-@jobs_api_bp.route('/jobs_with_compatibility', methods=['GET'])
-@sb_login_required
-def get_jobs_with_compatibility():
-    result = fetch_jobs_with_compatibility()
+        result = fetch_jobs_with_compatibility() if include_compatibility else fetch_jobs()
     if result.is_success():
         return jsonify(result.data)
     else:
