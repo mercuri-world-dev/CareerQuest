@@ -18,8 +18,8 @@ def profile():
     try:
         profile_resp = supabase.table('user_profiles').select('*').limit(1).execute() # Secure (RLS)
     except Exception as e:
-        if any('PGRST301' in str(e)):
-            return redirect(url_for('auth.session_expired'))
+        if 'PGRST301' in str(e):
+            return redirect(url_for('main.session_expired'))
         flash('There was an error fetching your profile. Please try again.', 'error')
         return redirect(url_for('users.dashboard'))
     profile = profile_resp.data[0] if profile_resp.data else None
