@@ -20,6 +20,7 @@ def get_supabase() -> Client:
             options=ClientOptions(
                 storage=FlaskSessionStorage(),
                 flow_type="pkce",
+                auto_refresh_token=True
             ),
         )
     return g.supabase
