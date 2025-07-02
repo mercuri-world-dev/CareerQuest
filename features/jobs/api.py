@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from debug.util.mock_data import MOCK_JOB, MOCK_USER_PROFILE
+
 from features.jobs.util import job_scoring as scoring
 from util.classes.result import Result
 from util.models import Job, JobWithCompatibility, JobWithCompatibilityFactors, UserProfile

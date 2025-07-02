@@ -1,5 +1,4 @@
 from functools import wraps
-
 from flask import flash, redirect, url_for
 
 from util.auth import check_has_profile, fetch_user_role, get_access_token, is_authenticated

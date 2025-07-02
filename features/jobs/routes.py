@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, render_template, request
+
 from util.auth import check_has_profile, get_access_token
 from util.decorators import profile_required, sb_login_required
 from features.jobs import api
@@ -59,7 +60,6 @@ def recommended_jobs():
     if not jobs_res.is_success():
         return render_template('recommended_jobs.html', err=jobs_res.error)
     jobs = jobs_res.data
-    print(jobs)
     successful_jobs = [job_res.data for job_res in jobs if job_res.is_success()]
     sorted_jobs = sorted(successful_jobs, key=lambda j: j.compatibility_score, reverse=True)[:10]
     rendered_jobs = [

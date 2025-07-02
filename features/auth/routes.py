@@ -1,6 +1,6 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from util.auth import is_authenticated
 
+from util.auth import is_authenticated
 from util.supabase.supabase_client import get_supabase
 
 auth_bp = Blueprint('auth', __name__, template_folder='templates', static_folder='static', static_url_path='/static/auth')

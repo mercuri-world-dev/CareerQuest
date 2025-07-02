@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 from flask import Blueprint, render_template, redirect, request, url_for, flash
 
 from util.supabase.supabase_client import get_supabase
@@ -12,7 +11,6 @@ user_bp = Blueprint('users', __name__, template_folder='templates', static_folde
 def dashboard():
     return render_template('dashboard.html')
 
-#TODO: fix this with final user profile model  
 @user_bp.route('/profile', methods=['GET', 'POST'])
 @sb_login_required
 def profile():
@@ -33,7 +31,6 @@ def profile():
                 "remote_preference": request.form.get('remote_preference') == 'on',
                 "hybrid_preference": request.form.get('hybrid_preference') == 'on',
                 "in_person_preference": request.form.get('in_person_preference') == 'on',
-                "updated_at": datetime.now(tz=timezone.utc).isoformat()
             }
 
             if profile and profile.get('id'):
