@@ -7,6 +7,67 @@ class ApplicationStatus(Enum):
   OPEN = True
   CLOSED = False
 
+class Site(Enum):
+  LINKEDIN = "linkedin"
+  INDEED = "indeed"
+  ZIP_RECRUITER = "zip_recruiter"
+  GLASSDOOR = "glassdoor"
+  GOOGLE = "google"
+  BAYT = "bayt"
+  NAUKRI = "naukri"
+
+class JobType(Enum):
+  FULLTIME = "fulltime"
+  PARTTIME = "parttime"
+  INTERNSHIP = "internship"
+  CONTRACT = "contract"
+  
+  @classmethod
+  def from_string(cls, job_type: str):
+    return cls[job_type.upper()] if job_type.upper() in cls.__members__ else None
+
+class Interval(Enum):
+  YEARLY = "yearly"
+  MONTHLY = "monthly"
+  WEEKLY = "weekly"
+  DAILY = "daily"
+  HOURLY = "hourly"
+
+  @classmethod
+  def from_string(cls, interval: str):
+    return cls[interval.upper()] if interval.upper() in cls.__members__ else None
+
+class SalarySource(Enum):
+  DIRECT_DATA = "direct_data"
+  DESCRIPTION = "description"
+
+  @classmethod
+  def from_string(cls, source: str):
+    return cls[source.upper()] if source.upper() in cls.__members__ else None
+
+@dataclass 
+class JobFunction:
+  interval: Optional[Interval] = None
+  min_amount: Optional[float] = None
+  max_amount: Optional[float] = None
+  currency: Optional[str] = None
+  salary_source: Optional[SalarySource] = None
+  
+  def to_dict(self):
+    return {k: v for k, v in self.__dict__.items() if v is not None}
+  
+  @classmethod
+  def from_dict(cls, data: dict):
+    interval = data.get('interval')
+    salary_source = data.get('salary_source')
+    return cls(
+      interval=Interval.from_string(interval) if interval else None,
+      min_amount=data.get('min_amount'),
+      max_amount=data.get('max_amount'),
+      currency=data.get('currency'),
+      salary_source=SalarySource.from_string(salary_source) if salary_source else None
+    )
+
 @dataclass
 class JobFactors:
   location_score: Optional[float] = None
@@ -28,6 +89,83 @@ class JobFactors:
       {"name": "Qualifications", "score": round(self.qualifications_score*100) if self.qualifications_score is not None else 0}
     ]
 
+# @dataclass
+# class Location:
+#   country: Optional[str] = None
+#   city: Optional[str] = None
+#   state: Optional[str] = None
+  
+#   def to_dict(self):
+#     return {k: v for k, v in self.__dict__.items() if v is not None}
+  
+#   @classmethod
+#   def from_dict(cls, data: dict):
+#     return cls(
+#       country=data.get('country'),
+#       city=data.get('city'),
+#       state=data.get('state')
+#     )
+
+@dataclass
+class SupabaseJobProps:
+  id: int
+  company_profile_id: int
+  user_profile_id: int
+
+@dataclass
+class NewJob:
+  provider: Site
+  company_name: str
+  role_name: str
+  supabase_props: Optional[SupabaseJobProps] = None
+  industry: Optional[str] = None
+  job_url: Optional[str] = None
+  location: Optional[str] = None
+  is_remote: Optional[bool] = None
+  description: Optional[str] = None
+  job_type: Optional[JobType] = None
+  job_function: Optional[JobFunction] = None
+  date_posted: Optional[datetime] = None
+  emails: Optional[list[str]] = None
+
+@dataclass
+class LinkedinJob(NewJob):
+  job_level: Optional[str] = None
+  company_industry: Optional[str] = None
+  
+  @classmethod
+  def from_response(cls, data: dict):
+    job_type = data.get('job_type')
+    job_function = data.get('job_function')
+    return cls(
+      provider=Site.LINKEDIN,
+      company_name=data.get('company', ''),
+      role_name=data.get('title', ''),
+      industry=data.get('company_industry', ''),
+      job_url=data.get('job_url'),
+      location=data.get('location', ''),
+      is_remote=data.get('is_remote', False),
+      description=data.get('description', ''),
+      job_type=JobType.from_string(job_type) if job_type else None,
+      job_function=JobFunction.from_dict(job_function) if job_function else None,
+      date_posted=data.get('date_posted'),
+      emails=data.get('emails', []),
+    )
+
+@dataclass
+class IndeedJob(NewJob):
+  company_country: Optional[str] = None
+  company_addresses: Optional[list[str]] = None
+  company_employees_label: Optional[str] = None
+  company_revenue_label: Optional[str] = None
+  company_description: Optional[str] = None
+  company_logo: Optional[str] = None
+
+@dataclass
+class NaukriJob(NewJob):
+  skills: Optional[str] = None
+  experience_range: Optional[str] = None
+
 @dataclass
 class Job:
   id: int
@@ -47,14 +185,15 @@ class Job:
   application_materials: Optional[list[str]] = None
   job_description: Optional[str] = None
   application_link: Optional[str] = None
+  provider: Optional[Site] = None
 
   @classmethod    
   def from_supabase_dict(cls, data: dict):
     return cls(
-      id=data.get('id'),
-      company_profile_id=data.get('company_profile_id'),
-      company_name=data.get('company_name'),
-      role_name=data.get('role_name'),
+      id=int(data.get('id', 0)),
+      company_profile_id=int(data.get('company_profile_id', 0)),
+      company_name=data.get('company_name', ''),
+      role_name=data.get('role_name', ''),
       industry=data.get('industry', []),
       weekly_hours=data.get('weekly_hours'),
       work_mode=data.get('work_mode'),
@@ -93,7 +232,7 @@ class UserProfile:
   @classmethod
   def from_supabase_dict(cls, data: dict):
     return cls(
-      id=data.get('id'),
+      id=int(data.get('id', 0)),
       remote_preference=data.get('remote_preference', False),
       hybrid_preference=data.get('hybrid_preference', False),
       in_person_preference=data.get('in_person_preference', False),
@@ -116,8 +255,8 @@ class CompanyProfile:
   @classmethod
   def from_supabase_dict(cls, data: dict):
     return cls(
-      id=data.get('id'),
-      company_name=data.get('company_name'),
+      id=data.get('id', ''),
+      company_name=data.get('company_name', ''),
       industry=data.get('industry'),
       description=data.get('description'),
       website=data.get('website'),

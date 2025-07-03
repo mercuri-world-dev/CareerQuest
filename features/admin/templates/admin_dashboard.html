@@ -1,2 +1,17 @@
 <h1>Admin Dashboard</h1>
 <p>admin 👍👍👍👍</p>
+{% for item in response_items %}
+    <div class="item">
+        {{item}}
+    </div>
+{% endfor %}
+
+{% if response_items|length == 0 %}
+    <p>No items found.</p>
+{% endif %}
+
+{% if error_message %}
+    <div class="error">
+        <p>{{ error_message }}</p>
+    </div>
+{% endif %}

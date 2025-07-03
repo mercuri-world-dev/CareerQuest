@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Preview Jobs - CareerQuest{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h1>Job Search Preview</h1>
+    <p>This is a preview of the new job search feature powered by jobspy.</p>
+  </div>
+  <div class="card-body">
+    {% if error %}
+        <div class="alert alert-danger">
+            <strong>Error:</strong> {{ error }}
+        </div>
+    {% endif %}
+
+    {% if jobs %}
+        <ul>
+            {% for job in jobs %}
+                <li>
+                  <div class="card">
+                    <div class="card-header">
+                      <strong>{{ job.company_name }}</strong> - {{ job.role_name }}<br>
+                    </div>
+                    <div class="card-body" style="color: white;">
+                      Job Type: {{ job.job_type }}<br>
+                      Industry: {{ job.industry }}<br>
+                      Remote: {{ 'Yes' if job.is_remote else 'No' }}<br>
+                      Location: {{ job.location}} <br>
+                      <a href="{{ job.job_url }}">View Job</a>
+                    </div>
+                  </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No jobs available for preview.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

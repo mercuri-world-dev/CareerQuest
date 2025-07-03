@@ -31,6 +31,9 @@ def create_app(config_object=None):
     if (os.environ.get('FLASK_ENV') == 'development'):
         from debug.routes import debug_bp
         app.register_blueprint(debug_bp, url_prefix='/debug')
+    if (os.environ.get('ENABLE_PREVIEW_FEATURES') == 'True'):
+        from features.preview.routes import preview_bp
+        app.register_blueprint(preview_bp, url_prefix='/preview')
     app.register_blueprint(main_bp)
     app.register_blueprint(jobs_bp)
     app.register_blueprint(jobs_api_bp, url_prefix='/api')

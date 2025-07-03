@@ -1,5 +1,4 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from gotrue import CodeExchangeParams
 
 from util.auth import is_authenticated
 from services.supabase.supabase_client import get_supabase
