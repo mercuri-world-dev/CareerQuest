@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from datetime import datetime, timezone
 
-from util.supabase.supabase_client import get_supabase
+from services.supabase.supabase_client import get_supabase
 from util.decorators import role_required, sb_login_required
 
 CONTENT_MANAGER_GROUPS = ['admin', 'elevated_content_manager', 'content_manager']
@@ -43,9 +43,10 @@ def edit_job(job_id):
             application_status = True
         else:
             application_status = False
+        weekly_hours = request.form.get('weekly_hours')
         update_data = {
             'role_name': request.form.get('role_name'),
-            'weekly_hours': int(request.form.get('weekly_hours')) if request.form.get('weekly_hours') else None,
+            'weekly_hours': int(weekly_hours) if weekly_hours else None,
             'work_mode': request.form.get('work_mode'),
             'location': request.form.get('location'),
             'job_type': request.form.get('job_type'),
@@ -89,10 +90,11 @@ def add_job():
             else:
                 application_status = False
 
+            weekly_hours = request.form.get('weekly_hours')
             company_profile_id=selected_company['id']
             company_name=selected_company.get('company_name')
             role_name=request.form.get('role_name')
-            weekly_hours=int(request.form.get('weekly_hours')) if request.form.get('weekly_hours') else None
+            weekly_hours=int(weekly_hours) if weekly_hours else None
             work_mode=request.form.get('work_mode')
             location=request.form.get('location')
             job_type=request.form.get('job_type')
@@ -114,15 +116,18 @@ def add_job():
             materials_list = [item.strip() for item in application_materials.split(',') if item.strip()]
             
             # Handle dates
-            if request.form.get('application_period_start'):
+            application_period_start_fr = request.form.get('application_period_start')
+            if application_period_start_fr:
               application_period_start = datetime.strptime(
-                request.form.get('application_period_start'), '%Y-%m-%d'
+                application_period_start_fr, '%Y-%m-%d'
               )
             else:
               application_period_start = None
-            if request.form.get('application_period_end'):
+
+            application_period_end_fr = request.form.get('application_period_end')
+            if application_period_end_fr:
               application_period_end = datetime.strptime(
-                request.form.get('application_period_end'), '%Y-%m-%d'
+                application_period_end_fr, '%Y-%m-%d'
               )
             else:
               application_period_end = None

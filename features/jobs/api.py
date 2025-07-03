@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request
 from features.jobs.util import job_scoring as scoring
 from util.classes.result import Result
 from util.models import Job, JobWithCompatibility, JobWithCompatibilityFactors, UserProfile
-from util.supabase.supabase_client import get_supabase
+from services.supabase.supabase_client import get_supabase
 from util.decorators import sb_login_required
 
 JOB_FIELDS = [
@@ -83,23 +83,34 @@ def fetch_jobs_with_compatibility_factors() -> Result[list[Result[JobWithCompati
         print(f"Error fetching user profile or calculating compatibility: {e}")
         return Result(success=False, error=str(e), data=[])
 
-def fetch_job(job_id) -> Result[Job]:
+def fetch_job(job_id) -> Result[Job|None]:
     supabase = get_supabase()
     try:
-        job = supabase.table('jobs').select('*').eq('id', job_id).single().execute()
+        job_resp = supabase.table('jobs').select('*').eq('id', job_id).single().execute()
     except Exception as e:
         print(f"Error fetching job: {e}")
         return Result(success=False, error=str(e))
-    if not job:
+    if not job_resp:
         print(f"Job with ID {job_id} not found.")
         return Result(success=False, error=f"Job with ID {job_id} not found.")
+    try:
+        job_data = job_resp.data
+        if not job_data:
+            print(f"Job with ID {job_id} not found.")
+            return Result(success=False, error=f"Job with ID {job_id} not found.")
+        job = Job(**{k: v for k, v in job_data.items() if k in JOB_FIELDS})
+    except Exception as e:
+        print(f"Error processing job data: {e}")
+        return Result(success=False, error=str(e))
     return Result(success=True, data=job)
 
-def fetch_job_with_compatibility(job_id) -> Result[JobWithCompatibility]:
+def fetch_job_with_compatibility(job_id) -> Result[JobWithCompatibility|None]:
     job_result = fetch_job(job_id)
     if not job_result.is_success():
-        return job_result
+        return Result(success=False, data=None, error=job_result.error)
     job = job_result.data
+    if job is None:
+        return Result(success=False, data=None, error="Job not found")
     supabase = get_supabase()
     try:
         user_profile_resp = supabase.table('user_profiles').select('*').limit(1).execute()
@@ -119,10 +130,12 @@ def fetch_job_with_compatibility(job_id) -> Result[JobWithCompatibility]:
         print(f"Error fetching user profile or calculating compatibility: {e}")
         return Result(success=False, error=str(e))
 
-def fetch_job_with_compatibility_factors(job_id) -> Result[JobWithCompatibilityFactors]:
+def fetch_job_with_compatibility_factors(job_id) -> Result[JobWithCompatibilityFactors|None]:
     job_result = fetch_job(job_id)
     if not job_result.is_success():
-        return job_result
+        return Result(success=False, error=job_result.error)
+    if job_result.data is None:
+        return Result(success=False, error="Job not found")
     job = job_result.data
     supabase = get_supabase()
     try:
@@ -133,7 +146,12 @@ def fetch_job_with_compatibility_factors(job_id) -> Result[JobWithCompatibilityF
         user_profile_dict = user_profile_resp.data[0]
         user_profile = UserProfile.from_supabase_dict(user_profile_dict)
         compat_result = scoring.calculate_job_compatibility_factors(job, user_profile)
-        return compat_result
+        if compat_result.is_success():
+            job_with_factors = compat_result.data
+            return Result(success=True, data=job_with_factors)
+        else:
+            print(f"Error calculating compatibility factors: {compat_result.error}")
+            return Result(success=False, error=compat_result.error)
     except Exception as e:
         print(f"Error fetching user profile or calculating compatibility: {e}")
         return Result(success=False, error=str(e))

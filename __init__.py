@@ -1,7 +1,7 @@
 from flask import Flask
 import os
 
-from util.supabase.supabase_client import get_supabase
+from services.supabase.supabase_client import get_supabase
 from util.auth import get_access_token
 
 def create_app(config_object=None):

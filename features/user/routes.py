@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, request, url_for, flash
 
-from util.supabase.supabase_client import get_supabase
+from services.supabase.supabase_client import get_supabase
 from util.auth import check_has_profile, refresh_access_token
 from util.decorators import sb_login_required
 

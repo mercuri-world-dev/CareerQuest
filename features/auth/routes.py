@@ -1,7 +1,8 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
+from gotrue import CodeExchangeParams
 
 from util.auth import is_authenticated
-from util.supabase.supabase_client import get_supabase
+from services.supabase.supabase_client import get_supabase
 
 auth_bp = Blueprint('auth', __name__, template_folder='templates', static_folder='static', static_url_path='/static/auth')
 
@@ -31,8 +32,8 @@ def login():
         if not user or not user.id:
             flash('Login failed: User not found', 'error')
             return redirect(url_for('auth.login'))
-        auth_token = res.session.access_token
-        refresh_token = res.session.refresh_token
+        auth_token = res.session.access_token if res.session else None
+        refresh_token = res.session.refresh_token if res.session else None
         if not auth_token:
             flash('Login failed: No authentication token received', 'error')
             return redirect(url_for('auth.login'))
@@ -68,7 +69,7 @@ def callback():
         return redirect(url_for('auth.login'))
     supabase = get_supabase()
     try:
-        exchange = supabase.auth.exchange_code_for_session({ "auth_code": code })
+        exchange = supabase.auth.exchange_code_for_session({ "auth_code": code }) # type: ignore
         if not exchange or not exchange.session:
             flash('OAuth callback failed: could not exchange code for session', 'error')
             return redirect(url_for('auth.login'))

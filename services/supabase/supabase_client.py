@@ -4,7 +4,7 @@ from werkzeug.local import LocalProxy
 from supabase.client import Client, ClientOptions
 from dotenv import load_dotenv, find_dotenv
 
-from util.supabase.flask_storage import FlaskSessionStorage
+from services.supabase.flask_storage import FlaskSessionStorage
 
 load_dotenv(find_dotenv())
 
@@ -26,4 +26,4 @@ def get_supabase() -> Client:
         )
     return g.supabase
 
-supabase: Client = LocalProxy(get_supabase)
+supabase: LocalProxy[Client] = LocalProxy(get_supabase)

@@ -4,7 +4,7 @@ from flask import session
 from dotenv import load_dotenv, find_dotenv
 import jwt
 
-from util.supabase.supabase_client import get_supabase
+from services.supabase.supabase_client import get_supabase
 
 load_dotenv(find_dotenv())
 
@@ -41,9 +41,9 @@ def get_access_token():
   if isinstance(supabase_token, str):
       try:
           supabase_token_json = json.loads(supabase_token)
+          return supabase_token_json.get('access_token')
       except json.JSONDecodeError:
           return None
-  return supabase_token_json.get('access_token')
 
 def refresh_access_token():
   supabase = get_supabase()
