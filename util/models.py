@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
@@ -15,6 +16,7 @@ class Site(Enum):
   GOOGLE = "google"
   BAYT = "bayt"
   NAUKRI = "naukri"
+  MERCURI = "mercuri"
 
 class JobType(Enum):
   FULLTIME = "fulltime"
@@ -94,7 +96,7 @@ class JobFactors:
 #   country: Optional[str] = None
 #   city: Optional[str] = None
 #   state: Optional[str] = None
-  
+
 #   def to_dict(self):
 #     return {k: v for k, v in self.__dict__.items() if v is not None}
   
@@ -113,7 +115,15 @@ class SupabaseJobProps:
   user_profile_id: int
 
 @dataclass
-class NewJob:
+class SiteSpecificFields(ABC):
+
+  @classmethod
+  @abstractmethod
+  def from_response(cls, data: dict) -> 'SiteSpecificFields':
+    pass
+
+@dataclass
+class NewJob(ABC):
   provider: Site
   company_name: str
   role_name: str
@@ -127,21 +137,29 @@ class NewJob:
   job_function: Optional[JobFunction] = None
   date_posted: Optional[datetime] = None
   emails: Optional[list[str]] = None
+  site_specific_fields: Optional[SiteSpecificFields] = None
 
-@dataclass
-class LinkedinJob(NewJob):
-  job_level: Optional[str] = None
-  company_industry: Optional[str] = None
-  
   @classmethod
   def from_response(cls, data: dict):
     job_type = data.get('job_type')
     job_function = data.get('job_function')
+    provider: Site = data.get('provider', 'MERCURI').upper()
+    match provider:
+      case Site.LINKEDIN:
+        site_specific_fields = LinkedInSpecific.from_response(data)
+      case Site.INDEED:
+        site_specific_fields = IndeedSpecific.from_response(data)
+      case Site.NAUKRI:
+        site_specific_fields = NaukriSpecific.from_response(data)
+      case Site.MERCURI:
+        site_specific_fields = MercuriSpecific.from_response(data)
+      case _:
+        site_specific_fields = None
     return cls(
-      provider=Site.LINKEDIN,
+      provider=provider,
       company_name=data.get('company', ''),
       role_name=data.get('title', ''),
-      industry=data.get('company_industry', ''),
+      industry=data.get('industry'),
       job_url=data.get('job_url'),
       location=data.get('location', ''),
       is_remote=data.get('is_remote', False),
@@ -150,10 +168,31 @@ class LinkedinJob(NewJob):
       job_function=JobFunction.from_dict(job_function) if job_function else None,
       date_posted=data.get('date_posted'),
       emails=data.get('emails', []),
+      site_specific_fields=site_specific_fields,
     )
+  
+@dataclass
+class NewJobWithCompatibility(NewJob):
+  compatibility_score: Optional[float] = None
 
 @dataclass
-class IndeedJob(NewJob):
+class NewJobWithCompatibilityFactors(NewJobWithCompatibility):
+  factors: Optional[JobFactors] = None
+ 
+@dataclass
+class LinkedInSpecific(SiteSpecificFields):
+  job_level: Optional[str] = None
+  company_industry: Optional[str] = None
+
+  @classmethod
+  def from_response(cls, data: dict) -> 'LinkedInSpecific':
+    return cls(
+      job_level=data.get('job_level'),
+      company_industry=data.get('company_industry'),
+    )
+  
+@dataclass
+class IndeedSpecific(SiteSpecificFields):
   company_country: Optional[str] = None
   company_addresses: Optional[list[str]] = None
   company_employees_label: Optional[str] = None
@@ -161,10 +200,38 @@ class IndeedJob(NewJob):
   company_description: Optional[str] = None
   company_logo: Optional[str] = None
 
+  @classmethod
+  def from_response(cls, data: dict) -> 'IndeedSpecific':
+    return cls(
+      company_country=data.get('company_country'),
+      company_addresses=data.get('company_addresses', []),
+      company_employees_label=data.get('company_employees_label'),
+      company_revenue_label=data.get('company_revenue_label'),
+      company_description=data.get('company_description'),
+      company_logo=data.get('company_logo')
+    )
+
 @dataclass
-class NaukriJob(NewJob):
+class NaukriSpecific(SiteSpecificFields):
   skills: Optional[str] = None
   experience_range: Optional[str] = None
+
+  @classmethod
+  def from_response(cls, data: dict) -> 'NaukriSpecific':
+    return cls(
+      skills=data.get('skills'),
+      experience_range=data.get('experience_range')
+    )
+  
+@dataclass
+class MercuriSpecific(SiteSpecificFields):
+  additional_fields: Optional[dict] = None
+
+  @classmethod
+  def from_response(cls, data: dict) -> 'MercuriSpecific':
+    return cls(
+      additional_fields=data.get('additional_fields', {})
+    )
 
 @dataclass
 class Job:
