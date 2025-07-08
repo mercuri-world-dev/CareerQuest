@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
 
+{% block head %}
+ <link rel="stylesheet" href="{{ url_for('preview.static', filename='preview.css') }}">
+{% endblock %}
 {% block title %}Preview Jobs - CareerQuest{% endblock %}
 
 {% block content %}
@@ -9,6 +12,62 @@
     <p>This is a preview of the new job search feature powered by jobspy.</p>
   </div>
   <div class="card-body">
+    <form method="get" class="form-group" style="margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap;">
+      <div class="row g-2">
+        <div>
+          <label for="site_name" class="form-label">Site</label>
+          <select class="form-control form-select" id="site_name" name="site_name">
+            <option value="linkedin" {% if request.args.get('site_name', 'linkedin') == 'linkedin' %}selected{% endif %}>LinkedIn</option>
+            <!-- <option value="indeed" {% if request.args.get('site_name') == 'indeed' %}selected{% endif %}>Indeed</option>
+            <option value="zip_recruiter" {% if request.args.get('site_name') == 'zip_recruiter' %}selected{% endif %}>ZipRecruiter</option>
+            <option value="glassdoor" {% if request.args.get('site_name') == 'glassdoor' %}selected{% endif %}>Glassdoor</option>
+            <option value="google" {% if request.args.get('site_name') == 'google' %}selected{% endif %}>Google</option>
+            <option value="bayt" {% if request.args.get('site_name') == 'bayt' %}selected{% endif %}>Bayt</option>
+            <option value="naukri" {% if request.args.get('site_name') == 'naukri' %}selected{% endif %}>Naukri</option> -->
+          </select>
+        </div>
+        <div>
+          <label for="search_term" class="form-label">Search Term</label>
+          <input type="text" class="form-control" id="search_term" name="search_term" value="{{ request.args.get('search_term', 'software engineer') }}">
+        </div>
+        <div>
+          <label for="location" class="form-label">Location</label>
+          <input type="text" class="form-control" id="location" name="location" value="{{ request.args.get('location', 'San Francisco, CA') }}">
+        </div>
+        <div class="col-md-2">
+          <label for="results_wanted" class="form-label">Results Wanted</label>
+          <input type="number" class="form-control" id="results_wanted" name="results_wanted" min="1" max="50" value="{{ request.args.get('results_wanted', 10) }}">
+        </div>
+        <div class="col-md-1">
+          <label for="hours_old" class="form-label">Hours Old</label>
+          <input type="number" class="form-control" id="hours_old" name="hours_old" min="1" max="168" value="{{ request.args.get('hours_old', 72) }}">
+        </div>
+      </div>
+      <div class="row g-2 mt-2">
+        <div class="col-md-2">
+          <label for="is_remote" class="form-label">Remote</label>
+          <select class="form-select" id="is_remote" name="is_remote">
+            <option value="" {% if request.args.get('is_remote', '') == '' %}selected{% endif %}>Any</option>
+            <option value="true" {% if request.args.get('is_remote') == 'true' %}selected{% endif %}>Yes</option>
+            <option value="false" {% if request.args.get('is_remote') == 'false' %}selected{% endif %}>No</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label for="job_type" class="form-label">Job Type</label>
+          <select class="form-select" id="job_type" name="job_type">
+            <option value="" {% if request.args.get('job_type', '') == '' %}selected{% endif %}>Any</option>
+            <option value="fulltime" {% if request.args.get('job_type') == 'fulltime' %}selected{% endif %}>Full Time</option>
+            <option value="parttime" {% if request.args.get('job_type') == 'parttime' %}selected{% endif %}>Part Time</option>
+            <option value="internship" {% if request.args.get('job_type') == 'internship' %}selected{% endif %}>Internship</option>
+            <option value="contract" {% if request.args.get('job_type') == 'contract' %}selected{% endif %}>Contract</option>
+          </select>
+        </div>
+        <div class="col-md-2 align-self-end">
+          <button type="submit" class="btn btn-primary w-100">Search</button>
+        </div>
+      </div>
+    </form>
+
     {% if error %}
         <div class="alert alert-danger">
             <strong>Error:</strong> {{ error }}

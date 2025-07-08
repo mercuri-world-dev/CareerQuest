@@ -28,7 +28,7 @@ def fetch_jobs() -> Result[list[Job]]:
                 if field in LIST_FIELDS:
                     values = [v.strip() for v in value.split(',') if v.strip()]
                     if values:
-                        query = query.contains(field, values)
+                       query = query.contains(field, values)
                 else:
                     query = query.eq(field, value)
         jobs_resp = query.execute()
