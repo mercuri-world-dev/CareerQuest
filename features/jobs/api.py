@@ -1,8 +1,10 @@
+from enum import Enum
 from flask import Blueprint, jsonify, request
 
 from features.jobs.util import job_scoring as scoring
 from util.classes.result import Result
-from util.models import Job, JobWithCompatibility, JobWithCompatibilityFactors, UserProfile
+from util.models.job_model import Job, JobWithCompatibility, JobWithCompatibilityFactors
+from util.models.user_profile_model import UserProfile
 from services.supabase.supabase_client import get_supabase
 from util.decorators import sb_login_required
 
@@ -16,6 +18,11 @@ LIST_FIELDS = [
   'industry', 'qualifications', 'accommodations', 'application_materials'
 ]
 
+class InteractionType(Enum):
+  DETAILS_CLICK = 'details_click'
+  APPLY_CLICK = 'apply_click'
+  SAVE = 'save'
+
 jobs_api_bp = Blueprint('jobs_api', __name__)
 
 def fetch_jobs() -> Result[list[Job]]:
@@ -24,7 +31,7 @@ def fetch_jobs() -> Result[list[Job]]:
         query = supabase.table('jobs').select('*')
         for field in JOB_FIELDS:
             value = request.args.get(field)
-            if value is not None: 
+            if value is not None:
                 if field in LIST_FIELDS:
                     values = [v.strip() for v in value.split(',') if v.strip()]
                     if values:
@@ -185,8 +192,9 @@ def job_click():
     try:
         supabase.table('job_clicks').upsert({
             'job_id': job_id,
-            'user_profile_id': user_profile_id
-        }, on_conflict='job_id, user_profile_id').execute()
+            'user_profile_id': user_profile_id,
+            'interaction_type': InteractionType.APPLY_CLICK.value
+        }, on_conflict='job_id, user_profile_id, interaction_type').execute()
     except Exception as e:
         print(f"Error upserting job click: {e}")
         return jsonify({'error': 'Failed to record job click'}), 500

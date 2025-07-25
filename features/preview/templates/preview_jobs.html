@@ -77,20 +77,9 @@
     {% if jobs %}
         <ul>
             {% for job in jobs %}
-                <li>
-                  <div class="card">
-                    <div class="card-header">
-                      <strong>{{ job.company_name }}</strong> - {{ job.role_name }}<br>
-                    </div>
-                    <div class="card-body" style="color: white;">
-                      Job Type: {{ job.job_type }}<br>
-                      Industry: {{ job.industry }}<br>
-                      Remote: {{ 'Yes' if job.is_remote else 'No' }}<br>
-                      Location: {{ job.location}} <br>
-                      <a href="{{ job.job_url }}">View Job</a>
-                    </div>
-                  </div>
-                </li>
+              {% with job=job %}
+                {% include 'preview_job_card.html' %}
+              {% endwith %}
             {% endfor %}
         </ul>
     {% else %}

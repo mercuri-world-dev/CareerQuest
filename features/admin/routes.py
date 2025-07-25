@@ -18,7 +18,6 @@ def admin_dashboard():
             hours_old=72,
             country_indeed='USA'
         )
-        print(test_resp)
         data = test_resp.data
         if not data:
             print("No jobs found or invalid response format")

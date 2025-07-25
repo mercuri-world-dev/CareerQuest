@@ -1,3 +1,105 @@
+.job-compact-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 1rem 0;
+  background: var(--primary-dark);
+  border-radius: 10px;
+  box-shadow: 0 1px 6px 0 rgba(60, 60, 120, 0.08);
+  color: var(--white);
+  font-size: 1.05em;
+}
+.job-compact-list > li {
+  padding: 0.45em 1.2em 0.45em 0.5em;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5em;
+}
+.job-compact-list > li:last-child {
+  border-bottom: none;
+}
+.job-compact-list strong {
+  min-width: 120px;
+  color: var(--secondary-color);
+  font-weight: 600;
+}
+.job-compact-list a {
+  color: var(--accent-color);
+  text-decoration: underline;
+  word-break: break-all;
+}
+.job-compact-list ul {
+  margin: 0.2em 0 0.2em 1.2em;
+  padding: 0;
+  list-style: disc inside;
+  font-size: 0.98em;
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+.job-compact-list ul li {
+  border: none;
+  padding: 0.1em 0;
+  color: var(--white-translucent);
+}
+.job-card {
+  background: var(--dark-gray-transparent);
+  border-radius: 14px;
+  box-shadow: 0 2px 12px 0 rgba(60, 60, 120, 0.10);
+  color: var(--white);
+  margin: 2rem auto;
+  max-width: 600px;
+  padding: 1.5rem 2rem;
+  text-align: left;
+}
+.job-description .short-desc { display: inline; }
+.job-description .desc-ellipsis { font-weight: bold; color: var(--secondary-color); margin-left: 2px; }
+.job-description .show-more-link, .job-description .show-less-link {
+  display: inline-block;
+  margin-top: 0.3em;
+  color: var(--accent-color);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.job-description .full-desc { display: none; }
+
+.job-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.company-profile-card {
+  background: var(--primary-dark);
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  box-shadow: 0 1px 6px 0 rgba(60, 60, 120, 0.08);
+}
+
+.company-profile-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--secondary-color);
+}
+
+.company-profile-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.company-profile-list > li {
+  margin-bottom: 0.4em;
+}
+.company-profile-list a {
+  color: var(--accent-color);
+  text-decoration: underline;
+}
+
+.job-description {
+  margin-bottom: 1.2rem;
+}
 .job-open-text {
   color: var(--white) !important;
 }

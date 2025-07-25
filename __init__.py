@@ -22,8 +22,8 @@ def create_app(config_object=None):
             supabase.postgrest.auth(access_token)
     
     from routes import main_bp
-    from features.jobs.routes import jobs_bp
-    from features.jobs.api import jobs_api_bp
+    # from features.jobs.routes import jobs_bp
+    # from features.jobs.api import jobs_api_bp
     from features.user.routes import user_bp
     from features.auth.routes import auth_bp
     from features.admin.routes import admin_bp
@@ -35,8 +35,8 @@ def create_app(config_object=None):
         from features.preview.routes import preview_bp
         app.register_blueprint(preview_bp, url_prefix='/preview')
     app.register_blueprint(main_bp)
-    app.register_blueprint(jobs_bp)
-    app.register_blueprint(jobs_api_bp, url_prefix='/api')
+    # app.register_blueprint(jobs_bp)
+    # app.register_blueprint(jobs_api_bp, url_prefix='/api')
     app.register_blueprint(user_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')    
     app.register_blueprint(admin_bp, url_prefix='/admin')

@@ -1,4 +1,3 @@
-<!-- templates/navbar.html -->
 <div class="navbar">
   <div class="container">
     <ul class="navbar-nav">
@@ -8,9 +7,9 @@
       <li class="nav-item">
         <a class="nav-link" href="{{ url_for('users.profile') }}">Profile</a>
       </li>
-      <li class="nav-item">
+      {#<li class="nav-item">
         <a class="nav-link" href="{{ url_for('jobs.all_jobs') }}">View Jobs</a>
-      </li>
+      </li>#}
       {% if not is_authenticated %}
       <li class="nav-item">
         <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
@@ -19,9 +18,9 @@
         <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
       </li>
       {% else %}
-      <li class="nav-item">
+      {#<li class="nav-item">
         <a class="nav-link" href="{{ url_for('jobs.recommended_jobs') }}">Recommended Jobs</a>
-      </li>
+      </li>#}
       <li class="nav-item">
         <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
       </li>

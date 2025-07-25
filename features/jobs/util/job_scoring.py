@@ -2,7 +2,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 from util.classes.result import Result
-from util.models import Job, JobFactors, JobWithCompatibility, JobWithCompatibilityFactors, UserProfile
+from util.models.job_model import Job, JobFactors, JobWithCompatibility, JobWithCompatibilityFactors
+from util.models.user_profile_model import UserProfile
 
 WEIGHTS = {
     "location_score": 0.3,
