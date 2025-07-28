@@ -6,7 +6,7 @@ from util.auth import get_access_token
 
 def create_app(config_object=None):
     app = Flask(__name__, instance_relative_config=True)
-    
+
     app.config.from_mapping(
         SECRET_KEY=os.environ.get('SECRET_KEY'),
         SERVER_NAME=os.environ.get('SERVER_NAME', 'localhost:5001'),

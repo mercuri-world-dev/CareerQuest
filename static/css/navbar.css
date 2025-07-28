@@ -1,0 +1,132 @@
+/* CareerQuest Vertical Navbar Effects */
+
+:root {
+  --navbar-width: 150px;
+  --navbar-radius: 0;
+  --navbar-bg: linear-gradient(180deg, #232b6b 0%, #6a1e8a 100%);
+  --navbar-shadow: 0 4px 24px 0 rgba(0,0,0,0.12);
+  --navbar-logo-width: 90px;
+  --nav-link-radius: 30px 0 30px 0;
+  --nav-link-padding: 12px 24px 12px 18px;
+  --nav-link-gap: 16px;
+  --nav-link-font-size: 1.1rem;
+  --nav-link-color: #fff;
+  --nav-link-active-color: #232b6b;
+  --nav-icon-active-filter: invert(14%) sepia(40%) saturate(2890%) hue-rotate(219deg) brightness(93%) contrast(96%);
+  --nav-link-bg-hover: transparent;
+  --nav-link-cutout-shadow: 0 2px 12px 0 rgba(0,0,0,0.10);
+  --nav-link-cutout-radius: 30px 0 30px 0;
+  --nav-link-cutout-width: 180px;
+  --nav-link-cutout-height: 48px;
+  --logout-radius: 0 0 30px 30px;
+  --transition: 0.25s cubic-bezier(.4,0,.2,1);
+}
+
+.vertical-navbar {
+  width: var(--navbar-width);
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 100;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.navbar-backdrop {
+  width: inherit;
+  min-height: inherit;
+  background: var(--navbar-bg);
+  border-radius: var(--navbar-radius);
+  padding: 32px 0 24px 0;
+  box-shadow: var(--navbar-shadow);
+  clip-path: url(#navbarPath);
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.navbar-logo {
+  margin-bottom: 32px;
+}
+
+.navbar-logo img {
+  width: var(--navbar-logo-width);
+  height: auto;
+}
+
+.navbar-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0 50px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: inherit;
+  top: 0;
+  left: 0;
+}
+
+.nav-item {
+  width: fit-content;
+  margin-bottom: 16px;
+  position: relative;
+  display: flex;
+}
+
+.nav-item:hover {
+  background: #fff;
+  border-radius: var(--nav-link-radius);
+}
+
+.nav-link {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--nav-link-gap);
+  padding: var(--nav-link-padding);
+  border-radius: var(--nav-link-radius);
+  color: var(--nav-link-color);
+  font-size: var(--nav-link-font-size);
+  font-weight: 500;
+  text-decoration: none;
+  transition: color var(--transition), font-weight var(--transition);
+  position: relative;
+  z-index: 1;
+  overflow: visible;
+  width: 100%;
+  background: none;
+  justify-content: flex-start;
+}
+
+.nav-link.selected,
+.nav-link.active {
+  color: var(--nav-link-active-color);
+}
+
+.nav-link:hover,
+.nav-link.selected,
+.nav-link.active {
+  color: var(--nav-link-active-color);
+  font-weight: 600;
+}
+
+.logout {
+  margin-top: auto;
+}
+
+@media (max-width: 600px) {
+  :root {
+    --navbar-width: 60px;
+    --navbar-logo-width: 60px;
+    --nav-link-font-size: 1rem;
+    --nav-link-padding: 10px 10px 10px 10px;
+  }
+  .vertical-navbar {
+    padding: 16px 0 12px 0;
+  }
+  .nav-link span:not(.nav-icon) {
+    display: none;
+  }
+}

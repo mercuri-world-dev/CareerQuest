@@ -20,3 +20,5 @@ venv/
 config.py
 
 .ref/
+
+node_modules
