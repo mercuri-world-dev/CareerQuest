@@ -10,14 +10,18 @@
 
 <div class="page-container">
   <header class="landing-header">
-    <img src="/static/assets/comet-thing.svg" aria-hidden="true" class="comet-thing">
-    <h1>
-      <img src="/static/assets/compass-logo.svg" alt="CareerQuest Logo" style="vertical-align: middle; border-radius: 12px;"> <!-- Replace with actual logo -->
-      Welcome to <span>CareerQuest!</span>
-    </h1>
-    <p class="tagline">
-      Our program is designed to help identify suitable paid employment for people living with mental illness, whether you are currently unemployed or looking to switch to a more accommodating job. Our program is completely free and available to anyone who is struggling with mental health, whether clinically diagnosed or not.
-    </p>
+    <div class="landing-header-body">
+      <h1>
+        <img src="/static/assets/compass-logo.svg" alt="CareerQuest Logo" style="vertical-align: middle; border-radius: 12px;"> <!-- Replace with actual logo -->
+        Welcome to <span>CareerQuest!</span>
+      </h1>
+      <p class="tagline">
+        Our program is designed to help identify suitable paid employment for people living with mental illness, whether you are currently unemployed or looking to switch to a more accommodating job. Our program is completely free and available to anyone who is struggling with mental health, whether clinically diagnosed or not.
+      </p>
+    </div>
+    <div class="comet-thing-container">
+      <img src="/static/assets/comet-thing.svg" aria-hidden="true" class="comet-thing">
+    </div>
   </header>
 
   <section class="hero-section">
@@ -46,21 +50,19 @@
       <div class="profile-card">
         <h3>Create your Profile!</h3>
         <p>We understand that mental illness can often make it difficult to identify and apply to accommodating jobs. Our completely free tools were designed by experts to make the job search process convenient and equitable.</p>
-        <a href="#" class="profile-btn">Let's do it!</a> <!-- Replace # with actual link -->
+        <a href="#" class="profile-btn"> {% include '/components/svg/invert-arrow-circle.html' %} Let's do it!</a> <!-- Replace # with actual link -->
       </div>
       <div class="get-started-card">
         <div class="get-started-card-body">
           <h3 title="Job Recommendations">Job Recommendations</h3>
-          <p title="Get personalized job matches based on your profile.">Get personalized job matches based on your profile.</p>
         </div>
-        <a href="#" class="card-link">Read More</a> <!-- Replace # with actual link -->
+        <a href="#" class="card-link">Read More{% with stroke='#20316D' %}{% include '/components/svg/arrow-circle.html' %}{% endwith %}</a> <!-- Replace # with actual link -->
       </div>
       <div class="get-started-card">
         <div class="get-started-card-body">
           <h3 title="Browse All Jobs!">Browse All Jobs!</h3>
-          <p title="Browse through our complete job listings.">Browse through our complete job listings.</p>
         </div>
-        <a href="#" class="card-link">Read More</a> <!-- Replace # with actual link -->
+        <a href="#" class="card-link">Read More{% with stroke='#20316D' %}{% include '/components/svg/arrow-circle.html' %}{% endwith %}</a> <!-- Replace # with actual link -->
       </div>
     </div>
   </section>

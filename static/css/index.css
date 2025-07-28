@@ -62,7 +62,7 @@
   --get-started-card-link-bg: #fff;
   --get-started-card-link-radius: 32px;
   --get-started-card-link-shadow: 0 2px 8px 0 rgba(100, 0, 255, 0.10);
-  --get-started-card-link-padding: 12px 32px;
+  --get-started-card-link-padding: 8px 10px;
   --img-border-color: #fff;
   --img-border-width: 16px;
 }
@@ -71,7 +71,7 @@ body {
   background: var(--section-bg);
   font-family: 'AlteHaasGroteskRegular', Arial, sans-serif;
   width: 100%;
-  padding: 0;
+  padding: 0 0 10vh 0;
 }
 
 .page-container {
@@ -83,10 +83,15 @@ body {
 
 .comet-thing {
   position: absolute;
-  right: -10%;
-  top: -70%;
+  right: -35%;
+  top: -55%;
+  height: 500px;
   filter: blur(12px);
   z-index: 1;
+}
+.comet-thing-container {
+  position: relative;
+  width: 80%;
 }
 
 .landing-header {
@@ -101,7 +106,7 @@ body {
   color: var(--header-title-color);
   overflow: hidden;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-items: left;
 }
 .landing-header h1 {
@@ -127,10 +132,11 @@ body {
 .landing-header .tagline {
   font-size: var(--header-subtitle-size);
   color: var(--header-subtitle-color);
-  margin-bottom: 18px;
+  margin: 0 0 10% 2%;
   position: relative;
   z-index: 1;
   text-align: left;
+  width: 100%;
 }
 .landing-header .landing-buttons {
   display: flex;
@@ -329,6 +335,7 @@ body {
   font-size: var(--get-started-card-body-size);
   color: #fff;
   margin-bottom: 18px;
+  text-align: left;
 }
 .profile-card .profile-btn {
   background: var(--get-started-card-link-bg);
@@ -345,6 +352,9 @@ body {
   display: inline-block;
   margin-top: 18px;
   width: 50%;
+  display: flex;
+  align-items: center;
+  gap: 8%;
 }
 .profile-card .profile-btn:hover {
   background: var(--button-bg);
@@ -387,21 +397,23 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-align: left;
 }
 .get-started-card .card-link {
   background: var(--get-started-card-link-bg);
   color: var(--get-started-card-link-color);
-  border-radius: var(--get-started-card-link-radius);
-  box-shadow: var(--get-started-card-link-shadow);
   padding: var(--get-started-card-link-padding);
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1.2rem;
+  font-weight: 400;
   text-decoration: none;
   border: none;
   cursor: pointer;
   transition: background 0.2s;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-top: 18px;
+  width: 100%;
 }
 .get-started-card .card-link:hover {
   background: var(--button-bg);
