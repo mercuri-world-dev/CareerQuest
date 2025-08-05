@@ -158,3 +158,10 @@ def _calculate_total_compatibility(job: JobWithCompatibilityFactors) -> float:
             qualifications_score=job.factors.qualifications_score
         )
     )
+
+
+
+
+
+
+# Now becomes a thin wrapper that calls predict.py logic
