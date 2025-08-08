@@ -83,8 +83,8 @@ body {
 
 .comet-thing {
   position: absolute;
-  right: -35%;
-  top: -55%;
+  right: -25%;
+  top: -65%;
   height: 500px;
   filter: blur(12px);
   z-index: 1;
@@ -256,8 +256,8 @@ body {
 }
 .hero-img-side {
   position: absolute;
+  height: 180px;
   width: 180px;
-  height: auto;
   object-fit: cover;
   background: var(--img-border-color);
   border: var(--img-border-width) solid var(--img-border-color);
@@ -265,6 +265,7 @@ body {
 }
 .hero-img-circle {
   border-radius: 50%;
+  
 }
 .hero-img-square {
   border-radius: 18px;
