@@ -71,7 +71,7 @@ body {
   background: var(--section-bg);
   font-family: 'AlteHaasGroteskRegular', Arial, sans-serif;
   width: 100%;
-  padding: 0 0 10vh 0;
+  padding: 0 0 0 0;
 }
 
 .page-container {
@@ -265,7 +265,6 @@ body {
 }
 .hero-img-circle {
   border-radius: 50%;
-  
 }
 .hero-img-square {
   border-radius: 18px;
