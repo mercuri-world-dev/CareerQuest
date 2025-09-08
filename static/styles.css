@@ -91,6 +91,7 @@ body {
 .main-container {
     display: flex;
     flex-direction: row;
+    align-items: flex-start;
 }
 
 .container {
