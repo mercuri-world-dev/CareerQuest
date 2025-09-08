@@ -8,25 +8,28 @@
       {% block head %}{% endblock %}
   </head>
   <body>
+    <div class="main-container">
       {% block navbar %}
         {% with is_authenticated=True %}
-          {% include 'components/navbar.html' %}
+          <!-- {% include 'components/navbar.html' %} -->
         {% endwith %}
       {% endblock %}
       {% block messages %}
         {% include 'components/messages.html' %}
       {% endblock %}
       {% include 'components/starbg.html' %}
-      <div class="container">
-          {% block content %}{% endblock %}
+      <div class="container" style="flex: 1;">
+        {% block content %}{% endblock %}
       </div>
-      <script src="{{ url_for('static', filename='script.js') }}"></script>
-      <script src="{{ url_for('static', filename='effects/starbg.js') }}"></script>
-      {% block scripts %}{% endblock %}
-  </body>
-  <footer>
-    <div class="container">
-      <p>&copy; 2025 CareerQuest. All rights reserved.</p>
+      <!-- <footer>
+        <div class="container">
+          <p>&copy; 2025 CareerQuest. All rights reserved.</p>
+        </div>
+      </footer> -->
     </div>
-  </footer>
+  </body>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <script src="{{ url_for('static', filename='effects/starbg.js') }}"></script>
+  <script src="{{ url_for('static', filename='effects/navbarAnim.js') }}"></script>
+  {% block scripts %}{% endblock %}
 </html>

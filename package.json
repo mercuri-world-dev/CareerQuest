@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.1.11",
+    "tailwindcss": "^4.1.11"
+  },
+  "devDependencies": {
+    "browser-sync": "^3.0.4"
+  }
+}

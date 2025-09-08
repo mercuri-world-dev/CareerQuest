@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <title>{% block title %}CareerQuest{% endblock %}</title>
+      <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+      <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+      {% block head %}{% endblock %}
+  </head>
+  <body>
+    <div>
+      {% block navbar %}
+        {% with is_authenticated=True %}
+          <!-- {% include 'components/navbar.html' %} -->
+        {% endwith %}
+      {% endblock %}
+      {% block messages %}
+        {% include 'components/messages.html' %}
+      {% endblock %}
+      <div>
+        {% block content %}{% endblock %}
+      </div>
+      <!-- <footer>
+        <div class="container">
+          <p>&copy; 2025 CareerQuest. All rights reserved.</p>
+        </div>
+      </footer> -->
+    </div>
+  </body>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <script src="{{ url_for('static', filename='effects/navbarAnim.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</html>

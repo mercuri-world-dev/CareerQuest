@@ -1,3 +1,7 @@
+
+@import "css/navbar.css";
+/* @import "tailwindcss"; */
+
 @font-face {
     font-family: 'Alte Haas Grotesk';
     src: url('/static/fonts/AlteHaasGrotesk-Regular.ttf') format('truetype');
@@ -11,8 +15,15 @@
     font-style: normal;
 }
 
+
 /* Base Styles */
 :root {
+    /* PALETTE */
+    --dark-blue-cq: #20316D;
+    --violet-cq: #442079;
+    --pink-gradient-cq: linear-gradient(90deg, #FF8ECE 0%, #DB76FF 100%);
+    --bg-gradient: linear-gradient(0deg, #A989D0, 47%, #D6E9E9 100%);
+
     --font-family: 'Alte Haas Grotesk', sans-serif;
 
     --primary-color: #D9C2ED;
@@ -66,7 +77,6 @@
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
     line-height: 1.6;
     color: var(--text-color);
     margin: 0;
@@ -75,6 +85,13 @@ body {
     min-height: 100vh;
     width: 100vw;
     overflow-x: hidden;
+    background: var(--bg-gradient);
+}
+
+.main-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
 }
 
 .container {
@@ -109,62 +126,6 @@ header h1 span {
     color: var(--primary-color);
     font-weight: bold;
     font-family: 'Alte Haas Grotesk Bold', sans-serif;
-}
-
-.tagline {
-    font-size: 1.1rem;
-    opacity: 0.9;
-    max-width: 600px;
-    margin: 0 auto;
-    font-style: italic;
-}
-
-/* Navbar Styles */
-.navbar {
-    background-color: var(--secondary-color-translucent);
-    border-bottom: 1px solid var(--light-gray);
-    color: var(--white);
-    padding: 15px 0;
-    margin-bottom: 30px;
-    box-shadow: var(--shadow);
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-}
-
-.navbar .container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.navbar-brand a {
-    color: var(--white);
-    font-size: 1.5rem;
-    font-weight: 700;
-    text-decoration: none;
-}
-
-.navbar-nav {
-    display: flex;
-    list-style: none;
-}
-
-.nav-item {
-    margin-left: 20px;
-}
-
-.nav-link {
-    color: var(--white);
-    text-decoration: none;
-    font-weight: 500;
-    transition: var(--transition);
-}
-
-.nav-link:hover {
-    color: var(--primary-color);
 }
 
 /* Card Styles */

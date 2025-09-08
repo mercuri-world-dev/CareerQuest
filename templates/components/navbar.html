@@ -1,30 +1,47 @@
-<div class="navbar">
-  <div class="container">
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('main.index') }}">Home</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('users.profile') }}">Profile</a>
-      </li>
-      {#<li class="nav-item">
-        <a class="nav-link" href="{{ url_for('jobs.all_jobs') }}">View Jobs</a>
-      </li>#}
-      {% if not is_authenticated %}
-      <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
-      </li>
-      {% else %}
-      {#<li class="nav-item">
-        <a class="nav-link" href="{{ url_for('jobs.recommended_jobs') }}">Recommended Jobs</a>
-      </li>#}
-      <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
-      </li>
-      {% endif %}
-    </ul>
+<nav class="vertical-navbar">
+
+  <svg height="0" width="0">
+    <clipPath id="navbarPath">
+      <path
+        d="M152 246H151.862C151.862 262.91 138.154 276.618 121.244 276.618H43.6221C26.158 276.618 12.0001 290.775 12 308.239C12 325.703 26.1579 339.861 43.6221 339.861H115.723C135.682 339.861 151.862 356.041 151.862 376H152V3010C152 3026.016 139.016 3039 123 3039H0V0H152V246Z"
+        id="navbarDrawPath"
+      />
+    </clipPath>
+  </svg>
+  <div class="navbar-backdrop"></div>
+  <ul class="navbar-nav">
+    <div class="navbar-logo">
+      <img src="/static/assets/cq_logo.png" alt="CareerQuest Logo" />
+    </div>
+    <li class="nav-item">
+      <a class="nav-link {% if request.endpoint == 'main.index' %}active selected{% endif %}" href="{{ url_for('main.index') }}">
+        <span class="nav-icon"><img src="/static/assets/home.svg" alt="Home" width="22" height="22" /></span>
+        <span>Home</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if request.endpoint == 'jobs.all_jobs' %}active selected{% endif %}" href="{{ url_for('jobs.all_jobs') }}">
+        <span class="nav-icon"><img src="/static/assets/jobs.svg" alt="Jobs" width="22" height="22" /></span>
+        <span>Jobs</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if request.endpoint == 'jobs.recommended_jobs' %}active selected{% endif %}" href="{{ url_for('jobs.recommended_jobs') }}">
+        <span class="nav-icon"><img src="/static/assets/match.svg" alt="Match" width="22" height="22" /></span>
+        <span>Match</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if request.endpoint == 'main.about' %}active selected{% endif %}" href="#">
+        <span class="nav-icon"><img src="/static/assets/about.svg" alt="About" width="22" height="22" /></span>
+        <span>About</span>
+      </a>
+    </li>
+  </ul>
+  <div class="nav-item logout">
+    <a class="nav-link" href="{{ url_for('auth.logout') }}">
+      <span class="nav-icon"><img src="/static/assets/logout.svg" alt="Logout" width="22" height="22" /></span>
+      <span>Logout</span>
+    </a>
   </div>
-</div>
+</nav>
