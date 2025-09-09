@@ -523,21 +523,6 @@ label {
     border-radius: 0 4px 4px 0;
 }
 
-/* Footer Styles */
-footer {
-    background-color: var(--secondary-dark-translucent);
-    border-top: 1px solid var(--light-gray);
-    color: var(--white);
-    padding: 20px 0;
-    text-align: center;
-    margin-top: 40px;
-}
-
-footer p {
-    opacity: 0.8;
-    font-size: 0.9rem;
-}
-
 /* Starry Background Styles */
 .star-background {
     position: fixed;

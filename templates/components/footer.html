@@ -1,29 +1,10 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
 
 <footer class="cq-footer" role="contentinfo">
-    <!-- <svg
-        xmlns="http://www.w3.org/2000/svg"
-        version="1.1"
-        height="0"
-        width="0"
-    >
-        <defs>
-            <filter id="torn">
-                <feTurbulence
-                    type="fractalNoise"
-                    id="turbulence"
-                    baseFrequency=".05"
-                    numOctaves="4"
-                />
-                <feDisplacementMap
-                    id="displacement"
-                    in="SourceGraphic"
-                    scale="4"
-                />
-            </filter>
-        </defs>
-    </svg> -->
-		<div class="cq-footer-inner">
+	<div class="cq-footer-inner">
+		<div class="cq-footer-bg">
+			{% include '/components/svg/torn.html' %}
+		</div>
 		<div class="cq-footer-left">
 			<h2 class="cq-footer-logo">CareerQuest</h2>
 			<a href="#" class="cq-footer-cta" aria-label="Join the Quest">
@@ -51,22 +32,19 @@
 				<a href="#">Lorem ipsum</a>
 				<a href="#">Lorem ipsum</a>
 			</div>
-			<div class="cq-footer-col cq-footer-social">
+
+		</div>
+
+		<div class="cq-footer-right">
 				<div class="cq-footer-social-icons">
 					<a href="#" aria-label="Instagram" class="cq-footer-icon">
-						<!-- simple Instagram icon -->
-						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/><circle cx="17.5" cy="6.5" r="0.7" fill="currentColor"/></svg>
+						<img src="/static/assets/insta.svg" alt="Instagram">
 					</a>
 					<a href="#" aria-label="LinkedIn" class="cq-footer-icon">
-						<!-- simple LinkedIn icon -->
-						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 11.5V17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M8 8.5V8.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M12.5 11.5V17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M12.5 8.5C12.5 8.5 12.5 11.5 12.5 11.5" stroke="currentColor" stroke-width="1.6"/></svg>
+						<img src="/static/assets/linkedin.svg" alt="LinkedIn" width="15px">
 					</a>
 				</div>
 				<h3 class="cq-footer-social-title">Lorem ipsum</h3>
-			</div>
-		</div>
-
-		<div class="cq-footer-bottom">
 			<span>CareerQuest © 2025. All rights reserved</span>
 		</div>
 	</div>

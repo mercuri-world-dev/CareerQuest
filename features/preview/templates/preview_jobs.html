@@ -1,4 +1,3 @@
-{% extends 'base.html' %}
 
 {% block head %}
  <link rel="stylesheet" href="{{ url_for('preview.static', filename='preview.css') }}">
@@ -6,85 +5,128 @@
 {% block title %}Preview Jobs - CareerQuest{% endblock %}
 
 {% block content %}
-<div class="card">
-  <div class="card-header">
-    <h1>Job Search Preview</h1>
-    <p>This is a preview of the new job search feature powered by jobspy.</p>
+<div class="jobs-header">
+  <div class="jobs-header-content">
+    <div class="jobs-title-section">
+      <h1 class="jobs-title">Available Jobs</h1>
+      <p class="jobs-subtitle">Browse through our complete job listings</p>
+    </div>
+    
+    <div class="jobs-filters-section">
+      <h2 class="filters-title">Filters:</h2>
+      <form method="get" class="filters-form" role="search" aria-label="Job search filters">
+        <div class="filters-row">
+          <div class="filter-group">
+            <label for="company_name" class="sr-only">Company Name</label>
+            <input 
+              type="text" 
+              class="filter-input" 
+              id="company_name" 
+              name="company_name" 
+              placeholder="Company Name"
+              value="{{ request.args.get('company_name', '') }}"
+              aria-describedby="company-help">
+          </div>
+          
+          <div class="filter-group">
+            <label for="industry" class="sr-only">Industry</label>
+            <input 
+              type="text" 
+              class="filter-input" 
+              id="industry" 
+              name="industry" 
+              placeholder="Industry (comma separated)"
+              value="{{ request.args.get('industry', '') }}"
+              aria-describedby="industry-help">
+          </div>
+          
+          <div class="filter-group">
+            <label for="role_name" class="sr-only">Job Title</label>
+            <input 
+              type="text" 
+              class="filter-input" 
+              id="role_name" 
+              name="role_name" 
+              placeholder="Job Title"
+              value="{{ request.args.get('role_name', '') }}"
+              aria-describedby="title-help">
+          </div>
+          
+          <div class="filter-group">
+            <label for="location" class="sr-only">Location</label>
+            <input 
+              type="text" 
+              class="filter-input" 
+              id="location" 
+              name="location" 
+              placeholder="Location"
+              value="{{ request.args.get('location', '') }}"
+              aria-describedby="location-help">
+          </div>
+        </div>
+        
+        <div class="filters-row">
+          <div class="filter-group">
+            <label for="job_type" class="sr-only">Job Type</label>
+            <select class="filter-select" id="job_type" name="job_type" aria-describedby="type-help">
+              <option value="">Type</option>
+              <option value="fulltime" {% if request.args.get('job_type') == 'fulltime' %}selected{% endif %}>Full Time</option>
+              <option value="parttime" {% if request.args.get('job_type') == 'parttime' %}selected{% endif %}>Part Time</option>
+              <option value="internship" {% if request.args.get('job_type') == 'internship' %}selected{% endif %}>Internship</option>
+              <option value="contract" {% if request.args.get('job_type') == 'contract' %}selected{% endif %}>Contract</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="work_mode" class="sr-only">Work Mode</label>
+            <select class="filter-select" id="work_mode" name="work_mode" aria-describedby="mode-help">
+              <option value="">Mode</option>
+              <option value="remote" {% if request.args.get('work_mode') == 'remote' %}selected{% endif %}>Remote</option>
+              <option value="onsite" {% if request.args.get('work_mode') == 'onsite' %}selected{% endif %}>On-site</option>
+              <option value="hybrid" {% if request.args.get('work_mode') == 'hybrid' %}selected{% endif %}>Hybrid</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="application_status" class="sr-only">Application Status</label>
+            <select class="filter-select" id="application_status" name="application_status" aria-describedby="status-help">
+              <option value="">Status</option>
+              <option value="open" {% if request.args.get('application_status') == 'open' %}selected{% endif %}>Open</option>
+              <option value="closed" {% if request.args.get('application_status') == 'closed' %}selected{% endif %}>Closed</option>
+            </select>
+          </div>
+          
+          <div class="filter-actions">
+            <button type="submit" class="filter-btn" aria-label="Apply filters">Filter</button>
+            <button type="button" class="help-btn" aria-label="Get help with filters" title="Need help with filters?">
+              <span aria-hidden="true">?</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
   </div>
-  <div class="card-body">
-    <form method="get" class="form-group" style="margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap;">
-      <div class="row g-2">
-        <div>
-          <label for="site_name" class="form-label">Site</label>
-          <select class="form-control form-select" id="site_name" name="site_name">
-            <option value="linkedin" {% if request.args.get('site_name', 'linkedin') == 'linkedin' %}selected{% endif %}>LinkedIn</option>
-            <!-- <option value="indeed" {% if request.args.get('site_name') == 'indeed' %}selected{% endif %}>Indeed</option>
-            <option value="zip_recruiter" {% if request.args.get('site_name') == 'zip_recruiter' %}selected{% endif %}>ZipRecruiter</option>
-            <option value="glassdoor" {% if request.args.get('site_name') == 'glassdoor' %}selected{% endif %}>Glassdoor</option>
-            <option value="google" {% if request.args.get('site_name') == 'google' %}selected{% endif %}>Google</option>
-            <option value="bayt" {% if request.args.get('site_name') == 'bayt' %}selected{% endif %}>Bayt</option>
-            <option value="naukri" {% if request.args.get('site_name') == 'naukri' %}selected{% endif %}>Naukri</option> -->
-          </select>
-        </div>
-        <div>
-          <label for="search_term" class="form-label">Search Term</label>
-          <input type="text" class="form-control" id="search_term" name="search_term" value="{{ request.args.get('search_term', 'software engineer') }}">
-        </div>
-        <div>
-          <label for="location" class="form-label">Location</label>
-          <input type="text" class="form-control" id="location" name="location" value="{{ request.args.get('location', 'San Francisco, CA') }}">
-        </div>
-        <div class="col-md-2">
-          <label for="results_wanted" class="form-label">Results Wanted</label>
-          <input type="number" class="form-control" id="results_wanted" name="results_wanted" min="1" max="50" value="{{ request.args.get('results_wanted', 10) }}">
-        </div>
-        <div class="col-md-1">
-          <label for="hours_old" class="form-label">Hours Old</label>
-          <input type="number" class="form-control" id="hours_old" name="hours_old" min="1" max="168" value="{{ request.args.get('hours_old', 72) }}">
-        </div>
-      </div>
-      <div class="row g-2 mt-2">
-        <div class="col-md-2">
-          <label for="is_remote" class="form-label">Remote</label>
-          <select class="form-select" id="is_remote" name="is_remote">
-            <option value="" {% if request.args.get('is_remote', '') == '' %}selected{% endif %}>Any</option>
-            <option value="true" {% if request.args.get('is_remote') == 'true' %}selected{% endif %}>Yes</option>
-            <option value="false" {% if request.args.get('is_remote') == 'false' %}selected{% endif %}>No</option>
-          </select>
-        </div>
-        <div class="col-md-2">
-          <label for="job_type" class="form-label">Job Type</label>
-          <select class="form-select" id="job_type" name="job_type">
-            <option value="" {% if request.args.get('job_type', '') == '' %}selected{% endif %}>Any</option>
-            <option value="fulltime" {% if request.args.get('job_type') == 'fulltime' %}selected{% endif %}>Full Time</option>
-            <option value="parttime" {% if request.args.get('job_type') == 'parttime' %}selected{% endif %}>Part Time</option>
-            <option value="internship" {% if request.args.get('job_type') == 'internship' %}selected{% endif %}>Internship</option>
-            <option value="contract" {% if request.args.get('job_type') == 'contract' %}selected{% endif %}>Contract</option>
-          </select>
-        </div>
-        <div class="col-md-2 align-self-end">
-          <button type="submit" class="btn btn-primary w-100">Search</button>
-        </div>
-      </div>
-    </form>
+</div>
 
+<div class="jobs-content">
     {% if error %}
-        <div class="alert alert-danger">
+        <div class="alert alert-danger" role="alert">
             <strong>Error:</strong> {{ error }}
         </div>
     {% endif %}
 
     {% if jobs %}
-        <ul>
+        <div class="jobs-list" role="main" aria-label="Job listings">
             {% for job in jobs %}
               {% with job=job %}
                 {% include 'preview_job_card.html' %}
               {% endwith %}
             {% endfor %}
-        </ul>
+        </div>
     {% else %}
-        <p>No jobs available for preview.</p>
+        <div class="no-jobs-message" role="status">
+            <p>No jobs available.</p>
+        </div>
     {% endif %}
-  </div>
 </div>
 {% endblock %}

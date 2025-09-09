@@ -19,10 +19,7 @@ def get_rendered_job_cards(include_compatibility=False, include_factors=False):
     if include_factors or include_compatibility:
         render_jobs = []
         for job in jobs:
-            if job.is_success():
-                render_jobs.append(render_template('components/job_card.html', job=job.data))
-            else:
-                render_jobs.append(render_template('components/job_error.html', msg=job.error))
+            render_jobs.append(render_template('components/job_card.html', job=job))
         return render_jobs
     else:
         return [render_template('components/job_card.html', job=job, include_compatibility=include_compatibility) for job in jobs]

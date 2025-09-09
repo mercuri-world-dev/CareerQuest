@@ -9,13 +9,12 @@ from services.supabase.supabase_client import get_supabase
 from util.decorators import sb_login_required
 
 JOB_FIELDS = [
-    'id', 'company_profile_id', 'company_name', 'role_name', 'industry', 'weekly_hours', 'work_mode', 'location',
-    'qualifications', 'accommodations', 'application_period_start', 'application_period_end', 'application_status',
-    'job_type', 'application_materials', 'job_description', 'application_link'
+    'id', 'provider', 'company_name', 'role_name', 'company_id', 'industry', 'weekly_hours', 'work_mode', 'location',
+    'is_remote', 'description', 'job_type', 'application_materials', 'job_url', 'date_posted'
 ]
 
 LIST_FIELDS = [
-  'industry', 'qualifications', 'accommodations', 'application_materials'
+  'industry', 'application_materials'
 ]
 
 class InteractionType(Enum):
@@ -43,7 +42,30 @@ def fetch_jobs() -> Result[list[Job]]:
             print("No jobs found.")
             return Result(success=False, error="No jobs found", data=[])
         jobs_data = jobs_resp.data
-        jobs = [Job(**{k: v for k, v in job.items() if k in JOB_FIELDS}) for job in jobs_data]
+        jobs = []
+        for job_data in jobs_data:
+            # Map the database fields to the Job class fields
+            job_dict = {
+                'id': job_data.get('id', ''),
+                'provider': job_data.get('provider', 'MERCURI'),  # Default to MERCURI if not specified
+                'company_name': job_data.get('company_name', ''),
+                'role_name': job_data.get('role_name', ''),
+                'company_id': job_data.get('company_id'),
+                'industry': job_data.get('industry'),
+                'job_url': job_data.get('application_link'),  # Map application_link to job_url
+                'location': job_data.get('location'),
+                'is_remote': job_data.get('work_mode') == 'remote' if job_data.get('work_mode') else None,
+                'description': job_data.get('job_description'),  # Map job_description to description
+                'job_type': job_data.get('job_type')
+            }
+            # Create Job object
+            try:
+                job = Job(**job_dict)
+                jobs.append(job)
+            except Exception as e:
+                print(f"Error creating Job object: {e}")
+                # Continue with next job if one fails
+                continue
         return Result(success=True, data=jobs)
     except Exception as e:
         print(f"Error fetching jobs: {e}")
@@ -105,7 +127,24 @@ def fetch_job(job_id) -> Result[Job|None]:
         if not job_data:
             print(f"Job with ID {job_id} not found.")
             return Result(success=False, error=f"Job with ID {job_id} not found.")
-        job = Job(**{k: v for k, v in job_data.items() if k in JOB_FIELDS})
+        
+        # Map the database fields to the Job class fields
+        job_dict = {
+            'id': job_data.get('id', ''),
+            'provider': job_data.get('provider', 'MERCURI'),  # Default to MERCURI if not specified
+            'company_name': job_data.get('company_name', ''),
+            'role_name': job_data.get('role_name', ''),
+            'company_id': job_data.get('company_id'),
+            'industry': job_data.get('industry'),
+            'job_url': job_data.get('application_link'),  # Map application_link to job_url
+            'location': job_data.get('location'),
+            'is_remote': job_data.get('work_mode') == 'remote' if job_data.get('work_mode') else None,
+            'description': job_data.get('job_description'),  # Map job_description to description
+            'job_type': job_data.get('job_type')
+        }
+        
+        # Create Job object
+        job = Job(**job_dict)
     except Exception as e:
         print(f"Error processing job data: {e}")
         return Result(success=False, error=str(e))

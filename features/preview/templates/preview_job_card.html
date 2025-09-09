@@ -1,149 +1,113 @@
-<div class="job-card">
-  <h3 class="job-title">{{ job.role_name }} at {{ job.company_name }}</h3>
-  <p class="location">{{ job.location }}</p>
-
-  <ul class="job-compact-list">
-    <li><strong>Provider:</strong> {{ job.provider_disp }}</li>
-    <li><strong>Company Name:</strong> {{ job.company_name or 'Not provided' }}</li>
-    <li><strong>Industry:</strong> {{ job.industry or 'Not provided' }}</li>
-    <li><strong>Location:</strong> {{ job.location or 'Not provided' }}</li>
-    <li><strong>Remote:</strong> {% if job.is_remote is not none %}{{ 'Yes' if job.is_remote else 'No' }}{% else %}Not provided{% endif %}</li>
-    <li class="job-description" id="job-desc-{{ job.id }}">
-      <strong>Description:</strong>
-      {% if job.description %}
-        {% with content=job.description, id=job.id %}
-          {% include 'components/expandable.html' %}
-        {% endwith %}
-      {% else %}
-        Not provided
-      {% endif %}
-    </li>
-    <li><strong>Job Type:</strong> {{ job.job_type.value if job.job_type else 'Not provided' }}</li>
-    <li><strong>Job Function:</strong>
-      {% if job.job_function %}
-        <ul>
-          {% for key, value in job.job_function.to_dict().items() %}
-            <li><strong>{{ key|replace('_', ' ')|title }}:</strong> {{ value if value is not none else 'Not provided' }}</li>
-          {% endfor %}
-        </ul>
-      {% else %}Not provided{% endif %}
-    </li>
-    <li><strong>Date Posted:</strong> {{ job.date_posted_disp }}</li>
-    <li><strong>Emails:</strong> {% if job.emails %}{{ job.emails | join(', ') }}{% else %}Not provided{% endif %}</li>
-    {% if job.site_specific_fields %}
-      {% set ssf = job.site_specific_fields %}
-        {# LinkedIn #}
-        {% if ssf.__class__.__name__ == 'JobLinkedInSpecific' %}
-          {% for key, value in ssf.to_dict().items() %}
-            <li><strong>{{ key|replace('_', ' ')|title }} (LinkedIn):</strong> {{ value if value is not none else 'Not provided' }}</li>
-          {% endfor %}
-        {# Naukri #}
-        {% elif ssf.__class__.__name__ == 'JobNaukriSpecific' %}
-          {% for key, value in ssf.to_dict().items() %}
-            <li><strong>{{ key|replace('_', ' ')|title }} (Naukri):</strong> {{ value if value is not none else 'Not provided' }}</li>
-          {% endfor %}
-        {# Mercuri #}
-        {% elif ssf.__class__.__name__ == 'JobMercuriSpecific' %}
-          {% for key, value in ssf.to_dict().items() %}
-            <li><strong>{{ key|replace('_', ' ')|title }} (Mercuri):</strong> {{ value if value is not none else 'Not provided' }}</li>
-          {% endfor %}
-        {# Google #}
-        {% elif ssf.__class__.__name__ == 'JobIndeedSpecific' %}
-          {% for key, value in ssf.to_dict().items() %}
-            <li><strong>{{ key|replace('_', ' ')|title }} (Indeed):</strong> {{ value if value is not none else 'Not provided' }}</li>
-          {% endfor %}
-        {# Glassdoor #}
-        {% elif ssf.__class__.__name__ == 'JobGlassdoorSpecific' %}
-          {% for key, value in ssf.to_dict().items() %}
-            <li><strong>{{ key|replace('_', ' ')|title }} (Glassdoor):</strong> {{ value if value is not none else 'Not provided' }}</li>
-          {% endfor %}
-        {# Google #}
-        {% elif ssf.__class__.__name__ == 'JobZipRecruiterSpecific' %}
-          {% for key, value in ssf.to_dict().items() %}
-            <li><strong>{{ key|replace('_', ' ')|title }} (ZipRecruiter):</strong> {{ value if value is not none else 'Not provided' }}</li>
-          {% endfor %}
-        {% endif %}
-    {% endif %}
-  </ul>
-
-  {% if job.job_url %}
-    <a href="{{ job.job_url }}" class="btn btn-primary apply-now-btn" data-job-id="{{ job.id }}" target="_blank" rel="noopener">Apply Now</a>
-  {% else %}
-    Not provided
-  {% endif %}
-  <a href="#" class="btn btn-secondary see-details-btn" style="margin-left: 0.7em;">See Details</a>
-
-  {% if job.application_period_start or job.application_period_end %}
-  <div class="application-period">
-    <p>Application Period: 
-      {% if job.application_period_start %}{{ job.application_period_start[:10] }}{% endif %}
-      {% if job.application_period_end %} - {{ job.application_period_end[:10] }}{% endif %}
-      {% if job.application_status == 'Open' %}
-      <span class="job-open-text">(Open)</span>
-      {% elif job.application_status == 'Closed' %}
-      <span class="job-closed-text">(Closed)</span>
-      {% endif %}
-    </p>
-  </div>
-  {% endif %}
-
-  {% if job.application_materials %}
-    <p>Application Materials: {{ job.application_materials | join(', ') }}</p>
-  {% endif %}
-
-  {% if job.application_link %}
-    <div class="apply-button">
-      <a href="{{ job.application_link }}" class="btn btn-primary apply-now-btn" 
-         data-job-id="{{ job.id }}" target="_blank" rel="noopener">Apply Now</a>
+<article class="job-card" role="article" aria-labelledby="job-title-{{ job.id }}">
+  <div class="job-card-header">
+    <div class="company-logo" aria-hidden="true">
+      <div class="logo-placeholder"></div>
     </div>
-  {% endif %}
-</div>
-
-{% if job.application_materials %}
-  <p>Application Materials: {{ job.application_materials | join(', ') }}</p>
-{% endif %}
-
-{% if job.application_link %}
-  <div class="apply-button">
-    <a href="{{ job.application_link }}" class="btn btn-primary apply-now-btn" 
-       data-job-id="{{ job.id }}" target="_blank" rel="noopener">Apply Now</a>
+    <div class="job-header-info">
+      <h3 class="job-company-name" id="job-title-{{ job.id }}">{{ job.company_name or 'Company Name' }}</h3>
+      <div class="job-location" aria-label="Job location">
+        <svg class="location-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+        <span>{{ job.location or 'location' }}</span>
+      </div>
+    </div>
   </div>
-{% endif %}
+
+  <div class="job-card-body">
+    <div class="job-details">
+      <div class="job-industry">
+        <strong>industry:</strong> <span>{{ job.industry or 'sports apparel' }}</span>
+      </div>
+      <div class="job-description">
+        <strong>description:</strong>
+        {% if job.description %}
+          <span class="description-text">{{ job.description[:50] }}{% if job.description|length > 50 %}...{% endif %}</span>
+          {% if job.description|length > 50 %}
+            <button class="read-more-btn" type="button" aria-expanded="false" aria-controls="full-desc-{{ job.id }}">Read more</button>
+            <span class="full-description" id="full-desc-{{ job.id }}" hidden>{{ job.description }}</span>
+          {% endif %}
+        {% else %}
+          <span>Lorem ipsum dolor sit amet... <button class="read-more-btn" type="button">Read more</button></span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="application-period">
+      <strong>Application Period:</strong>
+      <div class="date-range">
+        <span class="date-badge">{{ '2025/06/02' }}</span>
+        <span class="date-separator">-</span>
+        <span class="date-badge">{{ '2025/09/19' }}</span>
+      </div>
+    </div>
+
+    <div class="job-tags" role="list" aria-label="Job requirements and benefits">
+      {% if job.is_remote %}
+        <span class="job-tag" role="listitem">Remote</span>
+      {% endif %}
+      <span class="job-tag" role="listitem">Flexible Hours</span>
+      <span class="job-tag" role="listitem">Cover Letter</span>
+      <span class="job-tag job-tag-more" role="listitem">{{ '3' }}</span>
+    </div>
+  </div>
+
+  <div class="job-card-footer">
+    <div class="job-rate">
+      <svg class="clock-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12,6 12,12 16,14"></polyline>
+      </svg>
+      <span class="rate-amount">{{ '20' }}</span>
+      <span class="rate-period">W/HR</span>
+    </div>
+    <a href="{{ job.job_url }}">
+      <button class="visit-btn" type="button" aria-label="Visit job posting for {{ job.company_name }}">
+        Visit
+      </button>
+    </a>
+  </div>
+</article>
 
 <script>
-  if (!window.__applyNowListenerAdded) {
-    window.__applyNowListenerAdded = true;
-    document.addEventListener("DOMContentLoaded", function() {
-      document.querySelectorAll('.apply-now-btn').forEach(function(btn) {
-        btn.addEventListener('click', function(e) {
-          const jobId = btn.getAttribute('data-job-id');
-          fetch('/api/job_click', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ job_id: jobId })
-          });
-        });
-      });
-    });
-  }
-   document.addEventListener("DOMContentLoaded", function() {
-    document.querySelectorAll('.show-more-link').forEach(function(link) {
-      link.addEventListener('click', function() {
-        var jobId = link.getAttribute('data-job-id');
-        var descP = document.getElementById('job-desc-' + jobId);
-        link.style.display = 'none';
-        descP.querySelector('.short-desc').style.display = 'none';
-        descP.querySelector('.full-desc').style.display = '';
-      });
-    });
-    document.querySelectorAll('.show-less-link').forEach(function(link) {
-      link.addEventListener('click', function() {
-        var jobId = link.getAttribute('data-job-id');
-        var descP = document.getElementById('job-desc-' + jobId);
-        descP.querySelector('.full-desc').style.display = 'none';
-        descP.querySelector('.short-desc').style.display = '';
-        descP.querySelector('.show-more-link').style.display = '';
-      });
+document.addEventListener("DOMContentLoaded", function() {
+  // Handle read more functionality
+  document.querySelectorAll('.read-more-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const fullDesc = this.nextElementSibling;
+      const shortDesc = this.previousElementSibling;
+      
+      if (fullDesc && fullDesc.hasAttribute('hidden')) {
+        fullDesc.removeAttribute('hidden');
+        shortDesc.style.display = 'none';
+        this.textContent = 'Read less';
+        this.setAttribute('aria-expanded', 'true');
+      } else if (fullDesc) {
+        fullDesc.setAttribute('hidden', '');
+        shortDesc.style.display = 'inline';
+        this.textContent = 'Read more';
+        this.setAttribute('aria-expanded', 'false');
+      }
     });
   });
+
+  // Handle visit button clicks
+  document.querySelectorAll('.visit-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const jobCard = this.closest('.job-card');
+      const jobId = jobCard.querySelector('[id^="job-title-"]')?.id?.replace('job-title-', '');
+      
+      if (jobId) {
+        // Track job click
+        fetch('/api/job_click', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ job_id: jobId })
+        }).catch(err => console.warn('Failed to track job click:', err));
+        
+      }
+    });
+  });
+});
 </script>
