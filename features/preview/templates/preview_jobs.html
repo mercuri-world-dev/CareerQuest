@@ -1,0 +1,132 @@
+
+{% block head %}
+ <link rel="stylesheet" href="{{ url_for('preview.static', filename='preview.css') }}">
+{% endblock %}
+{% block title %}Preview Jobs - CareerQuest{% endblock %}
+
+{% block content %}
+<div class="jobs-header">
+  <div class="jobs-header-content">
+    <div class="jobs-title-section">
+      <h1 class="jobs-title">Available Jobs</h1>
+      <p class="jobs-subtitle">Browse through our complete job listings</p>
+    </div>
+    
+    <div class="jobs-filters-section">
+      <h2 class="filters-title">Filters:</h2>
+      <form method="get" class="filters-form" role="search" aria-label="Job search filters">
+        <div class="filters-row">
+          <div class="filter-group">
+            <label for="company_name" class="sr-only">Company Name</label>
+            <input 
+              type="text" 
+              class="filter-input" 
+              id="company_name" 
+              name="company_name" 
+              placeholder="Company Name"
+              value="{{ request.args.get('company_name', '') }}"
+              aria-describedby="company-help">
+          </div>
+          
+          <div class="filter-group">
+            <label for="industry" class="sr-only">Industry</label>
+            <input 
+              type="text" 
+              class="filter-input" 
+              id="industry" 
+              name="industry" 
+              placeholder="Industry (comma separated)"
+              value="{{ request.args.get('industry', '') }}"
+              aria-describedby="industry-help">
+          </div>
+          
+          <div class="filter-group">
+            <label for="role_name" class="sr-only">Job Title</label>
+            <input 
+              type="text" 
+              class="filter-input" 
+              id="role_name" 
+              name="role_name" 
+              placeholder="Job Title"
+              value="{{ request.args.get('role_name', '') }}"
+              aria-describedby="title-help">
+          </div>
+          
+          <div class="filter-group">
+            <label for="location" class="sr-only">Location</label>
+            <input 
+              type="text" 
+              class="filter-input" 
+              id="location" 
+              name="location" 
+              placeholder="Location"
+              value="{{ request.args.get('location', '') }}"
+              aria-describedby="location-help">
+          </div>
+        </div>
+        
+        <div class="filters-row">
+          <div class="filter-group">
+            <label for="job_type" class="sr-only">Job Type</label>
+            <select class="filter-select" id="job_type" name="job_type" aria-describedby="type-help">
+              <option value="">Type</option>
+              <option value="fulltime" {% if request.args.get('job_type') == 'fulltime' %}selected{% endif %}>Full Time</option>
+              <option value="parttime" {% if request.args.get('job_type') == 'parttime' %}selected{% endif %}>Part Time</option>
+              <option value="internship" {% if request.args.get('job_type') == 'internship' %}selected{% endif %}>Internship</option>
+              <option value="contract" {% if request.args.get('job_type') == 'contract' %}selected{% endif %}>Contract</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="work_mode" class="sr-only">Work Mode</label>
+            <select class="filter-select" id="work_mode" name="work_mode" aria-describedby="mode-help">
+              <option value="">Mode</option>
+              <option value="remote" {% if request.args.get('work_mode') == 'remote' %}selected{% endif %}>Remote</option>
+              <option value="onsite" {% if request.args.get('work_mode') == 'onsite' %}selected{% endif %}>On-site</option>
+              <option value="hybrid" {% if request.args.get('work_mode') == 'hybrid' %}selected{% endif %}>Hybrid</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="application_status" class="sr-only">Application Status</label>
+            <select class="filter-select" id="application_status" name="application_status" aria-describedby="status-help">
+              <option value="">Status</option>
+              <option value="open" {% if request.args.get('application_status') == 'open' %}selected{% endif %}>Open</option>
+              <option value="closed" {% if request.args.get('application_status') == 'closed' %}selected{% endif %}>Closed</option>
+            </select>
+          </div>
+          
+          <div class="filter-actions">
+            <button type="submit" class="filter-btn" aria-label="Apply filters">Filter</button>
+            <button type="button" class="help-btn" aria-label="Get help with filters" title="Need help with filters?">
+              <span aria-hidden="true">?</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="jobs-content">
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+            <strong>Error:</strong> {{ error }}
+        </div>
+    {% endif %}
+
+    {% if jobs %}
+        <div class="jobs-list" role="main" aria-label="Job listings">
+            {% for job in jobs %}
+              {% with job=job %}
+                {% include 'preview_job_card.html' %}
+              {% endwith %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-jobs-message" role="status">
+            <p>No jobs available for preview.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

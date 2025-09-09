@@ -1,0 +1,113 @@
+<article class="job-card" role="article" aria-labelledby="job-title-{{ job.id }}">
+  <div class="job-card-header">
+    <div class="company-logo" aria-hidden="true">
+      <div class="logo-placeholder"></div>
+    </div>
+    <div class="job-header-info">
+      <h3 class="job-company-name" id="job-title-{{ job.id }}">{{ job.company_name or 'Company Name' }}</h3>
+      <div class="job-location" aria-label="Job location">
+        <svg class="location-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+        <span>{{ job.location or 'location' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="job-card-body">
+    <div class="job-details">
+      <div class="job-industry">
+        <strong>industry:</strong> <span>{{ job.industry or 'sports apparel' }}</span>
+      </div>
+      <div class="job-description">
+        <strong>description:</strong>
+        {% if job.description %}
+          <span class="description-text">{{ job.description[:50] }}{% if job.description|length > 50 %}...{% endif %}</span>
+          {% if job.description|length > 50 %}
+            <button class="read-more-btn" type="button" aria-expanded="false" aria-controls="full-desc-{{ job.id }}">Read more</button>
+            <span class="full-description" id="full-desc-{{ job.id }}" hidden>{{ job.description }}</span>
+          {% endif %}
+        {% else %}
+          <span>Lorem ipsum dolor sit amet... <button class="read-more-btn" type="button">Read more</button></span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="application-period">
+      <strong>Application Period:</strong>
+      <div class="date-range">
+        <span class="date-badge">{{ '2025/06/02' }}</span>
+        <span class="date-separator">-</span>
+        <span class="date-badge">{{ '2025/09/19' }}</span>
+      </div>
+    </div>
+
+    <div class="job-tags" role="list" aria-label="Job requirements and benefits">
+      {% if job.is_remote %}
+        <span class="job-tag" role="listitem">Remote</span>
+      {% endif %}
+      <span class="job-tag" role="listitem">Flexible Hours</span>
+      <span class="job-tag" role="listitem">Cover Letter</span>
+      <span class="job-tag job-tag-more" role="listitem">{{ '3' }}</span>
+    </div>
+  </div>
+
+  <div class="job-card-footer">
+    <div class="job-rate">
+      <svg class="clock-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12,6 12,12 16,14"></polyline>
+      </svg>
+      <span class="rate-amount">{{ '20' }}</span>
+      <span class="rate-period">W/HR</span>
+    </div>
+    <a href="{{ job.job_url }}">
+      <button class="visit-btn" type="button" aria-label="Visit job posting for {{ job.company_name }}">
+        Visit
+      </button>
+    </a>
+  </div>
+</article>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Handle read more functionality
+  document.querySelectorAll('.read-more-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const fullDesc = this.nextElementSibling;
+      const shortDesc = this.previousElementSibling;
+      
+      if (fullDesc && fullDesc.hasAttribute('hidden')) {
+        fullDesc.removeAttribute('hidden');
+        shortDesc.style.display = 'none';
+        this.textContent = 'Read less';
+        this.setAttribute('aria-expanded', 'true');
+      } else if (fullDesc) {
+        fullDesc.setAttribute('hidden', '');
+        shortDesc.style.display = 'inline';
+        this.textContent = 'Read more';
+        this.setAttribute('aria-expanded', 'false');
+      }
+    });
+  });
+
+  // Handle visit button clicks
+  document.querySelectorAll('.visit-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const jobCard = this.closest('.job-card');
+      const jobId = jobCard.querySelector('[id^="job-title-"]')?.id?.replace('job-title-', '');
+      
+      if (jobId) {
+        // Track job click
+        fetch('/api/job_click', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ job_id: jobId })
+        }).catch(err => console.warn('Failed to track job click:', err));
+        
+      }
+    });
+  });
+});
+</script>
