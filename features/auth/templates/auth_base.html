@@ -9,18 +9,68 @@
       {% block head %}{% endblock %}
   </head>
   <body>
-      {% include 'components/starbg.html' %}
+      <main class="login-main" role="main">
+        <div class="login-container">
+          <div class="login-card">
+            <!-- Left Side - Branding -->
+            <div class="login-branding">
+              <h1 class="login-title">{% block auth_title %}{% endblock %}</h1>
+              <div class="login-prompt">
+                <p class="prompt-text">{% block prompt_text %}{% endblock %}</p>
+                {% block prompt_link %}{% endblock %}
+              </div>
+            </div>
 
-      <div class="auth-container">
-          {% block content %}{% endblock %}
-      </div>
+            <!-- Right Side - Form -->
+            <div class="login-form-section">
+              <div class="form-container">
+                {% block messages %}
+                  {% include 'components/messages.html' %}
+                {% endblock %}
+
+                <form method="POST" {% block auth_form_action %}{% endblock %} class="login-form">
+                  <div class="form-group">
+                    <label for="email" class="form-label">Email Address:</label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      class="form-input"
+                      required
+                      autocomplete="email"
+                      aria-describedby="email-error"
+                    />
+                    <div id="email-error" class="error-message" role="alert" aria-live="polite"></div>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="password" class="form-label">Password:</label>
+                    <input
+                      type="password"
+                      id="password"
+                      name="password"
+                      class="form-input"
+                      required
+                      autocomplete="current-password"
+                      aria-describedby="password-error"
+                    />
+                    <div id="password-error" class="error-message" role="alert" aria-live="polite"></div>
+                  </div>
+
+                  <div class="form-actions">
+                    {% block auth_button %}
+                    {% endblock %}
+
+                    {% block google_auth_button %}
+                    {% endblock %}
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
       <script src="{{ url_for('static', filename='script.js') }}"></script>
-      <script src="{{ url_for('static', filename='effects/starbg.js') }}"></script>
       {% block scripts %}{% endblock %}
   </body>
-  <footer>
-    <div class="container">
-      <p>&copy; 2025 CareerQuest. All rights reserved.</p>
-    </div>
-  </footer>
 </html>
