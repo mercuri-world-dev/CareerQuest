@@ -10,6 +10,7 @@
   width: 100%;
   border-radius: 2% 2% 0 0;
   background: var(--footer-gradient);
+  z-index: 100;
 }
 
 .cq-footer-bg {

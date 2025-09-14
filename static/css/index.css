@@ -75,7 +75,16 @@ body {
 }
 
 .page-container {
-  margin: 0 12% 0 12%;
+  display: flex;
+  flex-direction: row;
+}
+
+.nav-container {
+  min-width: 275;
+}
+
+.main-page-container {
+  margin: 0 6% 0 18%;
   display: flex;
   flex-direction: column;
   gap: 30px;
