@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from datetime import datetime, timezone
+import json
 
 from services.supabase.supabase_client import get_supabase
 from util.decorators import role_required, sb_login_required
@@ -38,33 +39,69 @@ def edit_job(job_id):
         flash('Job not found.', 'warning')
         return redirect(url_for('cms.manage_jobs'))
     if request.method == 'POST':
-        application_status_response = request.form.get('application_status', 'Open')
-        if application_status_response == 'Open':
-            application_status = True
-        else:
-            application_status = False
-        weekly_hours = request.form.get('weekly_hours')
+        # Parse form data
+        provided_id = request.form.get('provided_id')
+        provider = request.form.get('provider')
+        company_name = request.form.get('company_name')
+        role_name = request.form.get('role_name')
+        industry = request.form.get('industry', '')
+        industry_list = [item.strip() for item in industry.split(',') if item.strip()]
+        job_url = request.form.get('job_url')
+        location = request.form.get('location')
+        is_remote = request.form.get('is_remote') == 'on'
+        description = request.form.get('description')
+        job_type = request.form.get('job_type')
+        interval = request.form.get('interval')
+        min_amount = request.form.get('min_amount')
+        max_amount = request.form.get('max_amount')
+        currency = request.form.get('currency')
+        salary_source = request.form.get('salary_source')
+        date_posted_str = request.form.get('date_posted')
+        date_posted = datetime.strptime(date_posted_str, '%Y-%m-%d').date() if date_posted_str else None
+        emails_str = request.form.get('emails', '')
+        emails_list = [email.strip() for email in emails_str.split(',') if email.strip()]
+        
+        # Site-specific fields
+        job_level = request.form.get('job_level')
+        company_industry = request.form.get('company_industry')
+        skills = request.form.get('skills')
+        experience_range = request.form.get('experience_range')
+        additional_fields_str = request.form.get('additional_fields')
+        additional_fields = None
+        if additional_fields_str:
+            try:
+                additional_fields = json.loads(additional_fields_str)
+            except:
+                additional_fields = None
+        
         update_data = {
-            'role_name': request.form.get('role_name'),
-            'weekly_hours': int(weekly_hours) if weekly_hours else None,
-            'work_mode': request.form.get('work_mode'),
-            'location': request.form.get('location'),
-            'job_type': request.form.get('job_type'),
-            'job_description': request.form.get('job_description'),
-            'application_link': request.form.get('application_link'),
-            'application_status': application_status,
-            'industry': [item.strip() for item in request.form.get('industry', '').split(',') if item.strip()],
-            'qualifications': [item.strip() for item in request.form.get('qualifications', '').split(',') if item.strip()],
-            'accommodations': [item.strip() for item in request.form.get('accommodations', '').split(',') if item.strip()],
-            'application_materials': [item.strip() for item in request.form.get('application_materials', '').split(',') if item.strip()],
-            'application_period_start': request.form.get('application_period_start') or None,
-            'application_period_end': request.form.get('application_period_end') or None,
+            'provided_id': provided_id,
+            'provider': provider,
+            'company_name': company_name,
+            'role_name': role_name,
+            'industry': industry_list,
+            'job_url': job_url,
+            'location': location,
+            'is_remote': is_remote,
+            'description': description,
+            'job_type': job_type,
+            'interval': interval,
+            'min_amount': float(min_amount) if min_amount else None,
+            'max_amount': float(max_amount) if max_amount else None,
+            'currency': currency,
+            'salary_source': salary_source,
+            'date_posted': date_posted.isoformat() if date_posted else None,
+            'emails': emails_list,
+            'job_level': job_level,
+            'skills': skills,
+            'experience_range': experience_range,
+            'additional_fields': additional_fields,
             'updated_at': datetime.now(timezone.utc).isoformat()
         }
         supabase.table('jobs').update(update_data).eq('id', job_id).execute()
         flash('Job updated successfully!', 'message')
         return redirect(url_for('cms.manage_jobs'))
-    return render_template('edit_job.html', job=job)
+    return render_template('add_or_edit_job.html', job=job)
 
 @cms_bp.route('/add-job', methods=['GET', 'POST'])
 @sb_login_required
@@ -81,88 +118,72 @@ def add_job():
         selected_company = next((c for c in companies if str(c['id']) == str(company_id)), None)
         if not selected_company:
             flash('Please select a valid company.', 'warning')
-            return render_template('add_job.html', companies=companies)
-        try:
-            application_status_response = request.form.get('application_status', 'Open')
-            
-            if application_status_response == 'Open':
-                application_status = True
-            else:
-                application_status = False
+            return render_template('add_or_edit_job.html', companies=companies, job=None)
+        
+        # Parse form data
+        provided_id = request.form.get('provided_id')
+        provider = request.form.get('provider')
+        role_name = request.form.get('role_name')
+        industry = request.form.get('industry', '')
+        industry_list = [item.strip() for item in industry.split(',') if item.strip()]
+        job_url = request.form.get('job_url')
+        location = request.form.get('location')
+        is_remote = request.form.get('is_remote') == 'on'
+        description = request.form.get('description')
+        job_type = request.form.get('job_type')
+        interval = request.form.get('interval')
+        min_amount = request.form.get('min_amount')
+        max_amount = request.form.get('max_amount')
+        currency = request.form.get('currency')
+        salary_source = request.form.get('salary_source')
+        date_posted_str = request.form.get('date_posted')
+        date_posted = datetime.strptime(date_posted_str, '%Y-%m-%d').date() if date_posted_str else None
+        emails_str = request.form.get('emails', '')
+        emails_list = [email.strip() for email in emails_str.split(',') if email.strip()]
+        
+        # Site-specific fields
+        job_level = request.form.get('job_level')
+        company_industry = request.form.get('company_industry')
+        skills = request.form.get('skills')
+        experience_range = request.form.get('experience_range')
+        additional_fields_str = request.form.get('additional_fields')
+        additional_fields = None
+        if additional_fields_str:
+            try:
+                additional_fields = json.loads(additional_fields_str)
+            except:
+                additional_fields = None
+        
+        job_data = {
+            'provided_id': provided_id,
+            'provider': provider,
+            'company_name': selected_company['company_name'],
+            'company_profile_id': selected_company['id'],
+            'role_name': role_name,
+            'industry': industry_list,
+            'job_url': job_url,
+            'location': location,
+            'is_remote': is_remote,
+            'description': description,
+            'job_type': job_type,
+            'interval': interval,
+            'min_amount': float(min_amount) if min_amount else None,
+            'max_amount': float(max_amount) if max_amount else None,
+            'currency': currency,
+            'salary_source': salary_source,
+            'date_posted': date_posted.isoformat() if date_posted else None,
+            'emails': emails_list,
+            'job_level': job_level,
+            'company_industry': company_industry,
+            'skills': skills,
+            'experience_range': experience_range,
+            'additional_fields': additional_fields,
+        }
 
-            weekly_hours = request.form.get('weekly_hours')
-            company_profile_id=selected_company['id']
-            company_name=selected_company.get('company_name')
-            role_name=request.form.get('role_name')
-            weekly_hours=int(weekly_hours) if weekly_hours else None
-            work_mode=request.form.get('work_mode')
-            location=request.form.get('location')
-            job_type=request.form.get('job_type')
-            job_description=request.form.get('job_description')
-            application_link=request.form.get('application_link')
-            application_status=application_status
-
-            # Handle lists
-            industry = request.form.get('industry', '')
-            industry_list = [item.strip() for item in industry.split(',') if item.strip()]
-            
-            qualifications = request.form.get('qualifications', '')
-            qualifications_list = [item.strip() for item in qualifications.split(',') if item.strip()]
-            
-            accommodations = request.form.get('accommodations', '')
-            accommodations_list = [item.strip() for item in accommodations.split(',') if item.strip()]
-            
-            application_materials = request.form.get('application_materials', '')
-            materials_list = [item.strip() for item in application_materials.split(',') if item.strip()]
-            
-            # Handle dates
-            application_period_start_fr = request.form.get('application_period_start')
-            if application_period_start_fr:
-              application_period_start = datetime.strptime(
-                application_period_start_fr, '%Y-%m-%d'
-              )
-            else:
-              application_period_start = None
-
-            application_period_end_fr = request.form.get('application_period_end')
-            if application_period_end_fr:
-              application_period_end = datetime.strptime(
-                application_period_end_fr, '%Y-%m-%d'
-              )
-            else:
-              application_period_end = None
-
-            job_data = {
-              'company_profile_id': company_profile_id,
-              'company_name': company_name,
-              'role_name': role_name,
-              'weekly_hours': weekly_hours,
-              'work_mode': work_mode,
-              'location': location,
-              'job_type': job_type,
-              'job_description': job_description,
-              'application_link': application_link,
-              'application_status': application_status,
-              'industry': industry_list,
-              'qualifications': qualifications_list,
-              'accommodations': accommodations_list,
-              'application_materials': materials_list,
-              'application_period_start': application_period_start.isoformat() if application_period_start else None,
-              'application_period_end': application_period_end.isoformat() if application_period_end else None,
-            }
-
-            supabase.table('jobs').insert(job_data).execute()
-
-            flash('Job added successfully!', 'message') 
-            return redirect(url_for('cms.manage_jobs'))
-        except ValueError:
-            flash('Invalid date format. Please use YYYY-MM-DD.', 'warning')
-            return render_template('add_job.html', companies=companies)
-        except Exception as e:
-            print(f"Error adding job: {e}")
-            flash('There was an error adding the job. Please try again.', 'error')
-            return render_template('add_job.html', companies=companies)
-    return render_template('add_job.html', companies=companies)
+        supabase.table('jobs').insert(job_data).execute()
+        flash('Job added successfully!', 'message')
+        return redirect(url_for('cms.manage_jobs'))
+    return render_template('add_or_edit_job.html', companies=companies, job=None)
 
 @cms_bp.route('/manage-companies')
 @sb_login_required

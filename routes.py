@@ -10,7 +10,7 @@ def index():
     if is_authenticated():
         if fetch_user_role(get_access_token()) in ['admin', 'content_manager', 'elevated_content_manager']:
             return redirect(url_for('cms.dashboard'))
-        return redirect(url_for('users.dashboard')) 
+        # return redirect(url_for('users.dashboard')) 
     return render_template('index.html')
 
 @main_bp.route('/notfound')

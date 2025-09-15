@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% block title %}{{ "Edit Job" if job else "Add Job" }} - CareerQuest{% endblock %}
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('cms.static', filename='cms.css') }}">
+{% endblock %}
+{% block content %}
+<div class="card edit-job-card">
+  <div class="card-header">
+    <h2>{{ "Edit Job" if job else "Add New Job" }}</h2>
+    <p>{{ "Update your job listing" if job else "Create a new job listing" }}</p>
+  </div>
+  <div class="card-body">
+    {% block messages %}
+      {% include 'components/messages.html' %}
+    {% endblock %}
+
+    <form class="edit-job-form" method="POST">
+      {% if not job %}
+      <div class="form-group">
+        <label for="company_profile_id">Company</label>
+        <select id="company_profile_id" name="company_profile_id" class="form-control form-select" required>
+          <option value="" disabled selected>Select a company</option>
+          {% for company in companies %}
+            <option value="{{ company.id }}">{{ company.company_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+
+      <div class="form-group">
+        <label for="provided_id">Provided ID</label>
+        <input
+          type="text"
+          id="provided_id"
+          name="provided_id"
+          class="form-control"
+          value="{{ job.provided_id if job }}"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="provider">Provider</label>
+        <select id="provider" name="provider" class="form-control form-select" required>
+          <option value="" disabled {% if not job %}selected{% endif %}>Select provider</option>
+          <option value="linkedin" {% if job and job.provider == 'linkedin' %}selected{% endif %}>LinkedIn</option>
+          <option value="naukri" {% if job and job.provider == 'naukri' %}selected{% endif %}>Naukri</option>
+          <option value="mercuri" {% if job and job.provider == 'mercuri' %}selected{% endif %}>Mercuri</option>
+        </select>
+      </div>
+
+      {% if job %}
+      <div class="form-group">
+        <label for="company_name">Company Name</label>
+        <input
+          type="text"
+          id="company_name"
+          name="company_name"
+          class="form-control"
+          value="{{ job.company_name }}"
+          required
+        />
+      </div>
+      {% endif %}
+
+      <div class="form-group">
+        <label for="role_name">Job Title</label>
+        <input
+          type="text"
+          id="role_name"
+          name="role_name"
+          class="form-control"
+          value="{{ job.role_name if job }}"
+          required
+        />
+      </div>
+
+      <div class="form-row">
+        <div class="form-col">
+          <label for="job_type">Job Type</label>
+          <select id="job_type" name="job_type" class="form-control form-select">
+            <option value="" {% if not job or not job.job_type %}selected{% endif %}></option>
+            <option value="fulltime" {% if job and job.job_type == 'fulltime' %}selected{% endif %}>Full-time</option>
+            <option value="parttime" {% if job and job.job_type == 'parttime' %}selected{% endif %}>Part-time</option>
+            <option value="contract" {% if job and job.job_type == 'contract' %}selected{% endif %}>Contract</option>
+            <option value="internship" {% if job and job.job_type == 'internship' %}selected{% endif %}>Internship</option>
+          </select>
+        </div>
+
+        <div class="form-col">
+          <label for="location">Location</label>
+          <input type="text" id="location" name="location" class="form-control" value="{{ job.location if job }}" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="industry">Industry (comma separated)</label>
+        <input type="text" id="industry" name="industry" class="form-control" value="{{ job.industry|join(', ') if job and job.industry }}" />
+      </div>
+
+      <div class="form-group">
+        <label for="job_url">Job URL</label>
+        <input type="url" id="job_url" name="job_url" class="form-control" value="{{ job.job_url if job }}" />
+      </div>
+
+      <div class="form-group">
+        <label for="is_remote">Is Remote</label>
+        <input type="checkbox" id="is_remote" name="is_remote" {% if job and job.is_remote %}checked{% endif %} />
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" class="form-control" rows="5">{{ job.description if job }}</textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-col">
+          <label for="interval">Salary Interval</label>
+          <select id="interval" name="interval" class="form-control form-select">
+            <option value="" {% if not job or not job.interval %}selected{% endif %}></option>
+            <option value="yearly" {% if job and job.interval == 'yearly' %}selected{% endif %}>Yearly</option>
+            <option value="monthly" {% if job and job.interval == 'monthly' %}selected{% endif %}>Monthly</option>
+            <option value="weekly" {% if job and job.interval == 'weekly' %}selected{% endif %}>Weekly</option>
+            <option value="daily" {% if job and job.interval == 'daily' %}selected{% endif %}>Daily</option>
+            <option value="hourly" {% if job and job.interval == 'hourly' %}selected{% endif %}>Hourly</option>
+          </select>
+        </div>
+        <div class="form-col">
+          <label for="min_amount">Min Amount</label>
+          <input type="number" step="0.01" id="min_amount" name="min_amount" class="form-control" value="{{ job.min_amount if job }}" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-col">
+          <label for="max_amount">Max Amount</label>
+          <input type="number" step="0.01" id="max_amount" name="max_amount" class="form-control" value="{{ job.max_amount if job }}" />
+        </div>
+        <div class="form-col">
+          <label for="currency">Currency</label>
+          <input type="text" id="currency" name="currency" class="form-control" value="{{ job.currency if job }}" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="salary_source">Salary Source</label>
+        <select id="salary_source" name="salary_source" class="form-control form-select">
+          <option value="" {% if not job or not job.salary_source %}selected{% endif %}></option>
+          <option value="direct_data" {% if job and job.salary_source == 'direct_data' %}selected{% endif %}>Direct Data</option>
+          <option value="description" {% if job and job.salary_source == 'description' %}selected{% endif %}>Description</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="date_posted">Date Posted</label>
+        <input type="date" id="date_posted" name="date_posted" class="form-control" value="{{ job.date_posted[:10] if job and job.date_posted }}" />
+      </div>
+
+      <div class="form-group">
+        <label for="emails">Emails (comma separated)</label>
+        <input type="text" id="emails" name="emails" class="form-control" value="{{ job.emails|join(', ') if job and job.emails }}" />
+      </div>
+
+      <!-- Site-specific fields -->
+      <div id="linkedin-fields" class="site-specific-fields" style="display: none;">
+        <h3>LinkedIn Specific Fields</h3>
+        <div class="form-group">
+          <label for="job_level">Job Level</label>
+          <input type="text" id="job_level" name="job_level" class="form-control" value="{{ job.job_level if job }}" />
+        </div>
+        <div class="form-group">
+          <label for="company_industry">Company Industry</label>
+          <input type="text" id="company_industry" name="company_industry" class="form-control" value="{{ job.company_industry if job }}" />
+        </div>
+      </div>
+
+      <div id="naukri-fields" class="site-specific-fields" style="display: none;">
+        <h3>Naukri Specific Fields</h3>
+        <div class="form-group">
+          <label for="skills">Skills</label>
+          <input type="text" id="skills" name="skills" class="form-control" value="{{ job.skills if job }}" />
+        </div>
+        <div class="form-group">
+          <label for="experience_range">Experience Range</label>
+          <input type="text" id="experience_range" name="experience_range" class="form-control" value="{{ job.experience_range if job }}" />
+        </div>
+      </div>
+
+      <div id="mercuri-fields" class="site-specific-fields" style="display: none;">
+        <h3>Mercuri Specific Fields</h3>
+        <div class="form-group">
+          <label for="additional_fields">Additional Fields (JSON)</label>
+          <textarea id="additional_fields" name="additional_fields" class="form-control" rows="3">{{ job.additional_fields|tojson if job and job.additional_fields else '' }}</textarea>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary">{{ "Save Changes" if job else "Add Job" }}</button>
+    </form>
+  </div>
+</div>
+
+<script>
+document.getElementById('provider').addEventListener('change', function() {
+  const provider = this.value;
+  document.querySelectorAll('.site-specific-fields').forEach(field => {
+    field.style.display = 'none';
+  });
+  if (provider) {
+    document.getElementById(provider + '-fields').style.display = 'block';
+  }
+});
+
+// Trigger on page load
+document.getElementById('provider').dispatchEvent(new Event('change'));
+</script>
+
+{% endblock %}

@@ -14,7 +14,11 @@
         <tr>
           <th>Job Title</th>
           <th>Company</th>
+          <th>Provider</th>
+          <th>Location</th>
+          <th>Job Type</th>
           <th>Status</th>
+          <th>Date Posted</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -23,9 +27,13 @@
         <tr>
           <td>{{ job.role_name }}</td>
           <td>{{ job.company_name }}</td>
+          <td>{{ job.provider }}</td>
+          <td>{{ job.location or 'N/A' }}</td>
+          <td>{{ job.job_type or 'N/A' }}</td>
           <td>
             <span class="status-badge status-{{ job.application_status|lower }}">{{ job.application_status }}</span>
           </td>
+          <td>{{ job.date_posted[:10] if job.date_posted else 'N/A' }}</td>
           <td>
             <a href="{{ url_for('cms.edit_job', job_id=job.id) }}" class="btn btn-sm btn-primary">Edit</a>
           </td>
