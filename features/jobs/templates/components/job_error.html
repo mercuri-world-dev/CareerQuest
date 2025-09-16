@@ -1,8 +1,46 @@
-<div class="job-error-card card">
-  <div class="job-error-header">
-    <h3>An error occurred</h3>
+<article class="job-card job-error-card" role="article" aria-labelledby="error-title">
+  <div class="job-card-header error-header">
+    <div class="company-logo" aria-hidden="true">
+      <div class="logo-placeholder error-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+      </div>
+    </div>
+    <div class="job-header-info">
+      <h3 class="job-company-name error-title" id="error-title">An error occurred</h3>
+      <div class="job-location error-subtitle" aria-label="Error details">
+        <svg class="location-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        <span>Unable to load job data</span>
+      </div>
+    </div>
   </div>
-  <div class="job-error-body">
-    <p>{{ msg }}</p>
+
+  <div class="job-card-body">
+    <div class="job-details">
+      <div class="job-description error-message">
+        <strong>Error Details:</strong>
+        <span class="description-text">{{ msg }}</span>
+      </div>
+    </div>
   </div>
-</div>
+
+  <div class="job-card-footer error-footer">
+    <div class="job-rate">
+      <svg class="clock-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M12 2v6l4 2"></path>
+        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+      </svg>
+      <span class="rate-text">Try Again</span>
+    </div>
+    <button class="visit-btn" type="button" onclick="window.location.reload()" aria-label="Refresh page to try again">
+      Retry
+    </button>
+  </div>
+</article>

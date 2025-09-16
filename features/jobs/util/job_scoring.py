@@ -24,9 +24,7 @@ def calculate_jobs_compatibility(jobs: list[Job], user_profile: UserProfile) -> 
                 **job.__dict__,
                 compatibility_score=compatibility_result.data
             )
-            jobs_with_compatibility.append(Result[JobWithCompatibility](success=True, data=job_with_compatibility))
-        else:
-            jobs_with_compatibility.append(Result[JobWithCompatibility](success=False, error=compatibility_result.error))
+            jobs_with_compatibility.append(job_with_compatibility)
     return jobs_with_compatibility
 
 def calculate_job_compatibility(job: Job, user_profile: UserProfile) -> Result[float]:

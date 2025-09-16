@@ -176,7 +176,7 @@ class Job(ABC):
       company_name=data['company'],
       role_name=data['title'],
       industry=data.get('industry'),
-      job_url=data.get('job_url_direct', data.get('job_url', '')),
+      job_url=data.get('job_url', data.get('job_url', '')),
       location=data.get('location', ''),
       is_remote=data.get('is_remote', False),
       description=data.get('description', ''),

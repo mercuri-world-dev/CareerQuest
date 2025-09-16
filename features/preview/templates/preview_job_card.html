@@ -1,55 +1,103 @@
 <article class="job-card" role="article" aria-labelledby="job-title-{{ job.id }}">
   <div class="job-card-header">
     <div class="company-logo" aria-hidden="true">
-      <div class="logo-placeholder"></div>
+      {% if job.company_logo %}
+        <img src="{{ job.company_logo }}" alt="{{ job.company_name }} logo" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
+      {% else %}
+        <div class="logo-placeholder"></div>
+      {% endif %}
     </div>
     <div class="job-header-info">
-      <h3 class="job-company-name" id="job-title-{{ job.id }}">{{ job.company_name or 'Company Name' }}</h3>
+      <h3 class="job-company-name" id="job-title-{{ job.id }}">{{ job.role_name or 'Job Title Not Provided' }}{% if job.company_name %} ({{job.company_name}}){% endif %}</h3>
+      {% if job.location %}
       <div class="job-location" aria-label="Job location">
         <svg class="location-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
           <circle cx="12" cy="10" r="3"></circle>
         </svg>
-        <span>{{ job.location or 'location' }}</span>
+        <span>{{ job.location }}</span>
       </div>
+      {% endif %}
     </div>
   </div>
 
   <div class="job-card-body">
     <div class="job-details">
+      {% if job.industry %}
       <div class="job-industry">
-        <strong>industry:</strong> <span>{{ job.industry or 'sports apparel' }}</span>
+        <strong>Industry:</strong> <span>{{ job.industry }}</span>
       </div>
+      {% endif %}
+
+      {% if job.description %}
       <div class="job-description">
-        <strong>description:</strong>
-        {% if job.description %}
-          <span class="description-text">{{ job.description[:50] }}{% if job.description|length > 50 %}...{% endif %}</span>
-          {% if job.description|length > 50 %}
-            <button class="read-more-btn" type="button" aria-expanded="false" aria-controls="full-desc-{{ job.id }}">Read more</button>
-            <span class="full-description" id="full-desc-{{ job.id }}" hidden>{{ job.description }}</span>
-          {% endif %}
+        <strong>Description:</strong>
+        {% if job.description|length > 100 %}
+          <span class="description-text">{{ job.description[:100] }}...</span>
+          <button class="read-more-btn" type="button" aria-expanded="false" aria-controls="full-desc-{{ job.id }}">Read more</button>
+          <span class="full-description" id="full-desc-{{ job.id }}" hidden>{{ job.description }}</span>
         {% else %}
-          <span>Lorem ipsum dolor sit amet... <button class="read-more-btn" type="button">Read more</button></span>
+          <span class="description-text">{{ job.description }}</span>
         {% endif %}
       </div>
+      {% endif %}
+
+      <div class="job-type">
+        <strong>Job Type:</strong> <span>{% if job.job_type %}Full Time{%else%}Part Time{% endif %}</span>
+      </div>
+      
+
+      {% if job.experience_range %}
+      <div class="job-experience">
+        <strong>Experience:</strong> <span>{{ job.experience_range }}</span>
+      </div>
+      {% endif %}
+
+      {% if job.skills %}
+      <div class="job-skills">
+        <strong>Skills:</strong> <span>{{ job.skills }}</span>
+      </div>
+      {% endif %}
     </div>
 
+    {% if job.date_posted %}
     <div class="application-period">
-      <strong>Application Period:</strong>
+      <strong>Date Posted:</strong>
       <div class="date-range">
-        <span class="date-badge">{{ '2025/06/02' }}</span>
-        <span class="date-separator">-</span>
-        <span class="date-badge">{{ '2025/09/19' }}</span>
+        <span class="date-badge">
+          {% if job.date_posted %}
+            {% if job.date_posted is number %}
+              {{ (job.date_posted / 1000) | strftime('%Y-%m-%d') }}
+            {% else %}
+              {{ job.date_posted }}
+            {% endif %}
+          {% else %}
+            Not Provided
+          {% endif %}
+        </span>
       </div>
     </div>
+    {% endif %}
+
+    {% if job.job_function.min_amount and job.job_function.max_amount %}
+    <div class="job-salary">
+      <strong>Salary Range:</strong>
+      <div class="salary-range">
+        <span class="salary-badge">
+          {% if job.job_function.currency %}{{ job.job_function.currency }} {% endif %}
+          {{ job.job_function.min_amount | int }}
+          -
+          {{ job.max_amount | int }}
+          {% if job.job_function.interval %} per {{ job.job_function.interval }}{% endif %}
+        </span>
+      </div>
+    </div>
+    {% endif %}
 
     <div class="job-tags" role="list" aria-label="Job requirements and benefits">
       {% if job.is_remote %}
         <span class="job-tag" role="listitem">Remote</span>
       {% endif %}
-      <span class="job-tag" role="listitem">Flexible Hours</span>
-      <span class="job-tag" role="listitem">Cover Letter</span>
-      <span class="job-tag job-tag-more" role="listitem">{{ '3' }}</span>
     </div>
   </div>
 
@@ -59,20 +107,27 @@
         <circle cx="12" cy="12" r="10"></circle>
         <polyline points="12,6 12,12 16,14"></polyline>
       </svg>
-      <span class="rate-amount">{{ '20' }}</span>
-      <span class="rate-period">W/HR</span>
+      <span class="rate-amount">
+        {% if job.job_type %}
+          40
+        {% else %}
+          20
+        {% endif %}
+        W/HR
+      </span>
     </div>
-    <a href="{{ job.job_url }}">
-      <button class="visit-btn" type="button" aria-label="Visit job posting for {{ job.company_name }}">
+    {% if job.job_url %}
+    <a href="{{ job.job_url }}" target="_blank" rel="noopener">
+      <button class="visit-btn" type="button" aria-label="Visit job posting for {{ job.role_name or 'this position' }}">
         Visit
       </button>
     </a>
+    {% endif %}
   </div>
 </article>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  // Handle read more functionality
   document.querySelectorAll('.read-more-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
       const fullDesc = this.nextElementSibling;
@@ -92,14 +147,12 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   });
 
-  // Handle visit button clicks
   document.querySelectorAll('.visit-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
       const jobCard = this.closest('.job-card');
       const jobId = jobCard.querySelector('[id^="job-title-"]')?.id?.replace('job-title-', '');
       
       if (jobId) {
-        // Track job click
         fetch('/api/job_click', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},

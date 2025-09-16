@@ -19,7 +19,8 @@ def get_rendered_job_cards(include_compatibility=False, include_factors=False):
     if include_factors or include_compatibility:
         render_jobs = []
         for job in jobs:
-            render_jobs.append(render_template('components/job_card.html', job=job))
+            if job.is_success():
+                render_jobs.append(render_template('components/job_card.html', job=job.data))
         return render_jobs
     else:
         return [render_template('components/job_card.html', job=job, include_compatibility=include_compatibility) for job in jobs]
@@ -28,6 +29,7 @@ def get_rendered_job_cards(include_compatibility=False, include_factors=False):
 @sb_login_required
 def all_jobs():
     include_compatibility = request.args.get('include_compatibility', 'false').lower() == 'true'
+    print(include_compatibility)
     rendered_jobs = get_rendered_job_cards(include_compatibility=include_compatibility)
     access_token = get_access_token()
     has_profile = check_has_profile(access_token) if access_token else False
@@ -67,3 +69,7 @@ def recommended_jobs():
         'recommended_jobs.html',
         rendered_jobs=rendered_jobs
     )
+    
+@jobs_bp.route('/about')
+def about_jobs():
+    return render_template('about_jobs.html')

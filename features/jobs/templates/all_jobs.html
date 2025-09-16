@@ -1,77 +1,158 @@
-{% extends "base.html" %}
+{% extends "newbase.html" %}
 {% block head %}
   <link rel="stylesheet" href="{{ url_for('jobs.static', filename='jobs.css') }}">
 {% endblock %}
-{% block title %} All Jobs - CareerQuest {% endblock %}
+{% block title %}All Jobs - CareerQuest{% endblock %}
+
 {% block content %}
-  <div class="card">
-    <div class="card-header">
-      <h2>All Available Jobs</h2>
-      <p>Browse through our complete job listings</p>
+<div class="jobs-header">
+  <div class="jobs-header-content">
+    <div class="jobs-title-section">
+      <h1 class="jobs-title">All Available Jobs</h1>
+      <p class="jobs-subtitle">Browse through our complete job listings</p>
     </div>
-    <div class="card-body">
-      <form id="jobFilterForm" class="form-group" style="margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap;">
-        <input type="text" name="company_name" class="form-control" placeholder="Company Name" />
-        <input type="text" name="role_name" class="form-control" placeholder="Job Title" />
-        <select name="job_type" class="form-control form-select">
-          <option value="">Any Type</option>
-          <option value="Full-time">Full-time</option>
-          <option value="Part-time">Part-time</option>
-          <option value="Contract">Contract</option>
-          <option value="Internship">Internship</option>
-          <option value="Temporary">Temporary</option>
-        </select>
-        <select name="work_mode" class="form-control form-select">
-          <option value="">Any Mode</option>
-          <option value="remote">Remote</option>
-          <option value="hybrid">Hybrid</option>
-          <option value="in-person">In-person</option>
-        </select>
-        <input type="text" name="location" class="form-control" placeholder="Location" />
-        <input type="text" name="industry" class="form-control" placeholder="Industry (comma separated)" />
-        <select name="application_status" class="form-control form-select">
-          <option value="">Any Status</option>
-          <option value="Open">Open</option>
-          <option value="Closed">Closed</option>
-        </select>
-        {% if has_profile %}
-        <div class="checkbox-item" style="display: inline-block; margin-left: 1rem;">
-          <label class="checkbox-label" for="includecompatibility">
-            <input type="checkbox" id="includecompatibility" name="includecompatibility">
-            <span class="styled-checkbox"></span>
-            Include Compatibility
-          </label>
+    
+    <div class="jobs-filters-section">
+      <h2 class="filters-title">Filters:</h2>
+      <form id="jobFilterForm" method="get" class="filters-form" role="search" aria-label="Job search filters">
+        <div class="filters-row">
+          <div class="filter-group">
+            <label for="company_name" class="sr-only">Company Name</label>
+            <input 
+              type="text" 
+              class="filter-input" 
+              id="company_name" 
+              name="company_name" 
+              placeholder="Company Name"
+              value="{{ request.args.get('company_name', '') }}"
+              aria-describedby="company-help">
+          </div>
+          
+          <div class="filter-group">
+            <label for="role_name" class="sr-only">Job Title</label>
+            <input 
+              type="text" 
+              class="filter-input" 
+              id="role_name" 
+              name="role_name" 
+              placeholder="Job Title"
+              value="{{ request.args.get('role_name', '') }}"
+              aria-describedby="title-help">
+          </div>
+          
+          <div class="filter-group">
+            <label for="location" class="sr-only">Location</label>
+            <input 
+              type="text" 
+              class="filter-input" 
+              id="location" 
+              name="location" 
+              placeholder="Location"
+              value="{{ request.args.get('location', '') }}"
+              aria-describedby="location-help">
+          </div>
+          
+          <div class="filter-group">
+            <label for="industry" class="sr-only">Industry</label>
+            <input 
+              type="text" 
+              class="filter-input" 
+              id="industry" 
+              name="industry" 
+              placeholder="Industry (comma separated)"
+              value="{{ request.args.get('industry', '') }}"
+              aria-describedby="industry-help">
+          </div>
         </div>
-        {% else %}
-        <div>
-          <p>You must complete your profile to filter jobs by compatibility.</p>
-          <a href="{{ url_for('users.profile') }}" class="btn btn-primary">Complete Profile</a>
-        </div>
-        {% endif %}
-        <button type="submit" class="btn btn-primary">Filter</button>
-        <button type="reset" class="btn btn-secondary" onclick="clearFilterForm()">Reset</button>
-      </form>
-      <div id="jobsLoading" class="loading" style="display: none">
-        <div class="loading-spinner"></div>
-        <p>Loading jobs...</p>
-      </div>
-
-      <div id="jobsError" class="error" style="display: none"></div>
-
-      <div id="jobsResults" class="results-container">
-        {% if rendered_jobs %}
-          <h3>Results</h3>
-          {% for job in rendered_jobs %}
-            <div class="job-card">
-              {{ job | safe }}
+        
+        <div class="filters-row">
+          <div class="filter-group">
+            <label for="job_type" class="sr-only">Job Type</label>
+            <select class="filter-select" id="job_type" name="job_type" aria-describedby="type-help">
+              <option value="">Any Type</option>
+              <option value="Full-time" {% if request.args.get('job_type') == 'Full-time' %}selected{% endif %}>Full-time</option>
+              <option value="Part-time" {% if request.args.get('job_type') == 'Part-time' %}selected{% endif %}>Part-time</option>
+              <option value="Contract" {% if request.args.get('job_type') == 'Contract' %}selected{% endif %}>Contract</option>
+              <option value="Internship" {% if request.args.get('job_type') == 'Internship' %}selected{% endif %}>Internship</option>
+              <option value="Temporary" {% if request.args.get('job_type') == 'Temporary' %}selected{% endif %}>Temporary</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="work_mode" class="sr-only">Work Mode</label>
+            <select class="filter-select" id="work_mode" name="work_mode" aria-describedby="mode-help">
+              <option value="">Any Mode</option>
+              <option value="remote" {% if request.args.get('work_mode') == 'remote' %}selected{% endif %}>Remote</option>
+              <option value="hybrid" {% if request.args.get('work_mode') == 'hybrid' %}selected{% endif %}>Hybrid</option>
+              <option value="in-person" {% if request.args.get('work_mode') == 'in-person' %}selected{% endif %}>In-person</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="application_status" class="sr-only">Application Status</label>
+            <select class="filter-select" id="application_status" name="application_status" aria-describedby="status-help">
+              <option value="">Any Status</option>
+              <option value="Open" {% if request.args.get('application_status') == 'Open' %}selected{% endif %}>Open</option>
+              <option value="Closed" {% if request.args.get('application_status') == 'Closed' %}selected{% endif %}>Closed</option>
+            </select>
+          </div>
+          
+          {% if has_profile %}
+          <div class="filter-group">
+            <div class="checkbox-item">
+              <label class="checkbox-label" for="includecompatibility">
+                <input type="checkbox" id="includecompatibility" name="includecompatibility" 
+                       {% if request.args.get('includecompatibility') %}checked{% endif %}>
+                <span class="styled-checkbox"></span>
+                Include Compatibility
+              </label>
             </div>
-          {% endfor %}
-        {% else %}
-          <p>No jobs found.</p>
+          </div>
+          {% endif %}
+          
+          <div class="filter-actions">
+            <button type="submit" class="filter-btn" aria-label="Apply filters">Filter</button>
+            <button type="button" class="filter-btn btn-secondary" onclick="clearFilterForm()" aria-label="Reset all filters">Reset</button>
+          </div>
+        </div>
+        
+        {% if not has_profile %}
+        <div class="filters-row">
+          <div class="filter-group">
+            <p style="color: #2c3e50; margin: 0; font-size: 0.9rem;">You must complete your profile to filter jobs by compatibility.</p>
+            <a href="{{ url_for('users.profile') }}" class="btn btn-primary" style="margin-top: 0.5rem;">Complete Profile</a>
+          </div>
+        </div>
         {% endif %}
-      </div>
+      </form>
     </div>
   </div>
+</div>
+
+<div class="jobs-content">
+    <h2 class="jobs-content-title">Job Results:</h2>
+
+    <div id="jobsLoading" class="loading" style="display: none">
+      <div class="loading-spinner"></div>
+      <p>Loading jobs...</p>
+    </div>
+
+    <div id="jobsError" class="error" style="display: none"></div>
+
+    <div id="jobsResults" class="jobs-list" role="main" aria-label="Job listings">
+        {% if rendered_jobs %}
+            {% for job in rendered_jobs %}
+              <div class="job-card">
+                {{ job | safe }}
+              </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-jobs-message" role="status">
+                <p>No jobs found.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}
 {% block scripts %}
   <script>

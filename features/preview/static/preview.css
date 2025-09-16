@@ -1,6 +1,7 @@
 body {
   font-family: 'AlteHaasGroteskRegular', Arial, sans-serif;
   margin: 2rem;
+  background: linear-gradient(0deg, #A989D0, 47%, #D6E9E9 100%);
 }
 
 /* Jobs Header Styles */
@@ -403,6 +404,124 @@ body {
   min-width: 28px;
   text-align: center;
   padding: 0.4rem 0.5rem;
+}
+
+/* Job Card Footer */
+.job-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: #4fd1c7;
+  color: #065f46;
+}
+
+.job-rate {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.clock-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.rate-amount {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.rate-period {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.visit-btn {
+  background: white;
+  color: #065f46;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.visit-btn:hover {
+  background: #f0fdfa;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.visit-btn:active {
+  transform: translateY(0);
+}
+
+/* Additional styles for new fields */
+.job-company {
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.job-company strong {
+  color: #4a5568;
+  font-weight: 600;
+}
+
+.job-company span {
+  color: #718096;
+}
+
+.job-type,
+.job-experience,
+.job-skills {
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.job-type strong,
+.job-experience strong,
+.job-skills strong {
+  color: #4a5568;
+  font-weight: 600;
+}
+
+.job-type span,
+.job-experience span,
+.job-skills span {
+  color: #718096;
+}
+
+.job-salary {
+  margin-bottom: 1.25rem;
+}
+
+.job-salary strong {
+  display: block;
+  color: #4a5568;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.salary-range {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.salary-badge {
+  background: #e2e8f0;
+  color: #4a5568;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
 }
 
 /* Job Card Footer */

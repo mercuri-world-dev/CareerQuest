@@ -8,7 +8,7 @@
 
 {% block content %}
 <div class="page-container">
-  <nav class="nav-container">
+  <!-- <nav class="nav-container">
     <liquid-navbar
       items='[{"label":"Home","href":"/","icon":"/static/assets/home.svg"}]'
       logo="/static/assets/cq_logo_w_text.svg"
@@ -17,12 +17,12 @@
       height="800"
       style="--navbar-background: linear-gradient(180deg, #20316D 0%, #442179 100%); --nav-link-color: #fff;"
     ></liquid-navbar>
-  </nav>
+  </nav> -->
   <div class="main-page-container">
     <header class="landing-header">
       <div class="landing-header-body">
         <h1>
-          <img src="/static/assets/compass-logo.svg" alt="CareerQuest Logo" style="vertical-align: middle; border-radius: 12px;">
+          <img src="/static/assets/gradient-compass-logo.svg" alt="CareerQuest Logo" style="vertical-align: middle; border-radius: 12px;">
           Welcome to <span>CareerQuest!</span>
         </h1>
         <p class="tagline">
@@ -41,7 +41,7 @@
             <h2>Find the job that works for you.</h2>
             <p>Our program is designed to help identify suitable paid employment for people living with mental illness, whether you are currently unemployed or looking to switch to a more accommodating job. Our program is completely free and available to anyone who is struggling with mental health, whether clinically diagnosed or not.</p>
           </div>
-          <a href="#" class="btn-learn"> {% include '/components/svg/arrow-circle.html' %} Learn more</a>
+          <!-- <a href="#" class="btn-learn"> {% include '/components/svg/arrow-circle.html' %} Learn more</a> -->
         </div>
         <div class="hero-img-panel">
           <div class="hero-img-main-wrap">
@@ -60,19 +60,19 @@
         <div class="profile-card">
           <h3>Create your Profile!</h3>
           <p>We understand that mental illness can often make it difficult to identify and apply to accommodating jobs. Our completely free tools were designed by experts to make the job search process convenient and equitable.</p>
-          <a href="#" class="profile-btn"> {% include '/components/svg/invert-arrow-circle.html' %} Let's do it!</a> 
+          <a href="{{ url_for('users.profile') }}" class="profile-btn"> {% include '/components/svg/invert-arrow-circle.html' %} Let's do it!</a> 
         </div>
         <div class="get-started-card">
           <div class="get-started-card-body">
             <h3 title="Job Recommendations">Job Recommendations</h3>
           </div>
-          <a href="#" class="card-link">Read More{% with stroke='#20316D' %}{% include '/components/svg/arrow-circle.html' %}{% endwith %}</a> 
+          <a href="{{url_for('preview.preview_jobs')}}" class="card-link">Read More{% with stroke='#20316D' %}{% include '/components/svg/arrow-circle.html' %}{% endwith %}</a> 
         </div>
         <div class="get-started-card">
           <div class="get-started-card-body">
             <h3 title="Browse All Jobs!">Browse All Jobs!</h3>
           </div>
-          <a href="#" class="card-link">Read More{% with stroke='#20316D' %}{% include '/components/svg/arrow-circle.html' %}{% endwith %}</a>
+          <a href="{{url_for('preview.preview_jobs')}}" class="card-link">Read More{% with stroke='#20316D' %}{% include '/components/svg/arrow-circle.html' %}{% endwith %}</a>
         </div>
       </div>
     </section>
@@ -83,5 +83,5 @@
 
 {% block scripts %}
   <script src="{{ url_for('static', filename='effects/cardFlyin.js') }}"></script>
-  <script type="module" src="{{ url_for('static', filename='components/liquidnav.js') }}"></script>
+  <!-- <script type="module" src="{{ url_for('static', filename='components/liquidnav.js') }}"></script> -->
 {% endblock %}

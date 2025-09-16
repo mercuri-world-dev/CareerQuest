@@ -41,3 +41,4 @@ class JobType(Enum):
   @classmethod
   def from_string(cls, job_type: str):
     return cls[job_type.upper()] if job_type.upper() in cls.__members__ else None
+  
