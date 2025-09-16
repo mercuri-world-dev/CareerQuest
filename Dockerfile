@@ -42,4 +42,4 @@ USER flaskuser
 EXPOSE 5001
 
 # Start with gunicorn for production
-CMD ["gunicorn", "--bind", "0.0.0.0:5001", "--workers", "4", "--threads", "2", "run:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5001", "--workers", "1", "--threads", "1", "run:app"]
