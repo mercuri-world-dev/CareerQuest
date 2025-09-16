@@ -28,9 +28,9 @@ def create_app(config_object=None):
     from features.auth.routes import auth_bp
     from features.admin.routes import admin_bp
     from features.cms.routes import cms_bp
-    if (os.environ.get('FLASK_ENV') == 'development'):
-        from debug.routes import debug_bp
-        app.register_blueprint(debug_bp, url_prefix='/debug')
+    # if (os.environ.get('FLASK_ENV') == 'development'):
+    #     from debug.routes import debug_bp
+    #     app.register_blueprint(debug_bp, url_prefix='/debug')
     if (os.environ.get('ENABLE_PREVIEW_FEATURES') == 'True'):
         from features.preview.routes import preview_bp
         app.register_blueprint(preview_bp, url_prefix='/preview')
