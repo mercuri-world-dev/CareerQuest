@@ -1,4 +1,10 @@
 {
+  "name": "careerquest-root",
+  "private": true,
+  "scripts": {
+    "install-static": "cd static && npm ci",
+    "postinstall": "npm run install-static"
+  },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.11",
     "tailwindcss": "^4.1.11"
