@@ -6,7 +6,7 @@ from util.decorators import sb_login_required
 
 user_bp = Blueprint('users', __name__, template_folder='templates', static_folder='static', static_url_path='/static/user')
 
-@user_bp.route('/dashboard')
+# @user_bp.route('/dashboard')
 @sb_login_required
 def dashboard():
     return render_template('dashboard.html')
@@ -21,7 +21,8 @@ def profile():
         if 'PGRST301' in str(e):
             return redirect(url_for('main.session_expired'))
         flash('There was an error fetching your profile. Please try again.', 'error')
-        return redirect(url_for('users.dashboard'))
+        return redirect('/')
+        # return redirect(url_for('users.dashboard'))
     profile = profile_resp.data[0] if profile_resp.data else None
     if request.method == 'POST':
         try:
@@ -51,7 +52,8 @@ def profile():
             except Exception as e:
                 print(f"Error refreshing access token: {e}")
                 flash('There was an error refreshing your session. Please log in again.', 'error')
-                return redirect(url_for('users.dashboard'))
+                return redirect('/')
+                # return redirect(url_for('users.dashboard'))
             return render_template('profile.html', profile=resp.data[0] if resp.data else None)
         except Exception as e:
             print(f"Error updating user profile: {e}")

@@ -1,17 +1,24 @@
-{% extends "base.html" %}
+{% extends "newbase.html" %}
 {% block title %}My Profile - CareerQuest{% endblock %}
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('users.static', filename='user.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="card profile-card">
-    <div class="card-header">
-        <h2>My Profile</h2>
-        <p>Update your profile details to get better job recommendations</p>
-    </div>
-    <div class="card-body">
-        <form class="profile-form" method="POST" action="{{ url_for('users.profile') }}">
+{% block messages %}
+{% endblock %}
+<div class="profile-container">
+    <div class="profile-card">
+        <div class="profile-header">
+            <h1 class="profile-title">My Profile</h1>
+            <p class="profile-subtitle">Update your profile details to get better job recommendations</p>
+        </div>
+        <div class="profile-body">
+            <div class="profile-messages">
+                {% include 'components/messages.html' %}
+            </div>
+            
+            <form class="profile-form" method="POST" action="{{ url_for('users.profile') }}">
             
             <div class="form-row">
                 <div class="form-col">
@@ -75,10 +82,11 @@
                 </div>
             </div>
             
-            <div class="form-group">
+            <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Save Profile</button>
             </div>
         </form>
+        </div>
     </div>
 </div>
 {% endblock %}
