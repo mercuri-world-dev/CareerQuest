@@ -14,6 +14,11 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update && apt-get install -y curl ca-certificates gnupg \
+ && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+ && apt-get install -y nodejs \
+ && cd /app/static && npm ci --production
+
 # Create non-root user for security
 RUN groupadd -r flaskuser && useradd -r -g flaskuser flaskuser
 
