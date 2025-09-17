@@ -1,5 +1,17 @@
 /* User Profile Page Styling */
-/* Matches the auth page design system */
+
+.nav-container {
+  flex-grow: 1;
+  min-height: 100%;
+  z-index: 100;
+}
+
+.main-page-container {
+  margin: 0 6% 0 18%;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
 
 /* Profile Container */
 .profile-container {

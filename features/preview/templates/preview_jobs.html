@@ -4,6 +4,17 @@
   <title>Preview Jobs - CareerQuest</title>
 </head>
 {% block content %}
+<nav class="nav-container">
+  <liquid-navbar
+    items='[{"label":"About","href":"/","icon":"/static/assets/about.svg"}, {"label":"Profile","href":"/profile","icon":"/static/assets/profile.svg"}, {"label":"Jobs","href":"/preview/jobs","icon":"/static/assets/jobs.svg"}]'
+    logo="/static/assets/cq_logo_w_text.svg"
+    trailing='{"label":"Logout","href":"{{ url_for("auth.logout") }}","icon":"/static/assets/logout.svg"}'
+    width="200"
+    height="600"
+    style="--navbar-background: linear-gradient(180deg, #20316D 0%, #442179 100%); --nav-link-color: #fff;"
+  ></liquid-navbar>
+</nav>
+<div class="main-page-container">
 <div class="jobs-header">
   <div class="jobs-header-content">
     <div class="jobs-title-section">
@@ -153,4 +164,8 @@
         </div>
     {% endif %}
 </div>
+</div>
+{% endblock %}
+{% block scripts %}
+  <script type="module" src="{{ url_for('static', filename='components/liquidnav.js') }}"></script>
 {% endblock %}

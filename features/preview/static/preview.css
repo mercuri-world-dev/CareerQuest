@@ -2,6 +2,23 @@ body {
   font-family: 'AlteHaasGroteskRegular', Arial, sans-serif;
   margin: 2rem;
   background: linear-gradient(0deg, #A989D0, 47%, #D6E9E9 100%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  display: flex;
+  flex-direction: row;
+}
+
+.nav-container {
+  flex-grow: 1;
+  min-height: 100%;
+  z-index: 100;
+}
+
+.main-page-container {
+  margin: 0 6% 0 18%;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
 }
 
 /* Jobs Header Styles */
@@ -202,9 +219,8 @@ body {
 }
 
 .jobs-list {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
   align-items: stretch;
 }
@@ -238,7 +254,7 @@ body {
   border: 1px solid #e5e7eb;
   transition: all 0.2s ease;
   overflow: hidden;
-  max-width: 400px;
+  max-width: 350px;
   margin: 0;
   display: flex;
   flex-direction: column;
